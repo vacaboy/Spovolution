@@ -83,16 +83,16 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        if event.type == 2: #parece que o event.type de "KEYDOWN" é 2...
+        if event.type == pygame.KEYDOWN: #parece que o event.type de "KEYDOWN" é 2...
             print()
             print(event.key)
-            if event.key == 110: #a tecla "n" é o número 110
+            if event.key == pygame.K_n: #a tecla "n" é o número 110
                 tavos = player(10, 10)
                 player.draw(tavos)
-            if event.key == 114: #a tecla "r" é o numero 114
+            if event.key == pygame.K_r: #a tecla "r" é o numero 114
                 a = player(R.randint(0,1000), R.randint(0, 600))
                 player.draw(a)
-            if event.key == 116: #a tecla "t" é o numero 116
+            if event.key == pygame.K_t: #a tecla "t" é o numero 116
                 Tackle(robly18)
     print(robly18.HP)
     pygame.display.update()
