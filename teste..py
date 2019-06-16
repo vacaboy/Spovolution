@@ -49,16 +49,145 @@ class player(object):
         pygame.display.update()
 
 
+class chooseability(object):
+    def __init__(self):
+        self.ability = 0
+        self.name = "choose ability"
+        self.time = 30
+        self.time1 = 30
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+
+    def clock(self):
+        #texttime = fonttime.render(self.name + str(time), 1, (255,0,0))
+        self.time1 = self.time1 - 0.1
+        self.time = math.ceil(self.time1)
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        for i in range(10):
+            pygame.time.delay(10)
+
+    def draw(self):
+
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+
+        #ability tab: 
+        pygame.draw.rect(screen, (255,246,143),(0 ,0 ,300 , height))
+
+        #primeira abilidade, por enquanto, tackle:
+        pygame.draw.rect(screen, (199,97,20),(10,10, 280, 30))
+        screen.blit(texttackle,(100,15))
+                     #
+        
+        screen.blit(self.texttime, (300, 10))
+        screen.blit(textround, (300, 30))
+        for player in players:
+            player.draw()
+            
+        pygame.display.update()
+
+    
+
+    def receiveevent(self, event):
+        mouseposition = event.pos
+        print(mouseposition)
+        if 10 <= mouseposition[0]  <= 290 and 10 <= mouseposition[1] <= 40: #clicou en tackle:
+            print("aqui")
+            self.ability = "Tackle"
+            #Tackle(choosetarget(1)[0])
+            #decided = True
+            roundphase = choosetarget(self.ability)
+
+class choosetarget(object):
+    def __init__(self, ability):
+        self.target = craos
+        self.ability = ability
+        self.name = "choose target"
+        self.time = 30
+        self.time1 = 30
+        self.texttime = fonttime.render(self.name + str(self.time), 1, (255,0,0))
+
+    def clock(self):
+        #texttime = fonttime.render(self.name + str(time), 1, (255,0,0))
+        self.time1 = self.time1 - 0.1
+        self.time = math.ceil(self.time1)
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        for i in range(10):
+            pygame.time.delay(10)
+
+    def draw(self):
+
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+
+        #ability tab: 
+        pygame.draw.rect(screen, (255,246,143),(0 ,0 ,300 , height))
+
+        #primeira abilidade, por enquanto, tackle:
+        pygame.draw.rect(screen, (199,97,20),(10,10, 280, 30))
+        screen.blit(texttackle,(100,15))
+                     #
+        
+        screen.blit(self.texttime, (300, 10))
+        screen.blit(textround, (300, 30))
+        for player in players:
+            player.draw()
+            
+        pygame.display.update()
+
+    def receiveevent(self, event):
+        for player in players:
+            print(player.pos)
+            if ((mouseposition[0] - player.pos[0])**2 + (mouseposition[1] - player.pos[1])**2) <= 50**2:
+                self.target = player
+                roundphase = calculateeffects(self.ability, self.player)
+
+class calculateeffects(object):
+    def __init__(self, ability, target):
+        self.ability = ability
+        self.target = target
+        self.name = "calculating effects"
+        self.time = 30
+        self.time1 = 30
+        self.texttime = fonttime.render(self.name + str(self.time), 1, (255,0,0))
+
+    def clock(self):
+        #texttime = fonttime.render(self.name + str(time), 1, (255,0,0))
+        self.time1 = self.time1 - 0.1
+        self.time = math.ceil(self.time1)
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        for i in range(10):
+            pygame.time.delay(10)
+
+    def draw(self):
+
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+
+        #ability tab: 
+        pygame.draw.rect(screen, (255,246,143),(0 ,0 ,300 , height))
+
+        #primeira abilidade, por enquanto, tackle:
+        pygame.draw.rect(screen, (199,97,20),(10,10, 280, 30))
+        screen.blit(texttackle,(100,15))
+                     #
+        
+        screen.blit(self.texttime, (300, 10))
+        screen.blit(textround, (300, 30))
+        for player in players:
+            player.draw()
+            
+        pygame.display.update()
+
+    def effect(self):
+        if self.ability == "Tackle":
+            self.target.HP -= 1
+        
+        
+
+
 class A(object): #A é suposto ser "abilities" mas é para ser mais facil de escrever
     def __init__(self, phase, priority):
         self.phase = phase
         self.priority = priority
 
 
-time = 30
-
-time1 = 30        
-        
 
 def refresh():
     pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
@@ -89,34 +218,6 @@ def firstdraw():
         player.draw()
     pygame.display.update()
 
-def choosetarget(n):
-    p = []
-    while n>0:        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1: #nao sei como ver se se clicou no lado esquerdo ou direito do rato... o lado esquerdo é 1 e o lado esquerdo é 3
-                    mouseposition = event.pos
-                    print(mouseposition)
-
-                    for player in players:
-                        print(player.pos)
-                        if ((mouseposition[0] - player.pos[0])**2 + (mouseposition[1] - player.pos[1])**2) <= 50**2:
-                            p.append(player)
-                            n -= 1
-        #if  time >= 0:
-         #   texttime = fonttime.render("Beginning Of Round:" + str(time), 1, (255,0,0))
-          #  time1 = time1 - 0.1
-           # time = math.ceil(time1)
-        #else:
-         #   p = []
-          #  n = 0
-        screen.blit(textchoosetarget, (450, 300))
-        refresh()
-    return p
-
 def Tackle(target):
     target.HP -= 1
 
@@ -145,6 +246,11 @@ tomis = player(670, 500, "tomis")
 player.draw(tomis)
 
 
+#global time
+#time = 30
+#global time1
+#time1 = 30        
+        
 BeginningOfRound = True
 DuringRound = False
 EndOfRound = False
@@ -154,26 +260,30 @@ roundcount = 1
 textround = fonttime.render("round:" + str(roundcount), 1, (0, 0, 255))
 
 firstdraw()
+
+roundphase = chooseability()
+
+
 #main loop
 run = True
 while run:
-    if BeginningOfRound and not decided and time >= 0:
-        texttime = fonttime.render("Beginning Of Round:" + str(time), 1, (255,0,0))
-        time1 = time1 - 0.1
-        time = math.ceil(time1)
-    else:
-        BeginningOfRound = False
-        DuringRound = True
+    #if BeginningOfRound and not decided and time >= 0:
+     #   texttime = fonttime.render("Beginning Of Round:" + str(time), 1, (255,0,0))
+      #  time1 = time1 - 0.1
+       # time = math.ceil(time1)
+    #else:
+     #   BeginningOfRound = False
+      #  DuringRound = True
     
     
-    if DuringRound:
-        BeginningOfRound = True
-        DuringRound = False
-        roundcount += 1
-        time1 = 30
-        time = 30
-        textround = fonttime.render("round:" + str(roundcount), 1, (0, 0, 255))
-        decided = False
+    #if DuringRound:
+     #   BeginningOfRound = True
+      #  DuringRound = False
+       # roundcount += 1
+        #time1 = 30
+     #   time = 30
+     #   textround = fonttime.render("round:" + str(roundcount), 1, (0, 0, 255))
+       # decided = False
 
     
    # if EndOfRound:
@@ -186,13 +296,9 @@ while run:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: #nao sei como ver se se clicou no lado esquerdo ou direito do rato... o lado esquerdo é 1 e o lado esquerdo é 3
-                mouseposition = event.pos
-                print(mouseposition)
-                if 10 <= mouseposition[0]  <= 290 and 10 <= mouseposition[1] <= 40: #clicou en tackle:
-                    Tackle(choosetarget(1)[0])
-                    decided = True
-
-        
+                
+                roundphase.receiveevent(event)
+                
         if event.type == pygame.KEYDOWN:
             
             if event.key == pygame.K_n: 
@@ -210,9 +316,10 @@ while run:
             if event.key == pygame.K_DELETE:
                 run = False
                 
+    roundphase.clock()
+    roundphase.draw()
+    #for i in range(10):
+     #   pygame.time.delay(10)
 
-    for i in range(10):
-        pygame.time.delay(10)
-
-    refresh()
+    #refresh()
 pygame.quit()
