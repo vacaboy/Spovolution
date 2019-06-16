@@ -106,13 +106,14 @@ def choosetarget(n):
                         if ((mouseposition[0] - player.pos[0])**2 + (mouseposition[1] - player.pos[1])**2) <= 50**2:
                             p.append(player)
                             n -= 1
-        if  time >= 0:
-            texttime = fonttime.render("Beginning Of Round:" + str(time), 1, (255,0,0))
-            time1 = time1 - 0.1
-            time = math.ceil(time1)
-        else:
-            p = []
-            n = 0
+        #if  time >= 0:
+         #   texttime = fonttime.render("Beginning Of Round:" + str(time), 1, (255,0,0))
+          #  time1 = time1 - 0.1
+           # time = math.ceil(time1)
+        #else:
+         #   p = []
+          #  n = 0
+        screen.blit(textchoosetarget, (450, 300))
         refresh()
     return p
 
@@ -125,7 +126,7 @@ fontA = pygame.font.SysFont("mayence", 30, False, True)
 
 #texts:
 texttackle = fontA.render("Tackle", 1, (0,0,0))
-
+textchoosetarget = fonttime.render("choose target(s)!", 1, (255,0,0))
 
 
     
