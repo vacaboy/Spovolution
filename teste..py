@@ -20,6 +20,7 @@ screen = pygame.display.set_mode((width, height))
 players = []
 npcs = []
 abilities = []
+deadcorpses = []
 
 #__________________________________________________________________________________________________________________________________________________________________________________
 class player(object):
@@ -31,7 +32,7 @@ class player(object):
         self.abilities = []
         self.EXP = 0
         self.stage = 1
-        self.EXPtoevolve = 30
+        self.EXPtoevolve = 20
         self.abilitylastused = " "
         self.abilitylasttarget = " "
         self.ability = " "
@@ -57,10 +58,17 @@ class player(object):
         self.damaged = False
         self.target = []
         self.attacksreceived = 0
+        if self.HP >self.MaxHP:
+            self.HP = self.MaxHP
 
         
     def draw(self):
         pygame.draw.circle(screen, self.color, self.pos, 50) #the player
+
+        #name
+        textname = fontHP.render(self.name, 1 , self.color)
+        screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
+        
         #HP bar:
         pygame.draw.rect(screen, (255,0,0), (self.pos[0]-50, self.pos[1]-80, 100, 10))
         pygame.draw.rect(screen, (0,255,0), (self.pos[0]-50, self.pos[1]-80, round((self.HP/self.MaxHP)*100), 10))
@@ -147,11 +155,18 @@ class npc(object):
         self.damaged = False
         self.target = []
         self.attacksreceived = 0
+        if self.HP >self.MaxHP:
+            self.HP = self.MaxHP
         
 
         
     def draw(self):
         pygame.draw.circle(screen, self.color, self.pos, 50) #the player
+
+        #name
+        textname = fontHP.render(self.name, 1 , self.color)
+        screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
+        
         #HP bar:
         pygame.draw.rect(screen, (255,0,0), (self.pos[0]-50, self.pos[1]-80, 100, 10))
         pygame.draw.rect(screen, (0,255,0), (self.pos[0]-50, self.pos[1]-80, round((self.HP/self.MaxHP)*100), 10))
@@ -199,9 +214,50 @@ class npc(object):
     
     def addability(self, ability):
         self.abilities = self.abilities + [ability]
+#______________________________________________________________________________________________________________________________________________________________________
+class deadcorpse(object):
+    def __init__(self,x ,y, name, color, HP , MaxHP, abilitylastused, abilitylasttarget, EXP, EXPtoevolve):
+        self.pos = (x, y)
+        self.name = name
+        self.color = color
+        self.HP = HP
+        self.MaxHP = MaxHP
+        self.abilitylastused = abilitylastused
+        self.abilitylasttarget = abilitylasttarget
+        self. EXP = EXP
+        self.EXPtoevolve = EXPtoevolve
+        
+    def draw(self):
+        pygame.draw.circle(screen, self.color, self.pos, 50) #the player
 
+        #name
+        textname = fontHP.render(self.name, 1 , self.color)
+        screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
+        
+        #HP bar:
+        pygame.draw.rect(screen, (255,0,0), (self.pos[0]-50, self.pos[1]-80, 100, 10))
+        textHP = fontHP.render(str(self.HP) + "/" + str(self.MaxHP), 1, (255,0,0))
+        screen.blit(textHP, (self.pos[0] + 55, self.pos[1] - 80))
+        
+        #EXP bar:
+        pygame.draw.rect(screen, (0,0,255), (self.pos[0]-50, self.pos[1]-60, round((self.EXP/self.EXPtoevolve)*50), 10))
+        pygame.draw.rect(screen, (0,0,255), (self.pos[0]-50, self.pos[1]-60, 100, 10), 1)
+        pygame.draw.line(screen, (255,215,0), (self.pos[0],self.pos[1]-60), (self.pos[0],self.pos[1]-50))
+        textEXP = fontHP.render(str(self.EXP) + "/" + str(self.EXPtoevolve), 1, (0,0,255))
+        screen.blit(textEXP, (self.pos[0] + 55, self.pos[1] - 60))
+
+        #ability last used on:
+        textabilitylastused1 = fontHP.render("ability last used:", 1, self.color)
+        textabilitylastused2 = fontHP.render("target:", 1, self.color)
+        textabilitylastused3 = fontHP.render(str(self.abilitylasttarget), 1, self.color)
+        textabilitylastused4 = fontHP.render(self.abilitylastused, 1, self.color)
+        screen.blit(textabilitylastused1, (self.pos[0] - 55, self.pos[1] + 55))
+        screen.blit(textabilitylastused4, (self.pos[0] - 55, self.pos[1] + 65))
+        screen.blit(textabilitylastused2, (self.pos[0] - 55, self.pos[1] + 80))
+        screen.blit(textabilitylastused3, (self.pos[0] - 50, self.pos[1] + 95))
 #__________________________________________________________________________________________________________________________________________________________________________________
 class chooseability(object):
+
     def __init__(self, roundcount):
         self.roundcount = roundcount
         #self.caster = caster
@@ -232,10 +288,29 @@ class chooseability(object):
         screen.blit(self.textround, (300, 30))
         for player in players:
             player.draw()
+        for corpse in deadcorpses:
+            corpse.draw()
         pygame.display.update()
 
     def effect(self):
-        pass
+        
+        #verify if the game ended:
+        global run
+        global height
+        for corpse in deadcorpses:
+            if corpse.name == "craos":
+                textlose = fontend.render("YOU LOST! :( ", 1, (255,0,0))
+                screen.blit(textlose, (0, ((height /2) - 100)))
+                pygame.display.update()
+                pygame.time.delay(5000)
+                run = False
+
+        if len(players) == 1 and players[0].name == "craos":
+            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
+            screen.blit(textwin, (0, ((height /2) - 100)))
+            pygame.display.update()
+            pygame.time.delay(5000)
+            run = False
 
     
 
@@ -280,14 +355,14 @@ class choosetarget(object):
         screen.blit(self.textround, (300, 30))
         for player in players:
             player.draw()
+        for corpse in deadcorpses:
+            corpse.draw()
         craos.drawabilities()
         
         pygame.display.update()
 
     def effect(self):
         global roundphase
-        print(craos.ability.name)
-        print(str(craos.ability))
         if self.targetnumber == len(players):
             craos.target = players
             roundphase = calculateeffects(self.roundcount)
@@ -345,6 +420,8 @@ class calculateeffects(object):
         screen.blit(self.textround, (300, 30))
         for player in players:
             player.draw()
+        for corpse in deadcorpses:
+            corpse.draw()
         craos.drawabilities()
         
         pygame.display.update()
@@ -357,26 +434,47 @@ class calculateeffects(object):
         for npc in npcs:
             npc.chooseability()
             npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
-            #npc.ability.effect(npc.target, npc)
-        
-        #self.ability.effect(self.target, self.caster)
 
         for player in players:
             if player.ability.priority == 1:
                 player.ability.effect(player.target, player)
+
+        for player in players: #check if anyone died
+            if player.HP <= 0:
+                deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                players.remove(player)
+        for npc in npcs:
+            if npc.HP <=0:
+                npcs.remove(npc)
                 
         for player in players:
             if player.ability.priority == 2:
                 player.ability.effect(player.target, player)
+
+        for player in players: #check if anyone died
+            if player.HP <= 0:
+                deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                players.remove(player)
+        for npc in npcs:
+            if npc.HP <=0:
+                npcs.remove(npc)
                 
         for player in players:
             if player.ability.priority == 3:
                 player.ability.effect(player.target, player)
             
-            
 
+        for player in players: #check if anyone died
+            if player.HP <= 0:
+                deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                players.remove(player)
+        for npc in npcs:
+            if npc.HP <=0:
+                npcs.remove(npc)
+                
         for player in players:
             player.startnewround()
+                
         roundphase = chooseability(self.roundcount + 1)
 
     
@@ -406,11 +504,11 @@ class ability(object):
         elif self.name == "Double Edged Sword":
             caster.abilitylastused = "Double Edged Sword"
             caster.abilitylasttarget = [player.name for player in targets]
-            caster.EXP += 5
+            caster.EXP += 6
             caster.HP -= 2
             for target in targets:
-                target.EXP += 3
-                target.HP -= 3
+                target.EXP += 4
+                target.HP -= 4
                 target.damaged = True
                 target.attacksreceived += 1
 
@@ -436,11 +534,20 @@ class ability(object):
         elif self.name == "QuickPoke":
             caster.abilitylastused = "QuickPoke"
             caster.abilitylasttarget = [player.name for player in targets]
-            for target in targets:
-                target.EXP += 1
-                target.HP -= 1
-                caster.EXP += 1
-                target.damaged = True
+            for target in players:
+                if target == caster:
+                    pass
+                else:
+                    target.EXP += 1
+                    target.HP -= 1
+                    caster.EXP += 1
+                    target.damaged = True
+                    target.attacksreceived += 1
+                
+        elif self.name == "chill":
+            caster.abilitylastused = "chill"
+            caster.abilitylasttarget = [player.name for player in targets]
+            caster.HP += 1
                 
         elif self.name == "passed":
             caster.abilitylastused = "passed"
@@ -452,6 +559,7 @@ class ability(object):
 fonttime = pygame.font.SysFont("comicsans", 50, True)
 fontA = pygame.font.SysFont("mayence", 30, False, True)
 fontHP = pygame.font.SysFont("comicsans",20 ,False ,True)
+fontend = pygame.font.SysFont("mayence", 180, True)
 
 #texts:
 texttackle = fontA.render("Tackle", 1, (0,0,0))
@@ -482,7 +590,8 @@ abilities.append(ability("Tackle", 1, False, 2, True))
 abilities.append(ability("Double Edged Sword", 1, False, 2, True))
 abilities.append(ability("Uncertain Footing", 1, False, 3, True))
 abilities.append(ability("Stand Tall", 1, False, 3, True))
-abilities.append(ability("QuickPoke", len(players) - 1, False, 1, True))
+abilities.append(ability("QuickPoke", 0, False, 1, True))
+abilities.append(ability("chill", 0, True, 2, False))
 starterabilities = abilities
 
 
