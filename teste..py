@@ -289,8 +289,8 @@ class chooseability(object):
         #self.caster = caster
         #self.ability = ability("passed", 0, True, 1)
         self.name = "choose ability"
-        self.time = 900
-        self.time1 = 900
+        self.time = 90
+        self.time1 = 90
         self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
         self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
 
@@ -505,7 +505,48 @@ class calculateeffects(object):
         roundphase = chooseability(self.roundcount + 1)
 
     
-#________________________________________________________________________________________________________________________________
+#_______________________________________________________________________________________________________________________________________________________________________
+class improvmenttime(object):
+    def __init__(self, roundcount):
+        self.roundcount = roundcount
+        self.name = "improvment time"
+        self.time = 30
+        self.time1 = 30
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
+
+    def clock(self):
+        self.time1 = self.time1 - 0.1
+        self.time = math.ceil(self.time1)
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        for i in range(10):
+            pygame.time.delay(10)
+    
+    def draw(self):
+
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+
+        
+        screen.blit(self.texttime, (300, 10))
+        screen.blit(self.textround, (300, 30))
+        for player in players:
+            player.draw()
+        for corpse in deadcorpses:
+            corpse.draw()
+        craos.drawabilities()
+
+        #escolha:
+        pygame.draw.rect(screen, (227,207,87), (320, 290, 160, 130))
+        pygame.draw.rect(screen, (227,207,87), (520, 290, 160, 130))
+        
+        pygame.display.update()
+
+    def effect(self):
+        pass
+
+    def receiveevent(self, event):
+        mouseposition = event.pos
+        
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
