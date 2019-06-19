@@ -32,7 +32,7 @@ class player(object):
         self.abilities = []
         self.EXP = 0
         self.stage = 1
-        self.EXPtoevolve = 20
+        self.EXPtoevolve = 30
         self.abilitylastused = " "
         self.abilitylasttarget = " "
         self.ability = " "
@@ -68,6 +68,13 @@ class player(object):
         #name
         textname = fontHP.render(self.name, 1 , self.color)
         screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
+
+        #olhinhos
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 5)
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 1)
+        
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 5)
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 1)
         
         #HP bar:
         pygame.draw.rect(screen, (255,0,0), (self.pos[0]-50, self.pos[1]-80, 100, 10))
@@ -166,6 +173,13 @@ class npc(object):
         #name
         textname = fontHP.render(self.name, 1 , self.color)
         screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
+
+        #olhinhos
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 5)
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 1)
+        
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 5)
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 1)
         
         #HP bar:
         pygame.draw.rect(screen, (255,0,0), (self.pos[0]-50, self.pos[1]-80, 100, 10))
@@ -230,6 +244,18 @@ class deadcorpse(object):
     def draw(self):
         pygame.draw.circle(screen, self.color, self.pos, 50) #the player
 
+        #dead
+        textdead = fontHP.render("R.I.P", 1, (0,0,0))
+        screen.blit(textdead, (self.pos[0] - 10, self.pos[1] - 10))
+
+        #olhinhos
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 5)
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 1)
+        
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 5)
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 1)
+
+        
         #name
         textname = fontHP.render(self.name, 1 , self.color)
         screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
@@ -263,8 +289,8 @@ class chooseability(object):
         #self.caster = caster
         #self.ability = ability("passed", 0, True, 1)
         self.name = "choose ability"
-        self.time = 90
-        self.time1 = 90
+        self.time = 900
+        self.time1 = 900
         self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
         self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
 
@@ -295,11 +321,12 @@ class chooseability(object):
     def effect(self):
         
         #verify if the game ended:
+
         global run
         global height
         for corpse in deadcorpses:
             if corpse.name == "craos":
-                textlose = fontend.render("YOU LOST! :( ", 1, (255,0,0))
+                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
                 screen.blit(textlose, (0, ((height /2) - 100)))
                 pygame.display.update()
                 pygame.time.delay(5000)
@@ -617,28 +644,6 @@ roundphase = chooseability(1)
 #main loop
 run = True
 while run:
-    #if BeginningOfRound and not decided and time >= 0:
-     #   texttime = fonttime.render("Beginning Of Round:" + str(time), 1, (255,0,0))
-      #  time1 = time1 - 0.1
-       # time = math.ceil(time1)
-    #else:
-     #   BeginningOfRound = False
-      #  DuringRound = True
-    
-    
-    #if DuringRound:
-     #   BeginningOfRound = True
-      #  DuringRound = False
-       # roundcount += 1
-        #time1 = 30
-     #   time = 30
-     #   textround = fonttime.render("round:" + str(roundcount), 1, (0, 0, 255))
-       # decided = False
-
-    
-   # if EndOfRound:
-    #    pass
-
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -650,15 +655,7 @@ while run:
                 roundphase.receiveevent(event)
                 
         if event.type == pygame.KEYDOWN:
-            
                 
-            if event.key == pygame.K_r: 
-                a = player(R.randint(0,1000), R.randint(0, 600))
-                player.draw(a)
-                
-            if event.key == pygame.K_t: 
-                Tackle(robly18)
-                decided = True
                 
             if event.key == pygame.K_DELETE:
                 run = False
@@ -666,9 +663,5 @@ while run:
     roundphase.clock()
     roundphase.draw()
     roundphase.effect()
-    #print(str(roundcount))
-    #for i in range(10):
-     #   pygame.time.delay(10)
 
-    #refresh()
 pygame.quit()
