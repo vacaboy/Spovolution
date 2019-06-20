@@ -19,9 +19,11 @@ screen = pygame.display.set_mode((width, height))
 
 players = [] #has all the plyaer
 npcs = [] #has all player except craos. note: "player" and "npc" are different classes
-abilities = [[],[],[],[],[]] #keeps track of all abilities in the game, each sublist is the abilities of the correspondend stage. the first sublist are the stage 0 abilities and so on
+
+abilities = [[],[],[[],[],[]],[],[]] #keeps track of all abilities in the game, each sublist is the abilities of the correspondend stage. the first sublist are the stage 0 abilities and so on
+#the abilities in stage 2 divide into 3 sublists, offensive, defensive and utility
 deadcorpses = [] #has all the dead folk
-abilityprice = [0, 5] #has the price of each ability for each stage, for stage zero, the price is zero, for stage 1, the price is 5, and so on
+abilityprice = [0, 5, 10] #has the price of each ability for each stage, for stage zero, the price is zero, for stage 1, the price is 5, and so on
 evolveprice = [0, 20] #the same but for evolving
 evolveHPgain = [0, 20] #HP and MaxHP gained when evolving, per stage.
 evolveEXP = [0, 20, 40] #EXP needed to evolve, per stage.
@@ -33,7 +35,7 @@ class player(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = [ability("Tackle",0, 1, False, 2, True), ability("Uncertain Footing",0, 1, False, 3, True), ability("Stand Tall",0, 1, False, 3, True)]
+        self.abilities = [ability("Tackle",0, 1, False, 2, True)]
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
@@ -136,7 +138,7 @@ class npc(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = [ability("Tackle",0, 1, False, 2, True), ability("Uncertain Footing",0, 1, False, 3, True), ability("Stand Tall",0, 1, False, 3, True)]
+        self.abilities = [ability("Tackle",0, 1, False, 2, True)]
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
@@ -287,13 +289,13 @@ class deadcorpse(object):
 #__________________________________________________________________________________________________________________________________________________________________________________
 class chooseability(object):
 
-    def __init__(self, roundcount):
+    def __init__(self, roundcount, time = 900):
         self.roundcount = roundcount
         #self.caster = caster
         #self.ability = ability("passed", 0, True, 1)
         self.name = "choose ability"
-        self.time = 900
-        self.time1 = 900
+        self.time = time
+        self.time1 = time
         self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
         self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
         self.textgainability = fontA.render("learn ability", 1, (0,0,0))
@@ -337,22 +339,22 @@ class chooseability(object):
         pass
         #verify if the game ended:
 
-##        global run
-##        global height
-##        for corpse in deadcorpses:
-##            if corpse.name == "craos":
-##                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
-##                screen.blit(textlose, (0, ((height /2) - 100)))
-##                pygame.display.update()
-##                pygame.time.delay(5000)
-##                run = False
-##
-##        if len(players) == 1 and players[0].name == "craos":
-##            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
-##            screen.blit(textwin, (0, ((height /2) - 100)))
-##            pygame.display.update()
-##            pygame.time.delay(5000)
-##            run = False
+        global run
+        global height
+        for corpse in deadcorpses:
+            if corpse.name == "craos":
+                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
+                screen.blit(textlose, (0, ((height /2) - 100)))
+                pygame.display.update()
+                pygame.time.delay(5000)
+                run = False
+
+        if len(players) == 1 and players[0].name == "craos":
+            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
+            screen.blit(textwin, (0, ((height /2) - 100)))
+            pygame.display.update()
+            pygame.time.delay(5000)
+            run = False
 
     
 
@@ -369,7 +371,14 @@ class chooseability(object):
 
         if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
             print("ganhar habilidade")
-            self.gainability(craos)
+            if craos.EXP <= abilityprice[craos.stage]:
+                print("not enough EXP")
+            else:
+                if craos.stage == 1:
+                    self.gainability(craos)
+                elif craos.stage == 2:
+                    roundphase = gainability2(self.roundcount, self.time)
+                    
         elif 520 <= mouseposition[0] <= 680 and 290 <= mouseposition[1] <= 320:
             print("evoluir")
             self.evolve(craos)
@@ -416,6 +425,7 @@ class chooseability(object):
                   
 
     def evolve(self, player):
+        global roundphase
         #verify if the player has enough EXP:
         if player.EXP < evolveprice[player.stage]:
             pass
@@ -425,8 +435,8 @@ class chooseability(object):
             player.MaxHP += evolveHPgain[player.stage]
             player.EXPtoevolve = evolveEXP[player.stage + 1]
             player.stage += 1
-            for i in range(evolvenumberofabilitiesgained[player.stage - 1]):
-                self.gainabilityforfree(player)
+            roundphase = evolve1(self.roundcount, self.time)
+
 
 #__________________________________________________________________________________________________________________________________________________________________________________
 class choosetarget(object):
@@ -601,7 +611,241 @@ class calculateeffects(object):
                 
         roundphase = chooseability(self.roundcount + 1)
 
+
+#_____________________________________________________________________________________________________________________________________________________________________
+class evolve1(object):
+
+    def __init__(self, roundcount, time = 30):
+        self.roundcount = roundcount
+        self.name = "You are Evolving!"
+        self.time = time
+        self.time1 = time
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
+        self.textoffensive = fontA.render("Offensive", 1, (0,0,0))
+        self.textdefensive = fontA.render("Defensive", 1, (0,0,0))
+        self.textutility = fontA.render("Utility", 1, (0,0,0))
+        self.number = 3 #abilities he gets to choose
+        
+    def clock(self):
+        self.time1 = self.time1 - 0.1
+        self.time = math.ceil(self.time1)
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        for i in range(10):
+            pygame.time.delay(10)
+        if self.time <= 0:
+            global roundphase
+            roundphase = chooseability(self.roundcount, self.time)
+
+    def draw(self):
+
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+        craos.drawabilities()
+        screen.blit(self.texttime, (300, 10))
+        screen.blit(self.textround, (300, 30))
+        for player in players:
+            player.draw()
+        for corpse in deadcorpses:
+            corpse.draw()
+
+        if craos.stage == 2:
+            #escolha de tipo de habilidade :
+            pygame.draw.rect(screen, (255,48,48), (320, 290, 160, 30))
+            pygame.draw.rect(screen, (30,144,255), (520, 290, 160, 30))
+            pygame.draw.rect(screen, (0,201,87), (720, 290, 160, 30))
+    ##        pygame.draw.rect(screen, (227,207,87), (490, 295, 20, 20))
+    ##        pygame.draw.line(screen, (255,0,0),(490, 295) , (510, 315))
+    ##        pygame.draw.line(screen, (255,0,0),(510, 295) , (490, 315))
+
+            screen.blit(self.textoffensive, (330, 295))
+            screen.blit(self.textdefensive, (530, 295))
+            screen.blit(self.textutility, (730, 295))
+        
+        pygame.display.update()
+
+    def effect(self):
+        global roundphase
+        if self.number <= 0:
+            roundphase = chooseability(self.roundcount, self.time)
+
+
     
+
+    def receiveevent(self, event):
+        global roundphase
+        mouseposition = event.pos
+        print(mouseposition)
+        if  320 <= mouseposition[0]  <= 480 and 290 <= mouseposition[1] <= 320:
+            self.gainabilityoffensive(craos)
+            self.number -= 1
+        elif  520 <= mouseposition[0]  <= 680 and 290 <= mouseposition[1] <= 320:
+            self.gainabilitydefensive(craos)
+            self.number -= 1
+        elif  720 <= mouseposition[0]  <= 880 and 290 <= mouseposition[1] <= 320:
+            self.gainabilityutility(craos)
+            self.number -= 1
+
+    def gainabilityoffensive(self, player):
+        #verify if the player already has all the abilities
+        a = True
+        offensiveabilities = abilities[2][0]
+        while a:
+            b = R.randint(0,len(offensiveabilities) - 1)
+            print(b)
+            if not (offensiveabilities[b] in player.abilities):
+                player.abilities.append(offensiveabilities[b])
+                a = False
+
+    def gainabilitydefensive(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        defensiveabilities = abilities[2][1]
+        while a:
+            b = R.randint(0,len(defensiveabilities) - 1)
+            if not (defensiveabilities[b] in player.abilities):
+                player.abilities.append(defensiveabilities[b])
+                a = False
+
+
+    def gainabilityutility(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        utilityabilities = abilities[2][2]
+        while a:
+            b = R.randint(0,len(utilityabilities) - 1)
+            if not (utilityabilities[b] in player.abilities):
+                player.abilities.append(utilityabilities[b])
+                a = False
+
+#_____________________________________________________________________________________________________________________________________________________________________
+class gainability2(object):
+
+    def __init__(self, roundcount, time = 30):
+        self.roundcount = roundcount
+        self.name = "choose ability type"
+        self.time = time
+        self.time1 = time
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
+        self.textoffensive = fontA.render("Offensive", 1, (0,0,0))
+        self.textdefensive = fontA.render("Defensive", 1, (0,0,0))
+        self.textutility = fontA.render("Utility", 1, (0,0,0))
+        
+    def clock(self):
+        self.time1 = self.time1 - 0.1
+        self.time = math.ceil(self.time1)
+        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        for i in range(10):
+            pygame.time.delay(10)
+        if self.time <= 0:
+            global roundphase
+            roundphase = chooseability(self.roundcount, self.time)
+
+    def draw(self):
+
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+        craos.drawabilities()
+        screen.blit(self.texttime, (300, 10))
+        screen.blit(self.textround, (300, 30))
+        for player in players:
+            player.draw()
+        for corpse in deadcorpses:
+            corpse.draw()
+
+        if craos.stage == 2:
+            #escolha de tipo de habilidade :
+            pygame.draw.rect(screen, (255,48,48), (320, 290, 160, 30))
+            pygame.draw.rect(screen, (30,144,255), (520, 290, 160, 30))
+            pygame.draw.rect(screen, (0,201,87), (720, 290, 160, 30))
+    ##        pygame.draw.rect(screen, (227,207,87), (490, 295, 20, 20))
+    ##        pygame.draw.line(screen, (255,0,0),(490, 295) , (510, 315))
+    ##        pygame.draw.line(screen, (255,0,0),(510, 295) , (490, 315))
+
+            screen.blit(self.textoffensive, (330, 295))
+            screen.blit(self.textdefensive, (530, 295))
+            screen.blit(self.textutility, (730, 295))
+        
+        pygame.display.update()
+
+    def effect(self):
+        pass
+
+
+    
+
+    def receiveevent(self, event):
+        global roundphase
+        mouseposition = event.pos
+        print(mouseposition)
+        if  320 <= mouseposition[0]  <= 480 and 290 <= mouseposition[1] <= 320:
+            self.gainabilityoffensive(craos)
+            roundphase = chooseability(self.roundcount, self.time)
+        elif  520 <= mouseposition[0]  <= 680 and 290 <= mouseposition[1] <= 320:
+            self.gainabilitydefensive(craos)
+            roundphase = chooseability(self.roundcount, self.time)
+        elif  720 <= mouseposition[0]  <= 880 and 290 <= mouseposition[1] <= 320:
+            self.gainabilityutility(craos)
+            roundphase = chooseability(self.roundcount, self.time)
+
+    def gainabilityoffensive(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        offensiveabilities = abilities[player.stage][0]
+        for ability in offensiveabilities:
+            if not (ability in player.abilities):
+                a = False
+        if a:
+            pass
+        #verify if the player has enough EXP:
+        elif player.EXP < abilityprice[player.stage]:
+            pass
+        else:
+            while not a:
+                b = R.randint(0,len(offensiveabilities) - 1)
+                if not (offensiveabilities[b] in player.abilities):
+                    player.abilities.append(offensiveabilities[b])
+                    a = True
+                    player.EXP -= abilityprice[player.stage]
+
+    def gainabilitydefensive(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        defensiveabilities = abilities[player.stage][1]
+        for ability in defensiveabilities:
+            if not (ability in player.abilities):
+                a = False
+        if a:
+            pass
+        #verify if the player has enough EXP:
+        elif player.EXP < abilityprice[player.stage]:
+            pass
+        else:
+            while not a:
+                b = R.randint(0,len(defensiveabilities) - 1)
+                if not (defensiveabilities[b] in player.abilities):
+                    player.abilities.append(defensiveabilities[b])
+                    a = True
+                    player.EXP -= abilityprice[player.stage]
+                    
+    def gainabilityutility(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        utilityabilities = abilities[player.stage][2]
+        for ability in utilityabilities:
+            if not (ability in player.abilities):
+                a = False
+        if a:
+            pass
+        #verify if the player has enough EXP:
+        elif player.EXP < abilityprice[player.stage]:
+            pass
+        else:
+            while not a:
+                b = R.randint(0,len(utilityabilities) - 1)
+                if not (utilityabilities[b] in player.abilities):
+                    player.abilities.append(utilityabilities[b])
+                    a = True
+                    player.EXP -= abilityprice[player.stage]
 #_______________________________________________________________________________________________________________________________________________________________________
 ##class improvmenttime(object):
 ##    def __init__(self, roundcount):
@@ -783,8 +1027,27 @@ class ability(object):
         elif self.name == "chill":
             caster.abilitylastused = "chill"
             caster.abilitylasttarget = [player.name for player in targets]
-            caster.HP += 1
-                
+            caster.HP += 3
+
+        elif self.name == "Spear Throw":
+            caster.abilitylastused = "Spear Trhow"
+            caster.abilitylasttarget = [player.name for player in targets]
+            a = R.randint(1, 100)
+            if a > 60:
+                print("you missed")
+            else:
+                b=R.randint(1,12)
+                c=R.randint(1,12)
+                d=R.randint(1,12)
+                e = b + c + d
+                print("you dealt" + str(e) + "damage with spear throw")
+                for target in targets:
+                    caster.EXP += e
+                    target.HP -= e
+                    target.EXP += e
+                    target.damaged = True
+                    target.attacksreceived += 1
+                    
         elif self.name == "passed":
             caster.abilitylastused = "passed"
             caster.abilitylasttarget = []
@@ -823,17 +1086,25 @@ npc.draw(tomis)
 
 #abilities:
 abilities[0].append(ability("Tackle",0, 1, False, 2, True))
-abilities[0].append(ability("Uncertain Footing",0, 1, False, 3, True))
-abilities[0].append(ability("Stand Tall",0, 1, False, 3, True))
-starterabilities = abilities[0]
+
+abilities[1].append(ability("Uncertain Footing",0, 1, False, 3, True))
+abilities[1].append(ability("Stand Tall",0, 1, False, 3, True))
 abilities[1].append(ability("Double Edged Sword",1, 1, False, 2, True))
 abilities[1].append(ability("QuickPoke",1, 0, False, 1, True))
 abilities[1].append(ability("chill",1, 0, True, 2, False))
 
-abilities[2].append(ability("Spear Throw",2, 1,False, 2, True))
-abilities[2].append(ability("Kick",2, 1,False, 2, True))
-abilities[2].append(ability("Punch",2, 1,False, 2, True))
-abilities[2].append(ability("On The Edge",2, 1,False, 3, True))
+abilities[2][0].append(ability("Spear Throw",2, 1,False, 2, True))
+abilities[2][0].append(ability("Kick",2, 1,False, 2, True))
+abilities[2][0].append(ability("Punch",2, 1,False, 2, True))
+abilities[2][0].append(ability("On The Edge",2, 1,False, 3, True))
+
+abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False))
+abilities[2][1].append(ability("Refreshing Waters",2, 0,True, 2, False))
+abilities[2][1].append(ability("Regenerate",2, 0,True, 3, False))
+
+abilities[2][2].append(ability("Lullaby",2, 0,False, 3, False))
+abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False))
+abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False))
 #______________________________________________________________________________________________________________________________________________________________________
 
 
