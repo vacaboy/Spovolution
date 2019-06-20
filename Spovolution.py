@@ -33,8 +33,8 @@ class player(object):
     def __init__(self,x ,y, name = "none", color = "none"):
         global starterabilities
         self.pos = (x, y)
-        self.MaxHP = 20
-        self.HP = 20
+        self.MaxHP = 200
+        self.HP = 200
         self.abilities = [ability("Tackle",0, 1, False, 2, True)]
         self.EXP = 0
         self.stage = 1
@@ -45,6 +45,7 @@ class player(object):
         self.target = []
         self.damaged = False #True or False if this player was damaged this turn or not.
         self.attacksreceived = 0 #keeps track of how many attacks has this player received
+        self.conditions = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -138,7 +139,7 @@ class npc(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = [ability("Tackle",0, 1, False, 2, True)]
+        self.abilities = [ability("Tackle",0, 1, False, 2, True), ability("teste", 1, 0, True, 3, False)]
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
@@ -148,6 +149,7 @@ class npc(object):
         self.target = []
         self.damaged = False #True or False if this player was damaged this turn or not.
         self.attacksreceived = 0 #keeps track of how many attacks has this player received
+        self.conditions = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -309,7 +311,7 @@ class chooseability(object):
             pygame.time.delay(10)
         if self.time <= 0:
             global roundphase
-            craos.ability = ability("passed", 0, True, 1, False)
+            craos.ability = ability("passed",3, 0, True, 1, False)
             roundphase = calculateeffects(self.roundcount)
 
     def draw(self):
@@ -339,22 +341,24 @@ class chooseability(object):
         pass
         #verify if the game ended:
 
-        global run
-        global height
-        for corpse in deadcorpses:
-            if corpse.name == "craos":
-                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
-                screen.blit(textlose, (0, ((height /2) - 100)))
-                pygame.display.update()
-                pygame.time.delay(5000)
-                run = False
+##        global run
+##        global height
+##        for corpse in deadcorpses:
+##            if corpse.name == "craos":
+##                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
+##                screen.blit(textlose, (0, ((height /2) - 100)))
+##                pygame.display.update()
+##                pygame.time.delay(5000)
+##                run = False
+##
+##        if len(players) == 1 and players[0].name == "craos":
+##            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
+##            screen.blit(textwin, (0, ((height /2) - 100)))
+##            pygame.display.update()
+##            pygame.time.delay(5000)
+##            run = False
 
-        if len(players) == 1 and players[0].name == "craos":
-            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
-            screen.blit(textwin, (0, ((height /2) - 100)))
-            pygame.display.update()
-            pygame.time.delay(5000)
-            run = False
+        
 
     
 
@@ -362,23 +366,31 @@ class chooseability(object):
         global roundphase
         mouseposition = event.pos
         print(mouseposition)
+        #escolher habilidade
         for i in range(len(craos.abilities)):
             if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
                 craos.target = []
                 craos.ability = craos.abilities[i]
+                for npc in npcs:#npc's tambem escolhem as habilidades
+                    npc.chooseability()
+
+                for player in players:#fazer os efeitos que atuam agora
+                    for condition in player.conditions:
+                        if condition.priority == "chooseability":
+                            condition.effect()
                 roundphase = choosetarget(self.roundcount)
 
-
+        #ganhar habilidade
         if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
             print("ganhar habilidade")
-            if craos.EXP <= abilityprice[craos.stage]:
+            if craos.EXP < abilityprice[craos.stage]:
                 print("not enough EXP")
             else:
                 if craos.stage == 1:
                     self.gainability(craos)
                 elif craos.stage == 2:
                     roundphase = gainability2(self.roundcount, self.time)
-                    
+        #evoluir            
         elif 520 <= mouseposition[0] <= 680 and 290 <= mouseposition[1] <= 320:
             print("evoluir")
             self.evolve(craos)
@@ -477,15 +489,16 @@ class choosetarget(object):
 
     def effect(self):
         global roundphase
-        if self.targetnumber == len(players):
-            craos.target = players
-            roundphase = calculateeffects(self.roundcount)
             
         if (self.targetnumber == (len(players) - 1)) and not craos.ability.selftarget:
             craos.target = npcs
+            for npc in npcs:
+                npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
             roundphase = calculateeffects(self.roundcount)
             
         if self.targetnumber <= 0:
+            for npc in npcs:
+                npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
             roundphase = calculateeffects(self.roundcount)
 
     def receiveevent(self, event):
@@ -545,13 +558,14 @@ class calculateeffects(object):
 
     def effect(self):
         global roundphase
-        for npc in npcs:
-            npc.chooseability()
-            npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
-
-        for player in players:
+        #phase 1 of combat:
+        for player in players:#effects of priority 1 abilities
             if player.ability.priority == 1:
                 player.ability.effect(player.target, player)
+                
+            for condition in player.conditions: #conditions with priority 1
+                if condition.priority == 1:
+                    condition.effect()
 
         for player in players: #check if anyone died
             if player.HP <= 0:
@@ -560,10 +574,19 @@ class calculateeffects(object):
         for npc in npcs:
             if npc.HP <=0:
                 npcs.remove(npc)
-                
-        for player in players:
+
+
+
+
+        
+        #phase 2 of combat:     
+        for player in players:#effects of priority 2 abilities
             if player.ability.priority == 2:
                 player.ability.effect(player.target, player)
+                
+            for condition in player.conditions: #conditions of priority 2
+                if condition.priority == 2:
+                    condition.effect()
 
         for player in players: #check if anyone died
             if player.HP <= 0:
@@ -572,10 +595,17 @@ class calculateeffects(object):
         for npc in npcs:
             if npc.HP <=0:
                 npcs.remove(npc)
-                
-        for player in players:
+        
+
+
+        #phase 3 of combat    
+        for player in players:#effects of priority 3 abilities
             if player.ability.priority == 3:
                 player.ability.effect(player.target, player)
+
+            for condition in player.conditions: #conditions of priority 3
+                if condition.priority == 3:
+                    condition.effect()
             
 
         for player in players: #check if anyone died
@@ -847,118 +877,31 @@ class gainability2(object):
                     a = True
                     player.EXP -= abilityprice[player.stage]
 #_______________________________________________________________________________________________________________________________________________________________________
-##class improvmenttime(object):
-##    def __init__(self, roundcount):
-##        self.roundcount = roundcount
-##        self.name = "improvment time"
-##        self.time = 90
-##        self.time1 = 90
-##        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
-##        self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
-##        self.textgainability = fontA.render("learn ability", 1, (0,0,0))
-##        self.textevolve = fontA.render("EVOLVE!", 1, (0,0,0))
-##        
-##
-##    def clock(self):
-##        self.time1 = self.time1 - 0.1
-##        self.time = math.ceil(self.time1)
-##        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
-##        for i in range(10):
-##            pygame.time.delay(10)
-##    
-##    def draw(self):
-##
-##        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
-##
-##        
-##        screen.blit(self.texttime, (300, 10))
-##        screen.blit(self.textround, (300, 30))
-##        for player in players:
-##            player.draw()
-##        for corpse in deadcorpses:
-##            corpse.draw()
-##        craos.drawabilities()
-##
-##        #escolha:
-##        pygame.draw.rect(screen, (227,207,87), (320, 290, 160, 30))
-##        pygame.draw.rect(screen, (227,207,87), (520, 290, 160, 30))
-##        pygame.draw.rect(screen, (227,207,87), (490, 295, 20, 20))
-##        pygame.draw.line(screen, (255,0,0),(490, 295) , (510, 315))
-##        pygame.draw.line(screen, (255,0,0),(510, 295) , (490, 315))
-##
-##        screen.blit(self.textgainability, (330, 295))
-##        screen.blit(self.textevolve, (530, 295))
-##        
-##        pygame.display.update()
-##
-##    def effect(self):
-##        pass
-##
-##    def receiveevent(self, event):
-##        global roundphase
-##        mouseposition = event.pos
-##
-##        if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
-##            print("ganhar habilidade")
-##            self.gainability(craos)
-##        elif 520 <= mouseposition[0] <= 680 and 290 <= mouseposition[1] <= 320:
-##            print("evoluir")
-##            self.evolve(craos)
-##        elif 490 <= mouseposition[0] <= 510 and 295 <= mouseposition[1] <= 315:
-##            roundphase = chooseability(self.roundcount + 1)
-##
-##    def gainability(self, player):
-##        #verify if the player already has all the abilities:
-##        a = True
-##        stageabilities = abilities[player.stage]
-##        for ability in stageabilities:
-##            if not (ability in player.abilities):
-##                a = False
-##        if a:
-##            pass
-##        #verify if the player has enough EXP:
-##        elif player.EXP < abilityprice[player.stage]:
-##            pass
-##        else:
-##            while not a:
-##                b = R.randint(0,len(stageabilities) - 1)
-##                if not (stageabilities[b] in player.abilities):
-##                    player.abilities.append(stageabilities[b])
-##                    a = True
-##                    player.EXP -= abilityprice[player.stage]
-##
-##    def gainabilityforfree(self, player):
-##        #verify if the player already has all the abilities:
-##        a = True
-##        stageabilities = abilities[player.stage]
-##        for ability in stageabilities:
-##            if not (ability in player.abilities):
-##                a = False
-##        if a:
-##            pass
-##        else:
-##            while not a:
-##                b = R.randint(0,len(stageabilities) - 1)
-##                if not (stageabilities[b] in player.abilities):
-##                    player.abilities.append(stageabilities[b])
-##                    a = True
-##                  
-##
-##    def evolve(self, player):
-##        #verify if the player has enough EXP:
-##        if player.EXP < evolveprice[player.stage]:
-##            pass
-##        else:
-##            player.EXP -= evolveprice[player.stage]
-##            player.HP += evolveHPgain[player.stage]
-##            player.MaxHP += evolveHPgain[player.stage]
-##            player.EXPtoevolve = evolveEXP[player.stage + 1]
-##            player.stage += 1
-##            for i in range(evolvenumberofabilitiesgained[player.stage - 1]):
-##                self.gainabilityforfree(player)
-            
-            
+class condition(object):
+    def __init__(self, name, target, priority, duration):
+        self.name = name
+        self.target = target
+        self.priority = priority
+        self.duration = duration
+
+    def effect(self):
+        if self.name == "teste":
+            self.duration -= 1
+            if self.target.ability.damage:
+                print("dás mais 3 de dano")
+                for target in self.target.target:
+                    target.HP -=3
         
+        elif self.name == "Paralyzed":
+            print("estas paralizado esta ronda")
+            self.target.ability = ability("passed", 3, 0, True, 1, False)
+            self.duration -= 1
+
+        print(self.duration)
+        if self.duration == 0:
+            self.target.conditions.remove(self)
+            
+            
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
@@ -1047,6 +990,17 @@ class ability(object):
                     target.EXP += e
                     target.damaged = True
                     target.attacksreceived += 1
+
+        elif self.name == "teste":
+            caster.abilitylastused = "teste"
+            caster.abilitylasttarget = [player.name for player in targets]
+            caster.conditions.append(condition("teste", caster, 3, 4))
+
+        elif self.name == "teste2":
+            caster.abilitylastused = "teste2"
+            caster.abilitylasttarget = [player.name for player in targets]
+            for target in targets:
+                target.conditions.append(condition("Paralyzed", target, "chooseability", 1))
                     
         elif self.name == "passed":
             caster.abilitylastused = "passed"
@@ -1086,12 +1040,16 @@ npc.draw(tomis)
 
 #abilities:
 abilities[0].append(ability("Tackle",0, 1, False, 2, True))
+abilities[0].append(ability("Double Edged Sword",1, 1, False, 2, True))
+abilities[0].append(ability("chill",1, 0, True, 2, False))
 
 abilities[1].append(ability("Uncertain Footing",0, 1, False, 3, True))
 abilities[1].append(ability("Stand Tall",0, 1, False, 3, True))
-abilities[1].append(ability("Double Edged Sword",1, 1, False, 2, True))
 abilities[1].append(ability("QuickPoke",1, 0, False, 1, True))
-abilities[1].append(ability("chill",1, 0, True, 2, False))
+
+
+abilities[1].append(ability("teste", 1, 0, True, 3, False))
+abilities[1].append(ability("teste2", 1, 2, True, 3, False))
 
 abilities[2][0].append(ability("Spear Throw",2, 1,False, 2, True))
 abilities[2][0].append(ability("Kick",2, 1,False, 2, True))
