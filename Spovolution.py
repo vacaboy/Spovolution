@@ -33,9 +33,9 @@ class player(object):
     def __init__(self,x ,y, name = "none", color = "none"):
         global starterabilities
         self.pos = (x, y)
-        self.MaxHP = 200
-        self.HP = 200
-        self.abilities = [ability("Tackle",0, 1, False, 2, True)]
+        self.MaxHP = 20
+        self.HP = 20
+        self.abilities = [ability("Tackle",0, 1, False, 2, True),ability("Double Edged Sword",0, 1, False, 2, True), ability("chill",0, 0, True, 2, False)]
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
@@ -139,7 +139,7 @@ class npc(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = [ability("Tackle",0, 1, False, 2, True), ability("teste", 1, 0, True, 3, False)]
+        self.abilities = [ability("Tackle",0, 1, False, 2, True), ability("Double Edged Sword",0, 1, False, 2, True), ability("chill",0, 0, True, 2, False)]
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
@@ -640,6 +640,8 @@ class calculateeffects(object):
             run = False
                 
         roundphase = chooseability(self.roundcount + 1)
+        print()
+        print("round: " + str(self.roundcount + 1))
 
 
 #_____________________________________________________________________________________________________________________________________________________________________
@@ -923,6 +925,7 @@ class ability(object):
                 target.HP -= 2
                 target.damaged = True
                 target.attacksreceived += 1
+                print(caster.name + " dealt 2 damage to " + target.name + " using tackle")
 
         elif self.name == "Double Edged Sword":
             caster.abilitylastused = "Double Edged Sword"
@@ -934,6 +937,8 @@ class ability(object):
                 target.HP -= 4
                 target.damaged = True
                 target.attacksreceived += 1
+                print(caster.name + " dealt 4 damage to " + target.name + " using double edged sword")
+                print(caster.name + " dealt 2 damage to " + caster.name + " because of double edged sword")
 
         elif self.name == "Stand Tall":
             caster.abilitylastused = "Stand Tall"
@@ -943,6 +948,7 @@ class ability(object):
                 for target in targets:
                     target.EXP += 7
                     target.HP -= 7
+                    print(caster.name + " dealt 7 damage to " + target.name + " using Stand Tall")
             
         elif self.name == "Uncertain Footing":
             caster.abilitylastused = "Uncertain Footing"
@@ -952,8 +958,8 @@ class ability(object):
                 for target in targets:
                     target.EXP += 7
                     target.HP -=7
-            else:
-                pass
+                    print(caster.name + " dealt 7 damage to " + target.name + " using Uncertain Footing")
+
         elif self.name == "QuickPoke":
             caster.abilitylastused = "QuickPoke"
             caster.abilitylasttarget = [player.name for player in targets]
@@ -966,11 +972,13 @@ class ability(object):
                     caster.EXP += 1
                     target.damaged = True
                     target.attacksreceived += 1
+                    print(caster.name + " dealt 1 damage to " + target.name + " using QuickPoke")
                 
         elif self.name == "chill":
             caster.abilitylastused = "chill"
             caster.abilitylasttarget = [player.name for player in targets]
             caster.HP += 3
+            print(caster.name + " regained 3 damage using Chill")
 
         elif self.name == "Spear Throw":
             caster.abilitylastused = "Spear Trhow"
@@ -983,13 +991,38 @@ class ability(object):
                 c=R.randint(1,12)
                 d=R.randint(1,12)
                 e = b + c + d
-                print("you dealt" + str(e) + "damage with spear throw")
+                print(caster.name + " dealt " + str(e) +" damage to " + target.name + " using Spear Throw")
                 for target in targets:
                     caster.EXP += e
                     target.HP -= e
                     target.EXP += e
                     target.damaged = True
                     target.attacksreceived += 1
+
+        elif self.name == "Kick":
+            caster.abilitylastused = "Kick"
+            caster.abilitylasttarget = [player.name for player in targets]
+            a = R.randint(1,10)
+            b = R.randint(1,10)
+            c = a + b
+            caster.EXP += c
+            for target in targets:
+                target.EXP += c
+                target.HP -= c
+                target.damaged = True
+                target.attacksreceived += 1
+                print(caster.name + " dealt " + str(c) +" damage to " + target.name + " using Kick")
+
+        elif self.name == "Punch":
+            caster.abilitylastused = "Punch"
+            caster.abilitylasttarget = [player.name for player in targets]
+            caster.EXP += 9
+            for target in targets:
+                target.EXP += 9
+                target.HP -= 9
+                target.damaged = True
+                target.attacksreceived += 1
+                print(caster.name + " dealt 9 damage to " + target.name + " using Punch")
 
         elif self.name == "teste":
             caster.abilitylastused = "teste"
@@ -1005,6 +1038,7 @@ class ability(object):
         elif self.name == "passed":
             caster.abilitylastused = "passed"
             caster.abilitylasttarget = []
+            print(caster.name + " did nothing.")
             pass
 #______________________________________________________________________________________________________________________________________________________________________
 
@@ -1040,11 +1074,11 @@ npc.draw(tomis)
 
 #abilities:
 abilities[0].append(ability("Tackle",0, 1, False, 2, True))
-abilities[0].append(ability("Double Edged Sword",1, 1, False, 2, True))
-abilities[0].append(ability("chill",1, 0, True, 2, False))
+abilities[0].append(ability("Double Edged Sword",0, 1, False, 2, True))
+abilities[0].append(ability("chill",0, 0, True, 2, False))
 
-abilities[1].append(ability("Uncertain Footing",0, 1, False, 3, True))
-abilities[1].append(ability("Stand Tall",0, 1, False, 3, True))
+abilities[1].append(ability("Uncertain Footing",1, 1, False, 3, True))
+abilities[1].append(ability("Stand Tall",1, 1, False, 3, True))
 abilities[1].append(ability("QuickPoke",1, 0, False, 1, True))
 
 
@@ -1071,7 +1105,7 @@ abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False))
 
 
 roundphase = chooseability(1)
-
+print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
 
