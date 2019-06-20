@@ -17,11 +17,15 @@ screen = pygame.display.set_mode((width, height))
 
 
 
-players = []
-npcs = []
-abilities = []
-deadcorpses = []
-
+players = [] #has all the plyaer
+npcs = [] #has all player except craos. note: "player" and "npc" are different classes
+abilities = [[],[],[],[],[]] #keeps track of all abilities in the game, each sublist is the abilities of the correspondend stage. the first sublist are the stage 0 abilities and so on
+deadcorpses = [] #has all the dead folk
+abilityprice = [0, 5] #has the price of each ability for each stage, for stage zero, the price is zero, for stage 1, the price is 5, and so on
+evolveprice = [0, 20] #the same but for evolving
+evolveHPgain = [0, 20] #HP and MaxHP gained when evolving, per stage.
+evolveEXP = [0, 20, 40] #EXP needed to evolve, per stage.
+evolvenumberofabilitiesgained = [0, 2] #number of abilities gained when evolving, per stage.
 #__________________________________________________________________________________________________________________________________________________________________________________
 class player(object):
     def __init__(self,x ,y, name = "none", color = "none"):
@@ -29,10 +33,10 @@ class player(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = []
+        self.abilities = [ability("Tackle",0, 1, False, 2, True), ability("Uncertain Footing",0, 1, False, 3, True), ability("Stand Tall",0, 1, False, 3, True)]
         self.EXP = 0
         self.stage = 1
-        self.EXPtoevolve = 30
+        self.EXPtoevolve = 20
         self.abilitylastused = " "
         self.abilitylasttarget = " "
         self.ability = " "
@@ -121,7 +125,6 @@ class player(object):
             textability = fontA.render(ability.name, 1, (0,0,0))
             
             screen.blit(textability,(30, 15 + 40 * self.abilities.index(ability)))
-        pygame.display.update()
 
     def addability(self, ability):
         self.abilities = self.abilities + [ability]
@@ -133,10 +136,10 @@ class npc(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = []
+        self.abilities = [ability("Tackle",0, 1, False, 2, True), ability("Uncertain Footing",0, 1, False, 3, True), ability("Stand Tall",0, 1, False, 3, True)]
         self.EXP = 0
         self.stage = 1
-        self.EXPtoevolve = 30
+        self.EXPtoevolve = 20
         self.abilitylastused = " "
         self.abilitylasttarget = " "
         self.ability = " "
@@ -289,13 +292,14 @@ class chooseability(object):
         #self.caster = caster
         #self.ability = ability("passed", 0, True, 1)
         self.name = "choose ability"
-        self.time = 90
-        self.time1 = 90
+        self.time = 900
+        self.time1 = 900
         self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
         self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
+        self.textgainability = fontA.render("learn ability", 1, (0,0,0))
+        self.textevolve = fontA.render("EVOLVE!", 1, (0,0,0))
 
     def clock(self):
-        #texttime = fonttime.render(self.name + str(time), 1, (255,0,0), False)
         self.time1 = self.time1 - 0.1
         self.time = math.ceil(self.time1)
         self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
@@ -316,28 +320,39 @@ class chooseability(object):
             player.draw()
         for corpse in deadcorpses:
             corpse.draw()
+
+        #escolha de habilidade ou evoluir:
+        pygame.draw.rect(screen, (227,207,87), (320, 290, 160, 30))
+        pygame.draw.rect(screen, (227,207,87), (520, 290, 160, 30))
+##        pygame.draw.rect(screen, (227,207,87), (490, 295, 20, 20))
+##        pygame.draw.line(screen, (255,0,0),(490, 295) , (510, 315))
+##        pygame.draw.line(screen, (255,0,0),(510, 295) , (490, 315))
+
+        screen.blit(self.textgainability, (330, 295))
+        screen.blit(self.textevolve, (530, 295))
+        
         pygame.display.update()
 
     def effect(self):
-        
+        pass
         #verify if the game ended:
 
-        global run
-        global height
-        for corpse in deadcorpses:
-            if corpse.name == "craos":
-                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
-                screen.blit(textlose, (0, ((height /2) - 100)))
-                pygame.display.update()
-                pygame.time.delay(5000)
-                run = False
-
-        if len(players) == 1 and players[0].name == "craos":
-            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
-            screen.blit(textwin, (0, ((height /2) - 100)))
-            pygame.display.update()
-            pygame.time.delay(5000)
-            run = False
+##        global run
+##        global height
+##        for corpse in deadcorpses:
+##            if corpse.name == "craos":
+##                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
+##                screen.blit(textlose, (0, ((height /2) - 100)))
+##                pygame.display.update()
+##                pygame.time.delay(5000)
+##                run = False
+##
+##        if len(players) == 1 and players[0].name == "craos":
+##            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
+##            screen.blit(textwin, (0, ((height /2) - 100)))
+##            pygame.display.update()
+##            pygame.time.delay(5000)
+##            run = False
 
     
 
@@ -350,6 +365,68 @@ class chooseability(object):
                 craos.target = []
                 craos.ability = craos.abilities[i]
                 roundphase = choosetarget(self.roundcount)
+
+
+        if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
+            print("ganhar habilidade")
+            self.gainability(craos)
+        elif 520 <= mouseposition[0] <= 680 and 290 <= mouseposition[1] <= 320:
+            print("evoluir")
+            self.evolve(craos)
+
+
+    def gainability(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        stageabilities = abilities[player.stage]
+        for ability in stageabilities:
+            if not (ability in player.abilities):
+                a = False
+        if a:
+            pass
+        #verify if the player has enough EXP:
+        elif player.EXP < abilityprice[player.stage]:
+            pass
+        else:
+            while not a:
+                b = R.randint(0,len(stageabilities) - 1)
+                if not (stageabilities[b] in player.abilities):
+                    player.abilities.append(stageabilities[b])
+                    a = True
+                    player.EXP -= abilityprice[player.stage]
+
+    def gainabilityforfree(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        stageabilities = abilities[player.stage]
+        for ability in stageabilities:
+            if not (ability in player.abilities):
+                a = False
+        if a:
+            pass
+        else:
+            while not a:
+                b = R.randint(0,len(stageabilities) - 1)
+                print()
+                print(b)
+                print()
+                if not (stageabilities[b] in player.abilities):
+                    player.abilities.append(stageabilities[b])
+                    a = True
+                  
+
+    def evolve(self, player):
+        #verify if the player has enough EXP:
+        if player.EXP < evolveprice[player.stage]:
+            pass
+        else:
+            player.EXP -= evolveprice[player.stage]
+            player.HP += evolveHPgain[player.stage]
+            player.MaxHP += evolveHPgain[player.stage]
+            player.EXPtoevolve = evolveEXP[player.stage + 1]
+            player.stage += 1
+            for i in range(evolvenumberofabilitiesgained[player.stage - 1]):
+                self.gainabilityforfree(player)
 
 #__________________________________________________________________________________________________________________________________________________________________________________
 class choosetarget(object):
@@ -501,58 +578,149 @@ class calculateeffects(object):
                 
         for player in players:
             player.startnewround()
+
+        #verify if the game ended:
+        self.draw()
+        
+        global run
+        global height
+        for corpse in deadcorpses:
+            if corpse.name == "craos":
+                textlose = fontend.render("LOSER! :( ", 1, (255,0,0))
+                screen.blit(textlose, (0, ((height /2) - 100)))
+                pygame.display.update()
+                pygame.time.delay(5000)
+                run = False
+
+        if len(players) == 1 and players[0].name == "craos":
+            textwin = fontend.render("YOU WIN! :D ", 1, (0,255,0))
+            screen.blit(textwin, (0, ((height /2) - 100)))
+            pygame.display.update()
+            pygame.time.delay(5000)
+            run = False
                 
         roundphase = chooseability(self.roundcount + 1)
 
     
 #_______________________________________________________________________________________________________________________________________________________________________
-class improvmenttime(object):
-    def __init__(self, roundcount):
-        self.roundcount = roundcount
-        self.name = "improvment time"
-        self.time = 30
-        self.time1 = 30
-        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
-        self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
-
-    def clock(self):
-        self.time1 = self.time1 - 0.1
-        self.time = math.ceil(self.time1)
-        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
-        for i in range(10):
-            pygame.time.delay(10)
-    
-    def draw(self):
-
-        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
-
-        
-        screen.blit(self.texttime, (300, 10))
-        screen.blit(self.textround, (300, 30))
-        for player in players:
-            player.draw()
-        for corpse in deadcorpses:
-            corpse.draw()
-        craos.drawabilities()
-
-        #escolha:
-        pygame.draw.rect(screen, (227,207,87), (320, 290, 160, 130))
-        pygame.draw.rect(screen, (227,207,87), (520, 290, 160, 130))
-        
-        pygame.display.update()
-
-    def effect(self):
-        pass
-
-    def receiveevent(self, event):
-        mouseposition = event.pos
+##class improvmenttime(object):
+##    def __init__(self, roundcount):
+##        self.roundcount = roundcount
+##        self.name = "improvment time"
+##        self.time = 90
+##        self.time1 = 90
+##        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+##        self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
+##        self.textgainability = fontA.render("learn ability", 1, (0,0,0))
+##        self.textevolve = fontA.render("EVOLVE!", 1, (0,0,0))
+##        
+##
+##    def clock(self):
+##        self.time1 = self.time1 - 0.1
+##        self.time = math.ceil(self.time1)
+##        self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+##        for i in range(10):
+##            pygame.time.delay(10)
+##    
+##    def draw(self):
+##
+##        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+##
+##        
+##        screen.blit(self.texttime, (300, 10))
+##        screen.blit(self.textround, (300, 30))
+##        for player in players:
+##            player.draw()
+##        for corpse in deadcorpses:
+##            corpse.draw()
+##        craos.drawabilities()
+##
+##        #escolha:
+##        pygame.draw.rect(screen, (227,207,87), (320, 290, 160, 30))
+##        pygame.draw.rect(screen, (227,207,87), (520, 290, 160, 30))
+##        pygame.draw.rect(screen, (227,207,87), (490, 295, 20, 20))
+##        pygame.draw.line(screen, (255,0,0),(490, 295) , (510, 315))
+##        pygame.draw.line(screen, (255,0,0),(510, 295) , (490, 315))
+##
+##        screen.blit(self.textgainability, (330, 295))
+##        screen.blit(self.textevolve, (530, 295))
+##        
+##        pygame.display.update()
+##
+##    def effect(self):
+##        pass
+##
+##    def receiveevent(self, event):
+##        global roundphase
+##        mouseposition = event.pos
+##
+##        if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
+##            print("ganhar habilidade")
+##            self.gainability(craos)
+##        elif 520 <= mouseposition[0] <= 680 and 290 <= mouseposition[1] <= 320:
+##            print("evoluir")
+##            self.evolve(craos)
+##        elif 490 <= mouseposition[0] <= 510 and 295 <= mouseposition[1] <= 315:
+##            roundphase = chooseability(self.roundcount + 1)
+##
+##    def gainability(self, player):
+##        #verify if the player already has all the abilities:
+##        a = True
+##        stageabilities = abilities[player.stage]
+##        for ability in stageabilities:
+##            if not (ability in player.abilities):
+##                a = False
+##        if a:
+##            pass
+##        #verify if the player has enough EXP:
+##        elif player.EXP < abilityprice[player.stage]:
+##            pass
+##        else:
+##            while not a:
+##                b = R.randint(0,len(stageabilities) - 1)
+##                if not (stageabilities[b] in player.abilities):
+##                    player.abilities.append(stageabilities[b])
+##                    a = True
+##                    player.EXP -= abilityprice[player.stage]
+##
+##    def gainabilityforfree(self, player):
+##        #verify if the player already has all the abilities:
+##        a = True
+##        stageabilities = abilities[player.stage]
+##        for ability in stageabilities:
+##            if not (ability in player.abilities):
+##                a = False
+##        if a:
+##            pass
+##        else:
+##            while not a:
+##                b = R.randint(0,len(stageabilities) - 1)
+##                if not (stageabilities[b] in player.abilities):
+##                    player.abilities.append(stageabilities[b])
+##                    a = True
+##                  
+##
+##    def evolve(self, player):
+##        #verify if the player has enough EXP:
+##        if player.EXP < evolveprice[player.stage]:
+##            pass
+##        else:
+##            player.EXP -= evolveprice[player.stage]
+##            player.HP += evolveHPgain[player.stage]
+##            player.MaxHP += evolveHPgain[player.stage]
+##            player.EXPtoevolve = evolveEXP[player.stage + 1]
+##            player.stage += 1
+##            for i in range(evolvenumberofabilitiesgained[player.stage - 1]):
+##                self.gainabilityforfree(player)
+            
+            
         
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, targetnumber, selftarget, priority, damage):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage):
         self.name = name
-        #self.phase = phase
+        self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
         self.targetnumber = targetnumber # the number of targets the ability has.
         self.selftarget = selftarget # its suposed to be True or False, if the caster can target himself or not.
@@ -654,26 +822,22 @@ npc.draw(tomis)
 #______________________________________________________________________________________________________________________________________________________________________
 
 #abilities:
-abilities.append(ability("Tackle", 1, False, 2, True))
-abilities.append(ability("Double Edged Sword", 1, False, 2, True))
-abilities.append(ability("Uncertain Footing", 1, False, 3, True))
-abilities.append(ability("Stand Tall", 1, False, 3, True))
-abilities.append(ability("QuickPoke", 0, False, 1, True))
-abilities.append(ability("chill", 0, True, 2, False))
-starterabilities = abilities
+abilities[0].append(ability("Tackle",0, 1, False, 2, True))
+abilities[0].append(ability("Uncertain Footing",0, 1, False, 3, True))
+abilities[0].append(ability("Stand Tall",0, 1, False, 3, True))
+starterabilities = abilities[0]
+abilities[1].append(ability("Double Edged Sword",1, 1, False, 2, True))
+abilities[1].append(ability("QuickPoke",1, 0, False, 1, True))
+abilities[1].append(ability("chill",1, 0, True, 2, False))
 
-
-for player in players:
-    player.abilities = starterabilities
+abilities[2].append(ability("Spear Throw",2, 1,False, 2, True))
+abilities[2].append(ability("Kick",2, 1,False, 2, True))
+abilities[2].append(ability("Punch",2, 1,False, 2, True))
+abilities[2].append(ability("On The Edge",2, 1,False, 3, True))
 #______________________________________________________________________________________________________________________________________________________________________
 
 
-##BeginningOfRound = True
-##DuringRound = False
-##EndOfRound = False
-##
-##decided = False
-#roundcount = 1
+
 
 
 
@@ -700,7 +864,26 @@ while run:
                 
             if event.key == pygame.K_DELETE:
                 run = False
-                
+            if event.key == pygame.K_g:
+                roundphase.gainabilityforfree(craos)
+            if event.key == pygame.K_t:
+                print("clicaste t")
+                print("craos:")
+                for ability in craos.abilities:
+                    print(ability.name)
+                print()
+                print("robly18")
+                for ability in robly18.abilities:
+                    print(ability.name)
+                print()
+                print("tomis")  
+                for ability in tomis.abilities:
+                    print(ability.name)
+                print()
+                print("tavos")   
+                for ability in tavos.abilities:
+                    print(ability.name)
+
     roundphase.clock()
     roundphase.draw()
     roundphase.effect()
