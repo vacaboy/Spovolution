@@ -24,10 +24,9 @@ abilities = [[],[],[[],[],[]],[],[]] #keeps track of all abilities in the game, 
 #the abilities in stage 2 divide into 3 sublists, offensive, defensive and utility
 deadcorpses = [] #has all the dead folk
 abilityprice = [0, 5, 10] #has the price of each ability for each stage, for stage zero, the price is zero, for stage 1, the price is 5, and so on
-evolveprice = [0, 20] #the same but for evolving
-evolveHPgain = [0, 20] #HP and MaxHP gained when evolving, per stage.
-evolveEXP = [0, 20, 40] #EXP needed to evolve, per stage.
-evolvenumberofabilitiesgained = [0, 2] #number of abilities gained when evolving, per stage.
+evolveprice = [0, 20, 100] #the same but for evolving
+evolveHPgain = [0, 75] #HP and MaxHP gained when evolving, per stage.
+evolveEXP = [0, 20, 100] #EXP needed to evolve, per stage.
 #__________________________________________________________________________________________________________________________________________________________________________________
 class player(object):
     def __init__(self,x ,y, name = "none", color = "none"):
@@ -658,10 +657,6 @@ class loseability(object):
         self.texttime = fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
         self.textround = fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
         self.textreturn = fontA.render("Return", 1, (0,0,0))
-##        self.textoffensive = fontA.render("Offensive", 1, (0,0,0))
-##        self.textdefensive = fontA.render("Defensive", 1, (0,0,0))
-##        self.textutility = fontA.render("Utility", 1, (0,0,0))
-##        self.number = 3 #abilities he gets to choose
         
     def clock(self):
         self.time1 = self.time1 - 0.1
@@ -683,9 +678,8 @@ class loseability(object):
             player.draw()
         for corpse in deadcorpses:
             corpse.draw()
-
+        #return option:
         pygame.draw.rect(screen, (227,207,87), (320, 290, 160, 30))
-        
         screen.blit(self.textreturn, (330, 295))
         
         pygame.display.update()
@@ -699,47 +693,13 @@ class loseability(object):
         global roundphase
         mouseposition = event.pos
         print(mouseposition)
-        if  320 <= mouseposition[0]  <= 480 and 290 <= mouseposition[1] <= 320:
-            self.gainabilityoffensive(craos)
-            self.number -= 1
-        elif  520 <= mouseposition[0]  <= 680 and 290 <= mouseposition[1] <= 320:
-            self.gainabilitydefensive(craos)
-            self.number -= 1
-        elif  720 <= mouseposition[0]  <= 880 and 290 <= mouseposition[1] <= 320:
-            self.gainabilityutility(craos)
-            self.number -= 1
 
-    def gainabilityoffensive(self, player):
-        #verify if the player already has all the abilities
-        a = True
-        offensiveabilities = abilities[2][0]
-        while a:
-            b = R.randint(0,len(offensiveabilities) - 1)
-            print(b)
-            if not (offensiveabilities[b] in player.abilities):
-                player.abilities.append(offensiveabilities[b])
-                a = False
-
-    def gainabilitydefensive(self, player):
-        #verify if the player already has all the abilities:
-        a = True
-        defensiveabilities = abilities[2][1]
-        while a:
-            b = R.randint(0,len(defensiveabilities) - 1)
-            if not (defensiveabilities[b] in player.abilities):
-                player.abilities.append(defensiveabilities[b])
-                a = False
-
-
-    def gainabilityutility(self, player):
-        #verify if the player already has all the abilities:
-        a = True
-        utilityabilities = abilities[2][2]
-        while a:
-            b = R.randint(0,len(utilityabilities) - 1)
-            if not (utilityabilities[b] in player.abilities):
-                player.abilities.append(utilityabilities[b])
-                a = False
+        for i in range(len(craos.abilities)):
+            if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
+                craos.abilities.remove(craos.abilities[i])
+                roundphase = chooseability(self.roundcount, self.time + 5)
+            if  320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
+                roundphase = chooseability(self.roundcount, self.time + 5)
 
 #_____________________________________________________________________________________________________________________________________________________________________
 class evolve1(object):
@@ -802,6 +762,7 @@ class evolve1(object):
                     npc.MaxHP += evolveHPgain[npc.stage]
                     npc.EXPtoevolve = evolveEXP[npc.stage + 1]
                     npc.stage += 1
+                    npc.abilities = []
                     self.gainabilityoffensive(npc)
                     self.gainabilityoffensive(npc)
                     self.gainabilitydefensive(npc)
@@ -1160,6 +1121,12 @@ class ability(object):
                     target.EXP += 30
                     target.HP -= 30
                     print(caster.name + " dealt 30 damage to " + target.name + " using On The Edge")
+
+        elif self.name == "Refreshing Waters":
+            caster.abilitylastused = "Refreshing Waters"
+            caster.abilitylasttarget = [player.name for player in targets]
+            caster.HP += 12
+            print(caster.name + " regained 12 damage using Refreshing Waters")
             
         elif self.name == "teste":
             caster.abilitylastused = "teste"
