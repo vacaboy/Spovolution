@@ -27,6 +27,7 @@ abilityprice = [0, 5, 10] #has the price of each ability for each stage, for sta
 evolveprice = [0, 20, 100] #the same but for evolving
 evolveHPgain = [0, 75] #HP and MaxHP gained when evolving, per stage.
 evolveEXP = [0, 20, 100] #EXP needed to evolve, per stage.
+log = [] #isto mantem, ao longo de cada turno, quem da dano a quem.
 #__________________________________________________________________________________________________________________________________________________________________________________
 class player(object):
     def __init__(self,x ,y, name = "none", color = "none"):
@@ -69,7 +70,7 @@ class player(object):
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         for ability in self.abilities:
-            ability.worked = False
+            ability.startnewround()
 
         
     def draw(self):
@@ -129,9 +130,8 @@ class player(object):
         pygame.draw.rect(screen, (255,246,143),(0 ,0 ,300 , height)) #ability tab
         for ability in self.abilities:
             
-            #(199,97,20)
             pygame.draw.rect(screen, (139,69,19),(10,(10 + 40 * self.abilities.index(ability)), 280, 30))
-            if ability.abilitytype == "0":
+            if ability.abilitytype == "0": #criar o nome dela:
                 textability = fontA.render(ability.name, 1, (0,0,0))
                 
             elif ability.abilitytype == "Offensive":
@@ -145,6 +145,10 @@ class player(object):
 
             screen.blit(textability,(30, 15 + 40 * self.abilities.index(ability)))
 
+            if ability.cooldown > 0:
+                pygame.draw.line(screen, (255,0,0), (10, 10 + 40 * self.abilities.index(ability)), (290, 40 + 40 * self.abilities.index(ability)) )
+                pygame.draw.line(screen, (255,0,0), (10, 40 + 40 * self.abilities.index(ability)), (290, 10 + 40 * self.abilities.index(ability)) )
+
     def addability(self, ability):
         self.abilities = self.abilities + [ability]
 #______________________________________________________________________________________________________________________________________________________________________
@@ -155,7 +159,8 @@ class npc(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"), ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
+        self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"), ability("Limitless",2, 0,True, 3, False, "Utility")]
+        #self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"), ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
@@ -190,7 +195,7 @@ class npc(object):
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         for ability in self.abilities:
-            ability.worked = False
+            ability.startnewround()
         
 
         
@@ -236,8 +241,12 @@ class npc(object):
         screen.blit(textabilitylastused3, (self.pos[0] - 50, self.pos[1] + 95))
 
     def chooseability(self):
-        a = R.randint(0, len(self.abilities)-1)
-        self.ability = self.abilities[a]
+        a = True
+        while a:
+            b = R.randint(0, len(self.abilities)-1)
+            if self.abilities[b].cooldown == 0:
+                self.ability = self.abilities[b]
+                a = False
 
     def choosetarget(self, n, selftarget):
         self.target = []
@@ -373,16 +382,19 @@ class chooseability(object):
         #escolher habilidade
         for i in range(len(craos.abilities)):
             if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
-                craos.target = []
-                craos.ability = craos.abilities[i]
-                for npc in npcs:#npc's tambem escolhem as habilidades
-                    npc.chooseability()
+                if craos.abilities[i].cooldown == 0: #só podes escolher se a habilidade nao estiver em cooldown
+                    craos.target = []
+                    craos.ability = craos.abilities[i]
+                    for npc in npcs:#npc's tambem escolhem as habilidades
+                        npc.chooseability()
 
-                for player in players:#fazer os efeitos que atuam agora
-                    for condition in player.conditions:
-                        if condition.priority == "chooseability":
-                            condition.effect()
-                roundphase = choosetarget(self.roundcount)
+                    for player in players:#fazer os efeitos que atuam agora
+                        for condition in player.conditions:
+                            if condition.priority == "chooseability":
+                                condition.effect()
+                    roundphase = choosetarget(self.roundcount)
+                else:
+                    print("this ability is in cooldown for " + str(craos.abilities[i].cooldown) + " turns.")
 
         #ganhar habilidade
         if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
@@ -647,6 +659,7 @@ class calculateeffects(object):
         
         global run
         global height
+        global log
         if len(players) == 0:
             texttie = fontend.render("Its a Tie! :|", 1 ,(255,193,37))
             screenblit(texttie, (0, ((height / 2) - 100)))
@@ -683,7 +696,9 @@ class calculateeffects(object):
                         self.gainabilityoffensive(npc)
                         self.gainabilityoffensive(npc)
                         self.gainabilitydefensive(npc)
-                
+
+        log = []
+        
         roundphase = chooseability(self.roundcount + 1)
         print()
         print("round: " + str(self.roundcount + 1))
@@ -1028,6 +1043,7 @@ class condition(object):
         self.duration = duration
 
     def effect(self):
+        global log
         if self.name == "teste":
             self.duration -= 1
             if self.target.ability.damage:
@@ -1065,15 +1081,48 @@ class condition(object):
                     target.EXP += 7
                     print(self.target.name + " dealt 7 more damage")
 
+        elif self.name == "Limitless":
+            self.duration -= 1
+            for i in log:
+                if i[0] == self.target:
+                    i[2].HP -= i[1]
+                    i[2].EXP += i[1]
+                    self.target.EXP += i[1]
+                    print(self.target.name + " dealt " + str(i[1]) + " extra damage because of Limiless")
+
+        elif self.name == "Asleep":
+            
+            a = R.randint(1,100)
+            print("coisas de sleep:")
+            print(str(a))
+            print(str(self.duration))
+            if self.duration == 5 and a <= 30:
+                self.duration = 1
+            elif self.duration == 4 and a <= 50:
+                self.duration = 1
+            elif self.duration == 3 and a <= 70:
+                self.duration = 1
+            elif self.duration == 2 and a <= 80:
+                self.duration = 1
+            elif self.duration == 1 and a <= 90:
+                self.duration = 1
+            else:
+                self.target.ability = ability("passed", 3, 0, True, 1, False)
+                print(self.target.name + " is Asleep this round")
+                
+            self.duration -= 1
+
 
         if self.duration == 0:
+            if self.name == "Asleep":
+                print(self.target.name + " Woke UP!")
             self.target.conditions.remove(self)
             
             
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0):
         self.name = name
         self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
@@ -1082,13 +1131,22 @@ class ability(object):
         self.damage = damage #suposed to be True or False
         self.abilitytype = abilitytype
         self.worked = worked
+        self.cooldown = cooldown
+
+    def startnewround(self):
+        self.worked = False
+        if self.cooldown >= 1:
+            self.cooldown -= 1
+            print(self.name + str(self.cooldown))
         
     def effect(self, targets, caster):
+        global log
         if self.name == "Tackle":
             caster.abilitylastused = "Tackle"
             caster.abilitylasttarget = [player.name for player in targets]
             caster.dealtdamage = True
             for target in targets:
+                log.append([caster, 2, target])
                 caster.EXP += 2
                 target.EXP += 2
                 target.HP -= 2
@@ -1102,6 +1160,8 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             caster.dealtdamage = True
             for target in targets:
+                log.append([caster, 3, target])
+                log.append([caster, 2, caster])
                 caster.EXP += 5
                 caster.HP -= 2
                 target.EXP += 3
@@ -1117,6 +1177,7 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             if caster.attacksreceived >= 2:
                 for target in targets:
+                    log.append([caster, 8, target])
                     caster.EXP += 8
                     target.EXP += 8
                     target.HP -= 8
@@ -1128,6 +1189,7 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             if not caster.damaged:
                 for target in targets:
+                    log.append([caster, 8, target])
                     caster.EXP += 8
                     target.EXP += 8
                     target.HP -= 8
@@ -1137,11 +1199,17 @@ class ability(object):
         elif self.name == "QuickPoke":
             caster.abilitylastused = "QuickPoke"
             caster.abilitylasttarget = [player.name for player in targets]
+##            for player in player:
+##                if player == self.caster:
+##                    pass
+##                else:
+##                    caster.abilitylasttarget.append(player.name)
             caster.dealtdamage = True
             for target in players:
                 if target == caster:
                     pass
                 else:
+                    log.append([caster, 1, target])
                     target.EXP += 1
                     target.HP -= 1
                     caster.EXP += 1
@@ -1170,6 +1238,7 @@ class ability(object):
                 d=R.randint(1,12)
                 e = b + c + d
                 for target in targets:
+                    log.append([caster, e, target])
                     caster.EXP += e
                     target.HP -= e
                     target.EXP += e
@@ -1186,6 +1255,7 @@ class ability(object):
             b = R.randint(1,10)
             c = a + b
             for target in targets:
+                log.append([caster, c, target])
                 caster.EXP += c
                 target.EXP += c
                 target.HP -= c
@@ -1199,6 +1269,7 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             caster.dealtdamage = True
             for target in targets:
+                log.append([caster, 9, target])
                 caster.EXP += 9
                 target.EXP += 9
                 target.HP -= 9
@@ -1206,6 +1277,28 @@ class ability(object):
                 target.attacksreceived += 1
                 self.worked = True
                 print(caster.name + " dealt 9 damage to " + target.name + " using Punch")
+
+        elif self.name == "Blood Drain":
+            caster.abilitylastused = "Blood Drain"
+            caster.abilitylasttarget = [player.name for player in targets]
+            d = R.randint(1,100)
+            if d <= 75:
+                caster.dealtdamage = True
+                a = R.randint(1,8)
+                b = R.randint(1,8)
+                c = a + b
+                for target in targets:
+                    log.append([caster, c, target])
+                    caster.EXP += c
+                    target.EXP += c
+                    target.HP -= c
+                    caster.HP += c
+                    target.damaged = True
+                    target.attacksreceived += 1
+                    self.worked = True
+                    print(caster.name + " dealt " + str(c) +" damage to " + target.name + " using Blood Drain")
+            else:
+                print(caster.name + " missed Blood Drain")
                 
         elif self.name == "On The Edge":
             caster.abilitylastused = "On The Edge"
@@ -1223,6 +1316,7 @@ class ability(object):
             
             if a == b and a > 0:
                 for target in targets:
+                    log.append([caster, 30, target])
                     caster.EXP += 30
                     target.EXP += 30
                     target.HP -= 30
@@ -1241,6 +1335,7 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             caster.conditions.append(condition("Rock Solid", caster, 1, 1))
             self.worked = True
+            self.cooldown = 5
 
         elif self.name == "Regenerate":
             caster.abilitylastused = "Regenerate"
@@ -1258,7 +1353,25 @@ class ability(object):
             self.worked = True
             print(caster.name + " will deal 7 more damage for " + str(a) + " turns because of Fight Stance")
 
+        elif self.name == "Limitless":
+            caster.abilitylastused = "Limitless"
+            caster.abilitylasttarget = [player.name for player in targets]
+            caster.conditions.append(condition("Limitless", caster, 3, 1 + 1))
+            self.worked = True
+            print(caster.name + " will deal double damage next turn because of Limitless")
 
+        elif self.name == "Lullaby":
+            caster.abilitylastused = "Lullaby"
+            caster.abilitylasttarget = [player.name for player in targets]
+            print(caster.name + " sang a Lullaby")
+            for player in players:
+                if player == caster:
+                    pass
+                else:
+                    a = R.randint(1,2)
+                    if a == 1:
+                        player.conditions.append(condition("Asleep", player, "chooseability", 5))
+                        print(caster.name + " put " + player.name + " to Sleep. ")
             
         elif self.name == "teste":
             caster.abilitylastused = "teste"
@@ -1327,6 +1440,8 @@ abilities[2][0].append(ability("Spear Throw",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Kick",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Punch",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("On The Edge",2, 1,False, 3, True, "Offensive"))
+abilities[2][0].append(ability("Blood Drain",2, 1,False, 2, True, "Offensive"))
+
 
 abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False, "Defensive"))
 abilities[2][1].append(ability("Refreshing Waters",2, 0,True, 2, False, "Defensive"))
@@ -1335,6 +1450,7 @@ abilities[2][1].append(ability("Regenerate",2, 0,True, 3, False, "Defensive"))
 abilities[2][2].append(ability("Lullaby",2, 0,False, 3, False, "Utility"))
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
+abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility"))
 #______________________________________________________________________________________________________________________________________________________________________
 
 
@@ -1380,21 +1496,10 @@ while run:
                     for ability in player.abilities:
                         print(ability.name)
                     print()
-##                print("craos:")
-##                for ability in craos.abilities:
-##                    print(ability.name)
-##                print()
-##                print("robly18")
-##                for ability in robly18.abilities:
-##                    print(ability.name)
-##                print()
-##                print("tomis")  
-##                for ability in tomis.abilities:
-##                    print(ability.name)
-##                print()
-##                print("tavos")   
-##                for ability in tavos.abilities:
-##                    print(ability.name)
+            elif event.key == pygame.K_l:
+                for i in log:
+                    print(str(i))
+
 
     roundphase.clock()
     roundphase.draw()
