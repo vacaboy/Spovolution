@@ -47,6 +47,7 @@ class player(object):
         self.dealtdamage = False #True of False if this player dealt damage this turn or not.
         self.attacksreceived = 0 #keeps track of how many attacks has this player received
         self.conditions = []
+        self.unlearnedabilities = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -159,8 +160,8 @@ class npc(object):
         self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
-        self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"), ability("Limitless",2, 0,True, 3, False, "Utility")]
-        #self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"), ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
+        #self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"), ability("Limitless",2, 0,True, 3, False, "Utility")]
+        self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"), ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
@@ -172,6 +173,7 @@ class npc(object):
         self.dealtdamage = False #True of False if this player dealt damage this turn or not.
         self.attacksreceived = 0 #keeps track of how many attacks has this player received
         self.conditions = []
+        self.unlearnedabilities = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -420,7 +422,8 @@ class chooseability(object):
         a = True
         stageabilities = abilities[player.stage]
         for ability in stageabilities:
-            if not (ability in player.abilities):
+            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
+            #if not (ability.name in [i.name for i in player.abilities]):
                 a = False
         if a:
             pass
@@ -430,8 +433,11 @@ class chooseability(object):
         else:
             while not a:
                 b = R.randint(0,len(stageabilities) - 1)
-                if not (stageabilities[b] in player.abilities):
-                    player.abilities.append(stageabilities[b])
+                #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                if (not (stageabilities[b].name in [i.name for i in player.abilities])) and ( not (stageabilities[b].name in [i.name for i in player.unlearnedabilities])):
+                #if not (stageabilities[b].name in [i.name for i in player.abilities]):
+                
+                    player.abilities.append(stageabilities[b].clone())
                     a = True
                     player.EXP -= abilityprice[player.stage]
 
@@ -440,7 +446,8 @@ class chooseability(object):
         a = True
         stageabilities = abilities[player.stage]
         for ability in stageabilities:
-            if not (ability in player.abilities):
+            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
+            #if not (ability.name in [i.name for i in player.abilities]):
                 a = False
         if a:
             pass
@@ -450,8 +457,10 @@ class chooseability(object):
                 print()
                 print(b)
                 print()
-                if not (stageabilities[b] in player.abilities):
-                    player.abilities.append(stageabilities[b])
+                #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                if (not (stageabilities[b].name in [i.name for i in player.abilities])) and ( not (stageabilities[b].name in [i.name for i in player.unlearnedabilities])):
+                #if not (stageabilities[b].name in [i.name for i in player.abilities]):
+                    player.abilities.append(stageabilities[b].clone())
                     a = True
                   
 
@@ -646,10 +655,14 @@ class calculateeffects(object):
         for player in players: #check if anyone died
             if player.HP <= 0:
                 deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
-                players.remove(player)
-        for npc in npcs:
-            if npc.HP <=0:
-                npcs.remove(npc)
+                if player.name in [i.name for i in npcs]:
+                    players.remove(player)
+                    npcs.remove(player)
+                else:
+                    players.remove(player)
+##        for npc in npcs:
+##            if npc.HP <=0:
+##                npcs.remove(npc)
                 
         for player in players:
             player.startnewround()
@@ -706,34 +719,34 @@ class calculateeffects(object):
 
 
     def gainabilityoffensive(self, player):
-        #verify if the player already has all the abilities
         a = True
         offensiveabilities = abilities[2][0]
         while a:
             b = R.randint(0,len(offensiveabilities) - 1)
-            if not (offensiveabilities[b] in player.abilities):
-                player.abilities.append(offensiveabilities[b])
+            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            if not (offensiveabilities[b].name in [i.name for i in player.abilities]):
+                player.abilities.append(offensiveabilities[b].clone())
                 a = False
 
     def gainabilitydefensive(self, player):
-        #verify if the player already has all the abilities:
         a = True
         defensiveabilities = abilities[2][1]
         while a:
             b = R.randint(0,len(defensiveabilities) - 1)
-            if not (defensiveabilities[b] in player.abilities):
-                player.abilities.append(defensiveabilities[b])
+            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            if not (defensiveabilities[b].name in [i.name for i in player.abilities]):
+                player.abilities.append(defensiveabilities[b].clone())
                 a = False
 
 
     def gainabilityutility(self, player):
-        #verify if the player already has all the abilities:
         a = True
         utilityabilities = abilities[2][2]
         while a:
             b = R.randint(0,len(utilityabilities) - 1)
-            if not (utilityabilities[b] in player.abilities):
-                player.abilities.append(utilityabilities[b])
+            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            if not (utilityabilities[b].name in [i.name for i in player.abilities]):
+                player.abilities.append(utilityabilities[b].clone())
                 a = False
 
 #_____________________________________________________________________________________________________________________________________________________________________
@@ -786,9 +799,10 @@ class loseability(object):
 
         for i in range(len(craos.abilities)):
             if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
+                craos.unlearnedabilities.append(craos.abilities[i])
                 craos.abilities.remove(craos.abilities[i])
                 roundphase = chooseability(self.roundcount, self.time + 5)
-            if  320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
+            if  320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320: #return button
                 roundphase = chooseability(self.roundcount, self.time + 5)
 
 #_____________________________________________________________________________________________________________________________________________________________________
@@ -851,8 +865,11 @@ class evolve1(object):
                     npc.EXPtoevolve = evolveEXP[npc.stage + 1]
                     npc.stage += 1
                     npc.abilities = []
-                    self.gainabilityoffensive(npc)
-                    self.gainabilityoffensive(npc)
+                    #self.gainabilityoffensive(npc)
+                    #self.gainabilityoffensive(npc)
+                    #self.gainabilitydefensive(npc)
+                    self.gainabilitydefensive(npc)
+                    self.gainabilitydefensive(npc)
                     self.gainabilitydefensive(npc)
             
             roundphase = chooseability(self.roundcount, self.time + 15)
@@ -875,34 +892,34 @@ class evolve1(object):
             self.number -= 1
 
     def gainabilityoffensive(self, player):
-        #verify if the player already has all the abilities
         a = True
         offensiveabilities = abilities[2][0]
         while a:
             b = R.randint(0,len(offensiveabilities) - 1)
-            if not (offensiveabilities[b] in player.abilities):
-                player.abilities.append(offensiveabilities[b])
+            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            if not (offensiveabilities[b].name in [i.name for i in player.abilities]):
+                player.abilities.append(offensiveabilities[b].clone())
                 a = False
 
     def gainabilitydefensive(self, player):
-        #verify if the player already has all the abilities:
         a = True
         defensiveabilities = abilities[2][1]
         while a:
             b = R.randint(0,len(defensiveabilities) - 1)
-            if not (defensiveabilities[b] in player.abilities):
-                player.abilities.append(defensiveabilities[b])
+            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            if not (defensiveabilities[b].name in [i.name for i in player.abilities]):
+                player.abilities.append(defensiveabilities[b].clone())
                 a = False
 
 
     def gainabilityutility(self, player):
-        #verify if the player already has all the abilities:
         a = True
         utilityabilities = abilities[2][2]
         while a:
             b = R.randint(0,len(utilityabilities) - 1)
-            if not (utilityabilities[b] in player.abilities):
-                player.abilities.append(utilityabilities[b])
+            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            if not (utilityabilities[b].name in [i.name for i in player.abilities]):
+                player.abilities.append(utilityabilities[b].clone())
                 a = False
 
 #_____________________________________________________________________________________________________________________________________________________________________
@@ -978,9 +995,9 @@ class gainability2(object):
     def gainabilityoffensive(self, player):
         #verify if the player already has all the abilities:
         a = True
-        offensiveabilities = abilities[player.stage][0]
+        offensiveabilities = abilities[player.stage][0] #a list of the offensive abilities of the second stage
         for ability in offensiveabilities:
-            if not (ability in player.abilities):
+            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -990,8 +1007,9 @@ class gainability2(object):
         else:
             while not a:
                 b = R.randint(0,len(offensiveabilities) - 1)
-                if not (offensiveabilities[b] in player.abilities):
-                    player.abilities.append(offensiveabilities[b])
+                #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                if (not (offensiveabilities[b].name in [i.name for i in player.abilities])) and ( not (offensiveabilities[b].name in [i.name for i in player.unlearnedabilities])): 
+                    player.abilities.append(offensiveabilities[b].clone())
                     a = True
                     player.EXP -= abilityprice[player.stage]
 
@@ -1000,7 +1018,7 @@ class gainability2(object):
         a = True
         defensiveabilities = abilities[player.stage][1]
         for ability in defensiveabilities:
-            if not (ability in player.abilities):
+            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -1010,8 +1028,10 @@ class gainability2(object):
         else:
             while not a:
                 b = R.randint(0,len(defensiveabilities) - 1)
-                if not (defensiveabilities[b] in player.abilities):
-                    player.abilities.append(defensiveabilities[b])
+                #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                if (not (defensiveabilities[b].name in [i.name for i in player.abilities])) and ( not (defensiveabilities[b].name in [i.name for i in player.unlearnedabilities])):
+                #if not (defensiveabilities[b].name in [i.name for i in player.abilities]):
+                    player.abilities.append(defensiveabilities[b].clone())
                     a = True
                     player.EXP -= abilityprice[player.stage]
                     
@@ -1020,7 +1040,7 @@ class gainability2(object):
         a = True
         utilityabilities = abilities[player.stage][2]
         for ability in utilityabilities:
-            if not (ability in player.abilities):
+            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -1030,8 +1050,10 @@ class gainability2(object):
         else:
             while not a:
                 b = R.randint(0,len(utilityabilities) - 1)
-                if not (utilityabilities[b] in player.abilities):
-                    player.abilities.append(utilityabilities[b])
+                #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                if (not (utilityabilities[b].name in [i.name for i in player.abilities])) and ( not (utilityabilities[b].name in [i.name for i in player.unlearnedabilities])):
+                #if not (utilityabilities[b].name in [i.name for i in player.abilities]):
+                    player.abilities.append(utilityabilities[b].clone())
                     a = True
                     player.EXP -= abilityprice[player.stage]
 #_______________________________________________________________________________________________________________________________________________________________________
@@ -1138,6 +1160,11 @@ class ability(object):
         if self.cooldown >= 1:
             self.cooldown -= 1
             print(self.name + str(self.cooldown))
+
+    def clone(self):
+        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown)
+
+#ability("Lullaby",2, 0,False, 3, False, "Utility")
         
     def effect(self, targets, caster):
         global log
@@ -1335,7 +1362,7 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             caster.conditions.append(condition("Rock Solid", caster, 1, 1))
             self.worked = True
-            self.cooldown = 5
+            self.cooldown = 5 + 1
 
         elif self.name == "Regenerate":
             caster.abilitylastused = "Regenerate"
@@ -1358,12 +1385,14 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             caster.conditions.append(condition("Limitless", caster, 3, 1 + 1))
             self.worked = True
+            self.cooldown = 999
             print(caster.name + " will deal double damage next turn because of Limitless")
 
         elif self.name == "Lullaby":
             caster.abilitylastused = "Lullaby"
             caster.abilitylasttarget = [player.name for player in targets]
             print(caster.name + " sang a Lullaby")
+            self.cooldown = 5 + 1
             for player in players:
                 if player == caster:
                     pass
