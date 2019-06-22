@@ -73,8 +73,11 @@ class player(object):
 
         
     def draw(self):
-        pygame.draw.circle(screen, self.color, self.pos, 50) #the player
-
+        #the player:
+        if self.stage == 1:
+            pygame.draw.circle(screen, self.color, self.pos, 50)
+        else:
+            pygame.draw.rect(screen, self.color, (self.pos[0] - 50, self.pos[1] - 50, 100, 100))
         #name
         textname = fontHP.render(self.name, 1 , self.color)
         screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
@@ -192,7 +195,11 @@ class npc(object):
 
         
     def draw(self):
-        pygame.draw.circle(screen, self.color, self.pos, 50) #the player
+        #the player:
+        if self.stage == 1:
+            pygame.draw.circle(screen, self.color, self.pos, 50)
+        else:
+            pygame.draw.rect(screen, self.color, (self.pos[0] - 50, self.pos[1] - 50, 100, 100))
 
         #name
         textname = fontHP.render(self.name, 1 , self.color)
@@ -441,6 +448,8 @@ class chooseability(object):
         #verify if the player has enough EXP:
         if player.EXP < evolveprice[player.stage]:
             print("Not enought EXP")
+        elif player.stage == 2:
+            print("ainda nao esta implementado evoluires mais :(")
         else:
             player.EXP -= evolveprice[player.stage]
             player.HP += evolveHPgain[player.stage]
@@ -1078,9 +1087,9 @@ class ability(object):
         if self.name == "Tackle":
             caster.abilitylastused = "Tackle"
             caster.abilitylasttarget = [player.name for player in targets]
-            caster.EXP += 2
             caster.dealtdamage = True
             for target in targets:
+                caster.EXP += 2
                 target.EXP += 2
                 target.HP -= 2
                 target.damaged = True
@@ -1091,10 +1100,10 @@ class ability(object):
         elif self.name == "Double Edged Sword":
             caster.abilitylastused = "Double Edged Sword"
             caster.abilitylasttarget = [player.name for player in targets]
-            caster.EXP += 5
-            caster.HP -= 2
             caster.dealtdamage = True
             for target in targets:
+                caster.EXP += 5
+                caster.HP -= 2
                 target.EXP += 3
                 target.HP -= 3
                 target.damaged = True
@@ -1107,8 +1116,8 @@ class ability(object):
             caster.abilitylastused = "Stand Tall"
             caster.abilitylasttarget = [player.name for player in targets]
             if caster.attacksreceived >= 2:
-                caster.EXP += 8
                 for target in targets:
+                    caster.EXP += 8
                     target.EXP += 8
                     target.HP -= 8
                     self.worked = True
@@ -1118,8 +1127,8 @@ class ability(object):
             caster.abilitylastused = "Uncertain Footing"
             caster.abilitylasttarget = [player.name for player in targets]
             if not caster.damaged:
-                caster.EXP += 8
                 for target in targets:
+                    caster.EXP += 8
                     target.EXP += 8
                     target.HP -= 8
                     self.worked = True
@@ -1176,8 +1185,8 @@ class ability(object):
             a = R.randint(1,10)
             b = R.randint(1,10)
             c = a + b
-            caster.EXP += c
             for target in targets:
+                caster.EXP += c
                 target.EXP += c
                 target.HP -= c
                 target.damaged = True
@@ -1189,8 +1198,8 @@ class ability(object):
             caster.abilitylastused = "Punch"
             caster.abilitylasttarget = [player.name for player in targets]
             caster.dealtdamage = True
-            caster.EXP += 9
             for target in targets:
+                caster.EXP += 9
                 target.EXP += 9
                 target.HP -= 9
                 target.damaged = True
@@ -1213,8 +1222,8 @@ class ability(object):
                         b += 1
             
             if a == b and a > 0:
-                caster.EXP += 30
                 for target in targets:
+                    caster.EXP += 30
                     target.EXP += 30
                     target.HP -= 30
                     self.worked = True
