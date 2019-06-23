@@ -674,6 +674,25 @@ class calculateeffects(object):
 ##        for npc in npcs:
 ##            if npc.HP <=0:
 ##                npcs.remove(npc)
+
+        #phase 4 of combat    
+        for player in players:#effects of priority 4 abilities
+            if player.ability.priority == 4:
+                player.ability.effect(player.target, player)
+
+            for condition in player.conditions: #conditions of priority 4
+                if condition.priority == 4:
+                    condition.effect()
+            
+
+        for player in players: #check if anyone died
+            if player.HP <= 0:
+                deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                if player.name in [i.name for i in npcs]:
+                    players.remove(player)
+                    npcs.remove(player)
+                else:
+                    players.remove(player)
                 
         for player in players:
             player.startnewround()
@@ -1139,8 +1158,22 @@ class condition(object):
             else:
                 self.target.ability = ability("passed", 3, 0, True, 1, False)
                 print(self.target.name + " is Asleep this round")
-                
             self.duration -= 1
+
+        elif self.name == "Intimidated":
+            self.duration -= 1
+            if self.target.ability.damage and self.target.ability.worked:
+                for i in log:
+                    if i[0] == self.target:
+                        a = 5
+                        if i[1] < 5:
+                            a = i[i]
+                        i[2].HP += a 
+                        self.target.EXP -= a
+                        i[2].EXP -= a
+                        print(self.target.name + " dealt minus " + str(a) + " damage")
+                
+
 
 
         if self.duration == 0:
@@ -1486,6 +1519,18 @@ class ability(object):
                     if a == 1:
                         player.conditions.append(condition("Asleep", player, "chooseability", 5))
                         print(caster.name + " put " + player.name + " to Sleep. ")
+
+        elif self.name == "Intimidate":
+            caster.abilitylastused = "Intimidate"
+            caster.abilitylasttarget = [player.name for player in targets]
+            caster.abilitiesincooldown.append(["Intimidate", 1 + 1])
+            a = R.randint(1,6)
+            for player in players:
+                if player == caster:
+                    pass
+                else:
+                    player.conditions.append(condition("Intimidated", player, 3, a + 1))
+                    print(caster.name + " intimidated " + player.name + " for " + str(a) + " rounds ")
             
         elif self.name == "teste":
             caster.abilitylastused = "teste"
@@ -1568,6 +1613,7 @@ abilities[2][2].append(ability("Lullaby",2, 0,False, 3, False, "Utility", cooldo
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
+abilities[2][2].append(ability("Intimidate",2, 0,False, 4, False, "Utility", cooldown = 1))
 #______________________________________________________________________________________________________________________________________________________________________
 
 
