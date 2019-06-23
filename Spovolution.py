@@ -48,6 +48,7 @@ class player(object):
         self.attacksreceived = 0 #keeps track of how many attacks has this player received
         self.conditions = []
         self.unlearnedabilities = []
+        self.abilitiesincooldown = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -70,8 +71,12 @@ class player(object):
         self.attacksreceived = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
-        for ab in self.abilities:
-            ab.startnewround()
+        for ab in self.abilitiesincooldown:
+            ab[1] -= 1
+            print(self.name + " has " + ab[0] + " in cooldown for " + str(ab[1]) + " rounds ")
+        for ab in self.abilitiesincooldown:
+            if ab[1] == 0:
+                self.abilitiesincooldown.remove(ab)
 
         
     def draw(self):
@@ -146,7 +151,7 @@ class player(object):
 
             screen.blit(textability,(30, 15 + 40 * self.abilities.index(ab)))
 
-            if ab.cooldown > 0:
+            if ab.name in [i[0] for i in self.abilitiesincooldown]:
                 pygame.draw.line(screen, (255,0,0), (10, 10 + 40 * self.abilities.index(ab)), (290, 40 + 40 * self.abilities.index(ab)) )
                 pygame.draw.line(screen, (255,0,0), (10, 40 + 40 * self.abilities.index(ab)), (290, 10 + 40 * self.abilities.index(ab)) )
 
@@ -174,6 +179,7 @@ class npc(object):
         self.attacksreceived = 0 #keeps track of how many attacks has this player received
         self.conditions = []
         self.unlearnedabilities = []
+        self.abilitiesincooldown = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -196,8 +202,12 @@ class npc(object):
         self.attacksreceived = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
-        for ab in self.abilities:
-            ab.startnewround()
+        for ab in self.abilitiesincooldown:
+            ab[1] -= 1
+            print(self.name + " has " + ab[0] + " in cooldown for " + str(ab[1]) + " rounds ")
+        for ab in self.abilitiesincooldown:
+            if ab[1] == 0:
+                self.abilitiesincooldown.remove(ab)
         
 
         
@@ -246,7 +256,7 @@ class npc(object):
         a = True
         while a:
             b = R.randint(0, len(self.abilities)-1)
-            if self.abilities[b].cooldown == 0:
+            if not (self.abilities[b].name in [i[0] for i in self.abilitiesincooldown]):
                 self.ability = self.abilities[b]
                 a = False
 
@@ -384,7 +394,9 @@ class chooseability(object):
         #escolher habilidade
         for i in range(len(craos.abilities)):
             if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
-                if craos.abilities[i].cooldown == 0: #só podes escolher se a habilidade nao estiver em cooldown
+                #if craos.abilities[i].cooldown == 0:
+                #só podes escolher se a habilidade nao estiver em cooldown
+                if not(craos.abilities[i].name in [j[0] for j in craos.abilitiesincooldown]):
                     craos.target = []
                     craos.ability = craos.abilities[i]
                     for npc in npcs:#npc's tambem escolhem as habilidades
@@ -396,7 +408,7 @@ class chooseability(object):
                                 condition.effect()
                     roundphase = choosetarget(self.roundcount)
                 else:
-                    print("this ability is in cooldown for " + str(craos.abilities[i].cooldown) + " turns.")
+                    print("this ability is in cooldown")# for" " + str(craos.abilitiesincooldown[i]) + " turns.")
 
         #ganhar habilidade
         if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
@@ -1151,11 +1163,11 @@ class ability(object):
         self.worked = worked
         self.cooldown = cooldown
 
-    def startnewround(self):
-        self.worked = False
-        if self.cooldown >= 1:
-            self.cooldown -= 1
-            print(self.name + str(self.cooldown))
+##    def startnewround(self):
+##        self.worked = False
+##        if self.cooldown >= 1:
+##            self.cooldown -= 1
+##            print(self.name + str(self.cooldown))
 
     def clone(self):
         print(self.name)
@@ -1432,7 +1444,8 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             caster.conditions.append(condition("Rock Solid", caster, 1, 1))
             self.worked = True
-            self.cooldown = 5 + 1
+            caster.abilitiesincooldown.append(["Rock Solid", 5 + 1])
+            #self.cooldown = 5 + 1
 
         elif self.name == "Regenerate":
             caster.abilitylastused = "Regenerate"
@@ -1455,14 +1468,16 @@ class ability(object):
             caster.abilitylasttarget = [player.name for player in targets]
             caster.conditions.append(condition("Limitless", caster, 3, 1 + 1))
             self.worked = True
-            self.cooldown = 999
+            caster.abilitiesincooldown.append(["Limitless", 999])
+            #self.cooldown = 999
             print(caster.name + " will deal double damage next turn because of Limitless")
 
         elif self.name == "Lullaby":
             caster.abilitylastused = "Lullaby"
             caster.abilitylasttarget = [player.name for player in targets]
             print(caster.name + " sang a Lullaby")
-            self.cooldown = 5 + 1
+            caster.abilitiesincooldown.append(["Lullaby", 5 + 1])
+            #self.cooldown = 5 + 1
             for player in players:
                 if player == caster:
                     pass
@@ -1545,14 +1560,14 @@ abilities[2][0].append(ability("Everyone... GET IN HERE!",2, 1, False, 3, True, 
 abilities[2][0].append(ability("From The Shadows" ,2, 1, False, 3, True, "Offensive"))
 
 
-abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False, "Defensive"))
+abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False, "Defensive", cooldown = 5))
 abilities[2][1].append(ability("Refreshing Waters",2, 0,True, 2, False, "Defensive"))
 abilities[2][1].append(ability("Regenerate",2, 0,True, 3, False, "Defensive"))
 
-abilities[2][2].append(ability("Lullaby",2, 0,False, 3, False, "Utility"))
+abilities[2][2].append(ability("Lullaby",2, 0,False, 3, False, "Utility", cooldown = 5))
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
-abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility"))
+abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
 #______________________________________________________________________________________________________________________________________________________________________
 
 
