@@ -521,7 +521,8 @@ class choosetarget(object):
         global roundphase
             
         if (self.targetnumber == (len(players) - 1)) and not craos.ability.selftarget: #se a habilidade tem toda a gente como target, siga
-            craos.target = npcs
+            for p in npcs:    
+                craos.target.append(p)
             
             for npc in npcs:#escolher o target dos npcs
                 npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
@@ -1075,7 +1076,7 @@ class condition(object):
                     self.target.EXP += 3
         
         elif self.name == "Paralyzed":
-            print("estas paralizado esta ronda")
+            print(self.target.name + " is paralyzed this round")
             self.target.ability = ability("passed", 3, 0, True, 1, False)
             self.duration -= 1
 
@@ -1085,7 +1086,7 @@ class condition(object):
                 if player == self.target:
                     pass
                 else:
-                    if player.ability.damage and self.target in player.target: #se a habilidade der target ao caster E se a habilidade der dano, entao retira o caster dos targets.
+                    if player.ability.damage and (self.target in player.target): #se a habilidade der target ao caster E se a habilidade der dano, entao retira o caster dos targets.
                         player.target.remove(self.target)
             self.duration -= 1
 
@@ -1162,9 +1163,10 @@ class ability(object):
             print(self.name + str(self.cooldown))
 
     def clone(self):
+        print(self.name)
         return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown)
 
-#ability("Lullaby",2, 0,False, 3, False, "Utility")
+
         
     def effect(self, targets, caster):
         global log
@@ -1256,7 +1258,7 @@ class ability(object):
             caster.abilitylastused = "Spear Trhow"
             caster.abilitylasttarget = [player.name for player in targets]
             a = R.randint(1, 100)
-            if a > 60:
+            if a > 55:
                 print(caster.name + " missed the Spear Throw")
             else:
                 caster.dealtdamage = True
@@ -1326,6 +1328,27 @@ class ability(object):
                     print(caster.name + " dealt " + str(c) +" damage to " + target.name + " using Blood Drain")
             else:
                 print(caster.name + " missed Blood Drain")
+
+        elif self.name == "Headbutt":
+            caster.abilitylastused = "Headbutt"
+            caster.abilitylasttarget = [player.name for player in targets]
+            caster.dealtdamage = True
+            for target in targets:
+                a = R.randint(1,12)
+                b = R.randint(1,12)
+                c = a + b
+                log.append([caster, c, target])
+                caster.EXP += c
+                target.EXP += c
+                target.HP -= c
+                target.damaged = True
+                target.attacksreceived += 1
+                self.worked = True
+                d = R.randint(1,100)
+                if d <= 10:
+                    target.conditions.append(condition("Paralyzed", target, "chooseability", 1))
+                    print(caster.name + " paralyzed " + target.name + " with Headbutt")
+                print(caster.name + " dealt " + str(c) + " damage to " + target.name + " using Headbutt. d = " + str(d))
                 
         elif self.name == "On The Edge":
             caster.abilitylastused = "On The Edge"
@@ -1470,6 +1493,7 @@ abilities[2][0].append(ability("Kick",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Punch",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("On The Edge",2, 1,False, 3, True, "Offensive"))
 abilities[2][0].append(ability("Blood Drain",2, 1,False, 2, True, "Offensive"))
+abilities[2][0].append(ability("Headbutt",2, 1,False, 2, True, "Offensive"))
 
 
 abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False, "Defensive"))
@@ -1522,8 +1546,8 @@ while run:
                 print("clicaste a para ver as habilidades de toda a gente.")
                 for player in players:
                     print(player.name)
-                    for ability in player.abilities:
-                        print(ability.name)
+                    for a in player.abilities:
+                        print(a.name)
                     print()
             elif event.key == pygame.K_l:
                 for i in log:
