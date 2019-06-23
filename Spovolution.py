@@ -70,8 +70,8 @@ class player(object):
         self.attacksreceived = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
-        for ability in self.abilities:
-            ability.startnewround()
+        for ab in self.abilities:
+            ab.startnewround()
 
         
     def draw(self):
@@ -129,26 +129,26 @@ class player(object):
 
     def drawabilities(self):
         pygame.draw.rect(screen, (255,246,143),(0 ,0 ,300 , height)) #ability tab
-        for ability in self.abilities:
+        for ab in self.abilities:
             
-            pygame.draw.rect(screen, (139,69,19),(10,(10 + 40 * self.abilities.index(ability)), 280, 30))
-            if ability.abilitytype == "0": #criar o nome dela:
-                textability = fontA.render(ability.name, 1, (0,0,0))
+            pygame.draw.rect(screen, (139,69,19),(10,(10 + 40 * self.abilities.index(ab)), 280, 30))
+            if ab.abilitytype == "0": #criar o nome dela:
+                textability = fontA.render(ab.name, 1, (0,0,0))
                 
-            elif ability.abilitytype == "Offensive":
-                textability = fontA.render(ability.name, 1, (255,48,48))
+            elif ab.abilitytype == "Offensive":
+                textability = fontA.render(ab.name, 1, (255,48,48))
 
-            elif ability.abilitytype == "Defensive":
-                textability = fontA.render(ability.name, 1, (30,144,255))
+            elif ab.abilitytype == "Defensive":
+                textability = fontA.render(ab.name, 1, (30,144,255))
 
-            elif ability.abilitytype == "Utility":
-                textability = fontA.render(ability.name, 1, (0,201,87))
+            elif ab.abilitytype == "Utility":
+                textability = fontA.render(ab.name, 1, (0,201,87))
 
-            screen.blit(textability,(30, 15 + 40 * self.abilities.index(ability)))
+            screen.blit(textability,(30, 15 + 40 * self.abilities.index(ab)))
 
-            if ability.cooldown > 0:
-                pygame.draw.line(screen, (255,0,0), (10, 10 + 40 * self.abilities.index(ability)), (290, 40 + 40 * self.abilities.index(ability)) )
-                pygame.draw.line(screen, (255,0,0), (10, 40 + 40 * self.abilities.index(ability)), (290, 10 + 40 * self.abilities.index(ability)) )
+            if ab.cooldown > 0:
+                pygame.draw.line(screen, (255,0,0), (10, 10 + 40 * self.abilities.index(ab)), (290, 40 + 40 * self.abilities.index(ab)) )
+                pygame.draw.line(screen, (255,0,0), (10, 40 + 40 * self.abilities.index(ab)), (290, 10 + 40 * self.abilities.index(ab)) )
 
     def addability(self, ability):
         self.abilities = self.abilities + [ability]
@@ -196,8 +196,8 @@ class npc(object):
         self.attacksreceived = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
-        for ability in self.abilities:
-            ability.startnewround()
+        for ab in self.abilities:
+            ab.startnewround()
         
 
         
@@ -421,9 +421,8 @@ class chooseability(object):
         #verify if the player already has all the abilities:
         a = True
         stageabilities = abilities[player.stage]
-        for ability in stageabilities:
-            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
-            #if not (ability.name in [i.name for i in player.abilities]):
+        for ab in stageabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -445,9 +444,8 @@ class chooseability(object):
         #verify if the player already has all the abilities:
         a = True
         stageabilities = abilities[player.stage]
-        for ability in stageabilities:
-            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
-            #if not (ability.name in [i.name for i in player.abilities]):
+        for ab in stageabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -866,11 +864,8 @@ class evolve1(object):
                     npc.EXPtoevolve = evolveEXP[npc.stage + 1]
                     npc.stage += 1
                     npc.abilities = []
-                    #self.gainabilityoffensive(npc)
-                    #self.gainabilityoffensive(npc)
-                    #self.gainabilitydefensive(npc)
-                    self.gainabilitydefensive(npc)
-                    self.gainabilitydefensive(npc)
+                    self.gainabilityoffensive(npc)
+                    self.gainabilityoffensive(npc)
                     self.gainabilitydefensive(npc)
             
             roundphase = chooseability(self.roundcount, self.time + 15)
@@ -997,8 +992,8 @@ class gainability2(object):
         #verify if the player already has all the abilities:
         a = True
         offensiveabilities = abilities[player.stage][0] #a list of the offensive abilities of the second stage
-        for ability in offensiveabilities:
-            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
+        for ab in offensiveabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -1018,8 +1013,8 @@ class gainability2(object):
         #verify if the player already has all the abilities:
         a = True
         defensiveabilities = abilities[player.stage][1]
-        for ability in defensiveabilities:
-            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
+        for ab in defensiveabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -1040,8 +1035,8 @@ class gainability2(object):
         #verify if the player already has all the abilities:
         a = True
         utilityabilities = abilities[player.stage][2]
-        for ability in utilityabilities:
-            if (not (ability.name in [i.name for i in player.abilities])) and (not (ability.name in [i.name for i in player.unlearnedabilities])):
+        for ab in utilityabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
                 a = False
         if a:
             pass
@@ -1333,6 +1328,10 @@ class ability(object):
             caster.abilitylastused = "Headbutt"
             caster.abilitylasttarget = [player.name for player in targets]
             caster.dealtdamage = True
+            d = R.randint(1,100)
+            if d <= 10:
+                caster.conditions.append(condition("Paralyzed", caster, "chooseability", 1))
+                print(caster.name + " paralyzed himself with Headbutt")
             for target in targets:
                 a = R.randint(1,12)
                 b = R.randint(1,12)
@@ -1344,10 +1343,6 @@ class ability(object):
                 target.damaged = True
                 target.attacksreceived += 1
                 self.worked = True
-                d = R.randint(1,100)
-                if d <= 10:
-                    target.conditions.append(condition("Paralyzed", target, "chooseability", 1))
-                    print(caster.name + " paralyzed " + target.name + " with Headbutt")
                 print(caster.name + " dealt " + str(c) + " damage to " + target.name + " using Headbutt. d = " + str(d))
                 
         elif self.name == "On The Edge":
@@ -1371,7 +1366,59 @@ class ability(object):
                     target.EXP += 30
                     target.HP -= 30
                     self.worked = True
+                    target.damaged = True
+                    target.attacksreceived += 1
                     print(caster.name + " dealt 30 damage to " + target.name + " using On The Edge")
+
+        
+        elif self.name == "Everyone... GET IN HERE!":
+            caster.abilitylastused = "Everyone... GET IN HERE!"
+            caster.abilitylasttarget = [player.name for player in targets]
+            a = 0
+            for p in players: #calcular quantos ataques te tao a dar target
+                if p == caster:
+                    pass
+                elif (caster in p.target) and p.ability.abilitytype == "Offensive":
+                    a = a + 1
+                    
+            for target in targets:
+                n = 0
+                for i in range(a):
+                    b = R.randint(1,15)
+                    n = n + b
+                log.append([caster, n, target])
+                caster.EXP += n
+                target.EXP += n
+                target.HP -= n
+                self.worked = True
+                target.damaged = True
+                target.attacksreceived += 1
+                print(caster.name + " dealt " + str(n) + " damage to " + target.name + " using Everyone... GET IN HERE!")
+
+        elif self.name == "From The Shadows":
+            caster.abilitylastused = "From The Shadows"
+            caster.abilitylasttarget = [player.name for player in targets]
+            a = 0
+            for p in players: #verificar quantas pessoas te deram target:
+                if p == caster:
+                    pass
+                elif caster in p.target:
+                    a = a + 1
+            if a == 0:
+                for target in targets:
+                    n = 0
+                    for i in range(6):
+                        b = R.randint(1,6)
+                        print(b)
+                        n = n + b
+                    log.append([caster, n, target])
+                    caster.EXP += n
+                    target.EXP += n
+                    target.HP -= n
+                    self.worked = True
+                    target.damaged = True
+                    target.attacksreceived += 1
+                    print(caster.name + " dealt " + str(n) + " damage to " + target.name + " using From The Shadows")
 
         elif self.name == "Refreshing Waters":
             caster.abilitylastused = "Refreshing Waters"
@@ -1494,6 +1541,8 @@ abilities[2][0].append(ability("Punch",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("On The Edge",2, 1,False, 3, True, "Offensive"))
 abilities[2][0].append(ability("Blood Drain",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Headbutt",2, 1,False, 2, True, "Offensive"))
+abilities[2][0].append(ability("Everyone... GET IN HERE!",2, 1, False, 3, True, "Offensive"))
+abilities[2][0].append(ability("From The Shadows" ,2, 1, False, 3, True, "Offensive"))
 
 
 abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False, "Defensive"))
