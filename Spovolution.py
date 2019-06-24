@@ -49,6 +49,7 @@ class player(object):
         self.conditions = []
         self.unlearnedabilities = []
         self.abilitiesincooldown = []
+        self.abilitiesinchannel = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -77,6 +78,13 @@ class player(object):
         for ab in self.abilitiesincooldown:
             if ab[1] == 0:
                 self.abilitiesincooldown.remove(ab)
+
+        for ab in self.abilitiesinchannel:
+            if ab[2] == False or ab[1] == 0:
+                print(self.name + " stopped channeling " + ab[0])
+                self.abilitiesinchannel.remove(ab)
+            else:
+                ab[2] = False
 
         
     def draw(self):
@@ -180,6 +188,7 @@ class npc(object):
         self.conditions = []
         self.unlearnedabilities = []
         self.abilitiesincooldown = []
+        self.abilitiesinchannel = []
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -208,6 +217,13 @@ class npc(object):
         for ab in self.abilitiesincooldown:
             if ab[1] == 0:
                 self.abilitiesincooldown.remove(ab)
+
+        for ab in self.abilitiesinchannel:
+            if ab[2] == False or ab[1] == 0:
+                print(self.name + " stopped channeling " + ab[0])
+                self.abilitiesinchannel.remove(ab)
+            else:
+                ab[2] = False
         
 
         
@@ -262,21 +278,41 @@ class npc(object):
 
     def choosetarget(self, n, selftarget):
         self.target = []
-        while n > 0:
-            if selftarget:
-                a = R.randint(0, len(players)-1)
-                if players[a] in self.target:
-                    pass
-                else:
-                    self.target.append(players[a])
-                    n -= 1
+        if selftarget: #se te podes dar target a ti mesmo
+            if n >= len(players): #se o numero targets for maior ou igual que o numero de players, entao os targets sao todos os players:
+                for p in players:
+                    self.target.append(p)
             else:
-                a = R.randint(0, len(players)-1)
-                if (players[a] in self.target) or (players[a] == self):
-                    pass
-                else:
-                    self.target.append(players[a])
-                    n -= 1
+                while n > 0: #se nao, vamos escolher players
+                    a = R.randint(0, len(players)-1)
+                    if players[a] in self.target:
+                        pass
+                    else:
+                        self.target.append(players[a])
+                        n -= 1
+        else:#se nao de podes dar target a ti mesmo...
+            if n >= (len(players) - 1): #entao se o numero de targets for maior ou igual que o numero de players - 1, entao os targets sao todos os inimigos
+                for p in players:
+                    if p == self:
+                        pass
+                    else:
+                        self.target.append(p)
+            else:
+                while n > 0:#se nao, vamos escolher inimigos
+                    a = R.randint(0, len(players)-1)
+                    if (players[a] in self.target) or (players[a] == self):
+                        pass
+                    else:
+                        self.target.append(players[a])
+                        n -= 1
+        if self.ability.channel > 0: #se a habilidade escolhida tem channel:
+            if self.ability.name in [i[0] for i in self.abilitiesinchannel]: #se o player ja esta a dar channel à habilidade
+                a = [i[0] == self.ability.name for i in self.abilitiesinchannel].index(True)
+                if self.abilitiesinchannel[a][1] > 1: #se a habilidade nao vai atuar este turno
+                    self.target = []
+            elif not (self.ability.name in [i[0] for i in self.abilitiesinchannel]): #se o player ainda nao esta a dar channel à habilidade:
+                self.target = []
+       
     
     def addability(self, ability):
         self.abilities = self.abilities + [ability]
@@ -529,8 +565,76 @@ class choosetarget(object):
 
     def effect(self):
         global roundphase
+
+        if self.targetnumber <= 0: #se ja estao os targets todos escolhidos, siga em frente
             
-        if (self.targetnumber == (len(players) - 1)) and not craos.ability.selftarget: #se a habilidade tem toda a gente como target, siga
+            for npc in npcs: #escolher target dos npcs
+                npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
+
+            for player in players: #condiçoes que atuam agora:
+                for condition in player.conditions:
+                    if condition.priority == "after choosetarget":
+                        condition.effect()
+                        
+            roundphase = calculateeffects(self.roundcount)
+            
+        #se a habilidade escolhida é de channel, e não vai fazer o efeito este turno, siga a marinha
+        if craos.ability.channel > 0:#se a habilidade escolhida tem channel:
+            if craos.ability.name in [i[0] for i in craos.abilitiesinchannel]: #se o player ja esta a dar channel à habilidade
+                a = [i[0] == craos.ability.name for i in craos.abilitiesinchannel].index(True)
+                print(str(craos.abilitiesinchannel[a]))
+                if craos.abilitiesinchannel[a][1] >= 2: #se a habilidade nao vai atuar este turno
+                    for npc in npcs: #escolher target dos npcs
+                        npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
+
+                    for player in players: #condiçoes que atuam agora:
+                        for condition in player.conditions:
+                            if condition.priority == "after choosetarget":
+                                condition.effect()
+                        
+                    roundphase = calculateeffects(self.roundcount)
+                else:
+                    if ((self.targetnumber >= (len(players) - 1)) and not craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
+                        for p in npcs:    
+                            craos.target.append(p)
+                        for npc in npcs:#escolher o target dos npcs
+                            npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
+
+                        for player in players: #condiçoes que atuam agora:
+                            for condition in player.conditions:
+                                if condition.priority == "after choosetarget":
+                                    condition.effect()
+                          
+                        roundphase = calculateeffects(self.roundcount)
+                        
+                    elif self.targetnumber >= len(players):
+                        for p in players:    
+                            craos.target.append(p)
+                        for npc in npcs:#escolher o target dos npcs
+                            npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
+
+                        for player in players: #condiçoes que atuam agora:
+                            for condition in player.conditions:
+                                if condition.priority == "after choosetarget":
+                                    condition.effect()
+                          
+                        roundphase = calculateeffects(self.roundcount)
+
+                    
+                    
+            elif not (craos.ability.name in [i[0] for i in craos.abilitiesinchannel]): #se o player ainda nao esta a dar channel à habilidade:
+                for npc in npcs: #escolher target dos npcs
+                    npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
+
+                for player in players: #condiçoes que atuam agora:
+                    for condition in player.conditions:
+                        if condition.priority == "after choosetarget":
+                            condition.effect()
+                            
+                roundphase = calculateeffects(self.roundcount)
+            
+                
+        elif ((self.targetnumber >= (len(players) - 1)) and not craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
             for p in npcs:    
                 craos.target.append(p)
             
@@ -543,19 +647,23 @@ class choosetarget(object):
                         condition.effect()
               
             roundphase = calculateeffects(self.roundcount)
+
+        elif self.targetnumber >= len(players): #se a habilidade tem toda a gente como target, siga
+            for p in players:    
+                craos.target.append(p)
             
-        if self.targetnumber <= 0: #se ja estao os targets todos escolhidos, siga em frente
-            
-            for npc in npcs: #escolher target dos npcs
+            for npc in npcs:#escolher o target dos npcs
                 npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
             for player in players: #condiçoes que atuam agora:
                 for condition in player.conditions:
                     if condition.priority == "after choosetarget":
                         condition.effect()
-                        
+              
             roundphase = calculateeffects(self.roundcount)
 
+        
+                
     def receiveevent(self, event):
         mouseposition = event.pos
         for player in players:
@@ -1185,7 +1293,7 @@ class condition(object):
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0):
         self.name = name
         self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
@@ -1195,7 +1303,7 @@ class ability(object):
         self.abilitytype = abilitytype
         self.worked = worked
         self.cooldown = cooldown
-
+        self.channel = channel
 ##    def startnewround(self):
 ##        self.worked = False
 ##        if self.cooldown >= 1:
@@ -1204,7 +1312,7 @@ class ability(object):
 
     def clone(self):
         print(self.name)
-        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown)
+        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel)
 
 
         
@@ -1267,7 +1375,7 @@ class ability(object):
 
         elif self.name == "QuickPoke":
             caster.abilitylastused = "QuickPoke"
-            caster.abilitylasttarget = [player.name for player in targets]
+            caster.abilitylasttarget = [p.name for p in targets]
 ##            for player in player:
 ##                if player == self.caster:
 ##                    pass
@@ -1454,7 +1562,6 @@ class ability(object):
                     n = 0
                     for i in range(6):
                         b = R.randint(1,6)
-                        print(b)
                         n = n + b
                     log.append([caster, n, target])
                     caster.EXP += n
@@ -1465,6 +1572,39 @@ class ability(object):
                     target.attacksreceived += 1
                     print(caster.name + " dealt " + str(n) + " damage to " + target.name + " using From The Shadows")
 
+        elif self.name == "Unleash The Power":
+            caster.abilitylastused = "Unleash The Power"
+            caster.abilitylasttarget = [player.name for player in targets]
+            if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
+                caster.abilitiesinchannel.append([self.name, self.channel - 1, True])
+                #este "True" é verdadeiro ou falso consuante esta habilidade foi usada esta ronda, visto que se a habilidade channel nao for usada uma ronda, entao o channel para.
+                print(caster.name + " began channeling " + self.name + " for 4 rounds")
+                self.worked = True
+            else: #a é o indice das habilidades que estao em channel que é o desta habilidade
+                a = [i[0] == "Unleash The Power" for i in caster.abilitiesinchannel].index(True)
+                if caster.abilitiesinchannel[a][1] == 1: #se o channel chegou ao fim, a habilidade atua
+                    caster.abilitiesinchannel[a][1] -= 1
+                    b = R.randint(1,14)
+                    c = R.randint(1,14)
+                    d = R.randint(1,14)
+                    e = R.randint(1,14)
+                    f = b + c + d + e
+                    caster.abilitiesincooldown.append(["Unleash The Power", 3 + 1])
+                    for t in targets:
+                        t.EXP += f
+                        t.HP -= f
+                        caster.EXP += f
+                        self.worked = True
+                        t.damaged = True
+                        t.attacksreceived += 1
+                        log.append([caster, f, t])
+                        print(caster.name + " dealt " + str(f) + " damage to " + t.name + " using Unleash The Power")
+                else:
+                    caster.abilitiesinchannel[a][1] -= 1
+                    caster.abilitiesinchannel[a][2] = True
+                    self.worked = True
+                    print("Only " + str(caster.abilitiesinchannel[a][1]) + " turns left until " + caster.name + " Unleashes The Power")
+                    
         elif self.name == "Refreshing Waters":
             caster.abilitylastused = "Refreshing Waters"
             caster.abilitylasttarget = [player.name for player in targets]
@@ -1478,7 +1618,6 @@ class ability(object):
             caster.conditions.append(condition("Rock Solid", caster, 1, 1))
             self.worked = True
             caster.abilitiesincooldown.append(["Rock Solid", 5 + 1])
-            #self.cooldown = 5 + 1
 
         elif self.name == "Regenerate":
             caster.abilitylastused = "Regenerate"
@@ -1589,7 +1728,7 @@ abilities[0].append(ability("chill",0, 0, True, 2, False, "Defensive"))
 
 abilities[1].append(ability("Uncertain Footing",1, 1, False, 3, True, "Offensive"))
 abilities[1].append(ability("Stand Tall",1, 1, False, 3, True, "Offensive"))
-abilities[1].append(ability("QuickPoke",1, 0, False, 1, True, "Offensive"))
+abilities[1].append(ability("QuickPoke",1, 3, False, 1, True, "Offensive"))
 
 
 #abilities[1].append(ability("teste", 1, 0, True, 3, False))
@@ -1603,13 +1742,14 @@ abilities[2][0].append(ability("Blood Drain",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Headbutt",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Everyone... GET IN HERE!",2, 1, False, 3, True, "Offensive"))
 abilities[2][0].append(ability("From The Shadows" ,2, 1, False, 3, True, "Offensive"))
+abilities[2][0].append(ability("Unleash The Power" ,2, 2, False, 2, True, "Offensive", cooldown = 2, channel = 4))
 
 
 abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False, "Defensive", cooldown = 5))
 abilities[2][1].append(ability("Refreshing Waters",2, 0,True, 2, False, "Defensive"))
 abilities[2][1].append(ability("Regenerate",2, 0,True, 3, False, "Defensive"))
 
-abilities[2][2].append(ability("Lullaby",2, 0,False, 3, False, "Utility", cooldown = 5))
+abilities[2][2].append(ability("Lullaby",2, 3,False, 3, False, "Utility", cooldown = 5))
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
