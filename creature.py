@@ -24,6 +24,10 @@ class creature:
         self.unlearnedabilities = []
         self.abilitiesincooldown = []
         self.abilitiesinchannel = []
+        self.attackmultiplier = 1
+        self.attackadd = 0
+        self.defensemultiplier = 1
+        self.defenseadd = 0
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -42,6 +46,10 @@ class creature:
         self.dealtdamage = False
         self.target = []
         self.attacksreceived = 0
+        self.attackmultiplier = 1
+        self.attackadd = 0
+        self.defensemultiplier = 1
+        self.defenseadd = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         for ab in self.abilitiesincooldown:
@@ -101,6 +109,17 @@ class creature:
        
     def drawabilities(self, screen):
         pass
+     
+    def attack(self, targets, damage):
+        d1 = ( damage * self.attackmultiplier) + self.attackadd
+        for t in targets:
+            d2 = (d1 + t.defenseadd) * t.defensemultiplier
+            self.EXP += d2
+            t.EXP += d2
+            t.HP -= d2
+            gstate.get().log.append([self, t, d2])
+            t.damaged = True
+            t.attacksreceived += 1
 
 class player(creature):
 
