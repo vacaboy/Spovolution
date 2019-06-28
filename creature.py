@@ -168,9 +168,4 @@ class deadcorpse(creature):
         self.abilitylasttarget = abilitylasttarget
         self. EXP = EXP
         self.EXPtoevolve = EXPtoevolve
-        
-    def draw(self, screen):
-        super().draw(screen)
-        #dead
-        textdead = gstate.get().fontHP.render("R.I.P", 1, (0,0,0))
-        screen.blit(textdead, (self.pos[0] - 10, self.pos[1] - 10))
+        self.renderables.append(textrenderable(x, y, (0,0,0), gstate.get().fontHP, "R.I.P.")
