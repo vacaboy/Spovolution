@@ -140,7 +140,7 @@ while run:
                     print(str(i))
 
 
-    roundphase.clock()
+    roundphase = roundphase.clock()
     roundphase.draw(screen)
     pygame.display.update()
     roundphase = roundphase.effect()
