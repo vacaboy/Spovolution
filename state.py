@@ -28,7 +28,7 @@ class state():
             
     def effect(self):
         return self
-        
+            
     def receiveevent(self):
         return self
 
@@ -37,7 +37,7 @@ class state():
 
 class chooseability(state):
 
-    def __init__(self, roundcount, time = 900):
+    def __init__(self, roundcount, time = 3):
         super().__init__(roundcount)
         self.name = "choose ability"
         self.time = time
@@ -52,7 +52,13 @@ class chooseability(state):
         super().clock()
         if self.time <= 0:
             gstate.get().craos.ability = ability("passed",3, 0, True, 1, False)
-            return calculateeffects(self.roundcount)
+            print(str(gstate.get().craos.ability.name))
+            
+            for npc in gstate.get().npcs:#npc's tambem escolhem as habilidades
+                        npc.chooseability()            
+            return choosetarget(self.roundcount)
+        else:
+            return self
 
     def draw(self, screen):
         super().draw(screen)
@@ -184,6 +190,15 @@ class choosetarget(state):
         self.targetnumber = gstate.get().craos.ability.targetnumber
         
 
+    def clock(self):
+        super().clock()
+        #colocar aqui condiçao de se passar o tempo... escolher targets aleatorios e seguir
+        # if time <= 0:
+                
+            # return calculateeffects(self.roundcount)
+        # else:
+        return self
+     
     def effect(self):
 
         if self.targetnumber <= 0: #se ja estao os targets todos escolhidos, siga em frente
@@ -310,7 +325,9 @@ class calculateeffects(state):
         self.texttime = gstate.get().fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
         self.textround = gstate.get().fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
 
-
+    def clock(self):
+        super().clock()
+        return calculateeffects(self.roundcount)
 
     def effect(self):
         #phase 1 of combat:
@@ -494,6 +511,8 @@ class loseability(state):
         super().clock()
         if self.time <= 0:
             return chooseability(self.roundcount)
+        else:
+            return self
 
     def draw(self, screen):
         super().draw(screen)
@@ -512,9 +531,9 @@ class loseability(state):
             if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
                 gstate.get().craos.unlearnedabilities.append(gstate.get().craos.abilities[i])
                 gstate.get().craos.abilities.remove(gstate.get().craos.abilities[i])
-                return chooseability(self.roundcount, self.time + 5)
+                return chooseability(self.roundcount, self.time)
             if  320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320: #return button
-                return chooseability(self.roundcount, self.time + 5)
+                return chooseability(self.roundcount, self.time)
         return self
 
 #_____________________________________________________________________________________________________________________________________________________________________
@@ -536,6 +555,8 @@ class evolve1(state):
         super().draw()
         if self.time <= 0:
             return chooseability(self.roundcount)
+        else:
+            return self
 
     def draw(self, screen):
         super().draw(screen)
@@ -567,6 +588,8 @@ class evolve1(state):
                     self.gainabilitydefensive(npc)
             
             return chooseability(self.roundcount, self.time + 15)
+        else:
+            return self
 
 
     
@@ -634,6 +657,8 @@ class gainability2(state):
         super().clock()
         if self.time <= 0:
             return chooseability(self.roundcount, self.time)
+        else:
+            return self
 
     def draw(self, screen):
         super().draw(screen)
