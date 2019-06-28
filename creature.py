@@ -29,6 +29,8 @@ class creature:
         self.attackadd = 0
         self.defensemultiplier = 1
         self.defenseadd = 0
+        self.healmultiplier = 1
+        self.healadd = 0
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -92,15 +94,28 @@ class creature:
         pass
      
     def attack(self, targets, damage):
+        self.dealtdamage = True 
         d1 = ( damage * self.attackmultiplier) + self.attackadd
+        if d1 < 0:
+            d1 = 0
         for t in targets:
-            d2 = (d1 + t.defenseadd) * t.defensemultiplier
+            d2 = round( (d1 - t.defenseadd) * t.defensemultiplier )
+            if d2 < 0:
+                d2 = 0
             self.EXP += d2
             t.EXP += d2
             t.HP -= d2
-            gstate.get().log.append([self, t, d2])
+            gstate.get().log.append([self, d2, t])
             t.damaged = True
             t.attacksreceived += 1
+            print(self.name + " dealt " + str(d2) + " damage to " + t.name)
+       
+    def heal(self, targets, amount):
+        for t in targets:
+            h1 = (amount * t.healmultiplier) + t.healadd
+            t.HP += h1
+            if t.HP > t.MaxHP:
+                t.HP = t.MaxHP
 
 class player(creature):
 
@@ -185,6 +200,7 @@ class deadcorpse(creature):
         self.MaxHP = MaxHP
         self.abilitylastused = abilitylastused
         self.abilitylasttarget = abilitylasttarget
-        self. EXP = EXP
+        self.EXP = EXP
         self.EXPtoevolve = EXPtoevolve
-        self.renderables.append(textrenderable(x, y, (0,0,0), gstate.get().fontHP, "R.I.P.")
+        
+        self.renderables.append(textrenderable(x, y, (0,0,0), gstate.get().fontHP, lambda: "R.I.P."))

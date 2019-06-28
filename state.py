@@ -37,7 +37,7 @@ class state():
 
 class chooseability(state):
 
-    def __init__(self, roundcount, time = 3):
+    def __init__(self, roundcount, time = 900):
         super().__init__(roundcount)
         self.name = "choose ability"
         self.time = time
@@ -109,6 +109,7 @@ class chooseability(state):
         elif 520 <= mouseposition[0] <= 680 and 290 <= mouseposition[1] <= 320:
             print("evoluir")
             self.evolve(gstate.get().craos)
+            return evolve1(self.roundcount, self.time)
         #desaprender habilidade:
         elif 720 <= mouseposition[0] <= 880 and 290 <= mouseposition[1] <= 320:
             print("desaprender habilidade")
@@ -172,7 +173,7 @@ class chooseability(state):
             player.MaxHP += evolveHPgain[player.stage]
             player.EXPtoevolve = evolveEXP[player.stage + 1]
             player.stage += 1
-            return evolve1(self.roundcount, self.time)
+            
 
 
 #__________________________________________________________________________________________________________________________________________________________________________________
@@ -458,9 +459,11 @@ class calculateeffects(state):
 
         log = []
         
-        return chooseability(self.roundcount + 1)
         print()
         print("round: " + str(self.roundcount + 1))
+        
+        return chooseability(self.roundcount + 1)
+        
 
 
 
@@ -552,7 +555,7 @@ class evolve1(state):
         self.number = 3 #abilities he gets to choose
         
     def clock(self):
-        super().draw()
+        super().clock()
         if self.time <= 0:
             return chooseability(self.roundcount)
         else:
@@ -693,7 +696,7 @@ class gainability2(state):
     def gainabilityoffensive(self, player):
         #verify if the player already has all the abilities:
         a = True
-        offensiveabilities = gstate.get().abilties[player.stage][0] #a list of the offensive abilities of the second stage
+        offensiveabilities = gstate.get().abilities[player.stage][0] #a list of the offensive abilities of the second stage
         for ab in offensiveabilities:
             if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
                 a = False
