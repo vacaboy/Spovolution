@@ -3,10 +3,11 @@ from abilities import *
 import random as R
 import pygame
 import gstate
+from renderable import playerrenderable, textrenderable, barrenderable
 
 class creature:
     def __init__(self, x, y, name = "none", color = "none"):
-        self.pos = (x, y)
+        self.x, self.y = self.pos = (x, y)
         self.MaxHP = 20
         self.HP = 20
         self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"),ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
@@ -38,6 +39,22 @@ class creature:
             self.name = R.randint(0,999)
         else:
             self.name = name
+
+        fontHP = gstate.get().fontHP
+
+        self.renderables = [playerrenderable(self),
+                            textrenderable(x + 55, y, self.color, fontHP, lambda: self.name),
+
+                            barrenderable(x-50, y-80, 100, 10, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP)),
+                            textrenderable(x+55, y-80, (255,0,0), fontHP, lambda: str(self.HP) + "/" + str(self.MaxHP)),
+
+                            barrenderable(x-50, y-60, 100, 10, (0,0,255), (0,0,255), lambda: (self.EXP, self.EXPtoevolve*2), True),
+                            textrenderable(x+55, y-60, (0,0,255), fontHP, lambda: str(self.EXP) + "/" + str(self.EXPtoevolve)),
+
+                            textrenderable(x-55, y+55, self.color, fontHP, lambda: "ability last used:"),
+                            textrenderable(x-55, y+65, self.color, fontHP, lambda: "target:"),
+                            textrenderable(x-55, y+80, self.color, fontHP, lambda: str(self.abilitylasttarget)),
+                            textrenderable(x-50, y+95, self.color, fontHP, lambda: self.abilitylastused)]
             
 
     def startnewround(self):
@@ -68,44 +85,8 @@ class creature:
             
         
     def draw(self, screen):
-        #the player:
-        if self.stage == 1:
-            pygame.draw.circle(screen, self.color, self.pos, 50)
-        else:
-            pygame.draw.rect(screen, self.color, (self.pos[0] - 50, self.pos[1] - 50, 100, 100))
-        #name
-        textname = gstate.get().fontHP.render(self.name, 1 , self.color)
-        screen.blit(textname, (self.pos[0] + 55, self.pos[1]))
-
-        #olhinhos
-        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 5)
-        pygame.draw.circle(screen, (0,0,0), (self.pos[0]-10, self.pos[1]-30), 1)
-        
-        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 5)
-        pygame.draw.circle(screen, (0,0,0), (self.pos[0]+10, self.pos[1]-30), 1)
-        
-        #HP bar:
-        pygame.draw.rect(screen, (255,0,0), (self.pos[0]-50, self.pos[1]-80, 100, 10))
-        pygame.draw.rect(screen, (0,255,0), (self.pos[0]-50, self.pos[1]-80, round((self.HP/self.MaxHP)*100), 10))
-        textHP = gstate.get().fontHP.render(str(self.HP) + "/" + str(self.MaxHP), 1, (255,0,0))
-        screen.blit(textHP, (self.pos[0] + 55, self.pos[1] - 80))
-        
-        #EXP bar:
-        pygame.draw.rect(screen, (0,0,255), (self.pos[0]-50, self.pos[1]-60, round((self.EXP/self.EXPtoevolve)*50), 10))
-        pygame.draw.rect(screen, (0,0,255), (self.pos[0]-50, self.pos[1]-60, 100, 10), 1)
-        pygame.draw.line(screen, (255,215,0), (self.pos[0],self.pos[1]-60), (self.pos[0],self.pos[1]-50))
-        textEXP = gstate.get().fontHP.render(str(self.EXP) + "/" + str(self.EXPtoevolve), 1, (0,0,255))
-        screen.blit(textEXP, (self.pos[0] + 55, self.pos[1] - 60))
-
-        #ability last used on:
-        textabilitylastused1 = gstate.get().fontHP.render("ability last used:", 1, self.color)
-        textabilitylastused2 = gstate.get().fontHP.render("target:", 1, self.color)
-        textabilitylastused3 = gstate.get().fontHP.render(str(self.abilitylasttarget), 1, self.color)
-        textabilitylastused4 = gstate.get().fontHP.render(self.abilitylastused, 1, self.color)
-        screen.blit(textabilitylastused1, (self.pos[0] - 55, self.pos[1] + 55))
-        screen.blit(textabilitylastused4, (self.pos[0] - 55, self.pos[1] + 65))
-        screen.blit(textabilitylastused2, (self.pos[0] - 55, self.pos[1] + 80))
-        screen.blit(textabilitylastused3, (self.pos[0] - 50, self.pos[1] + 95))
+        for r in self.renderables:
+            r.draw(screen)
        
     def drawabilities(self, screen):
         pass
