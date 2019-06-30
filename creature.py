@@ -97,6 +97,7 @@ class creature:
      
     def attack(self, targets, damage):
         self.dealtdamage = True 
+        d3 = 0
         d1 = ( damage * self.attackmultiplier) + self.attackadd
         if d1 < 0:
             d1 = 0
@@ -104,7 +105,10 @@ class creature:
             d2 = round( (d1 - t.defenseadd) * t.defensemultiplier )
             if d2 < 0:
                 d2 = 0
-            self.HP += ((d2 * self.lifesteal) * self.healmultiplier) + self.healadd
+            if self.lifesteal != 0:
+                d3 = ((d2 * self.lifesteal) * self.healmultiplier) + self.healadd
+                self.HP += d3
+                print(self.name + " regained " + str(d3) + " HP")
             self.EXP += d2
             if not (t == self):
                 t.EXP += d2
@@ -113,6 +117,7 @@ class creature:
             t.damaged = True
             t.attacksreceived += 1
             print(self.name + " dealt " + str(d2) + " damage to " + t.name)
+            print(str(damage) + " "  +  str(d1) + " "  + str(d2) + " "  + str(d3))
        
     def heal(self, targets, amount):
         for t in targets:

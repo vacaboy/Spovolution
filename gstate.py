@@ -15,6 +15,7 @@ class gstate():
 		self.fontA = pygame.font.SysFont("mayence", 30, False, True)
 		self.fontHP = pygame.font.SysFont("comicsans",20 ,False ,True)
 		self.fontend = pygame.font.SysFont("mayence", 180, True)
+        self.run = True
 
 
 _s = None

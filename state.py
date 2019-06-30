@@ -108,8 +108,7 @@ class chooseability(state):
         #evoluir            
         elif 520 <= mouseposition[0] <= 680 and 290 <= mouseposition[1] <= 320:
             print("evoluir")
-            self.evolve(gstate.get().craos)
-            return evolve1(self.roundcount, self.time)
+            return self.evolve(gstate.get().craos)
         #desaprender habilidade:
         elif 720 <= mouseposition[0] <= 880 and 290 <= mouseposition[1] <= 320:
             print("desaprender habilidade")
@@ -165,14 +164,17 @@ class chooseability(state):
         #verify if the player has enough EXP:
         if player.EXP < evolveprice[player.stage]:
             print("Not enought EXP")
+            return self
         elif player.stage == 2:
             print("ainda nao esta implementado evoluires mais :(")
+            return self
         else:
             player.EXP -= evolveprice[player.stage]
             player.HP += evolveHPgain[player.stage]
             player.MaxHP += evolveHPgain[player.stage]
             player.EXPtoevolve = evolveEXP[player.stage + 1]
             player.stage += 1
+            return evolve1(self.roundcount, self.time)
             
 
 
@@ -417,31 +419,29 @@ class calculateeffects(state):
 
         #verify if the game ended:
         
-        global run
         global height
-        global log
         global screen
         if len(gstate.get().players) == 0:
             texttie = gstate.get().fontend.render("Its a Tie! :|", 1 ,(255,193,37))
             screen.blit(texttie, (0, ((height / 2) - 100)))
             pygame.display.update()
             pygame.time.delay(5000)
-            run = False
+            gstate.get().run = False
         else:
             for corpse in gstate.get().deadcorpses:
                 if corpse.name == "craos":
                     textlose = gstate.get().fontend.render("LOSER! :( ", 1, (255,0,0))
-                    #screen.blit(textlose, (0, ((height /2) - 100)))
+                    screen.blit(textlose, (0, ((height /2) - 100)))
                     pygame.display.update()
                     pygame.time.delay(5000)
-                    run = False
+                    gstate.get().run = False
 
         if len(gstate.get().players) == 1 and gstate.get().players[0].name == "craos":
             textwin = gstate.get().fontend.render("YOU WIN! :D ", 1, (0,255,0))
             screen.blit(textwin, (0, ((height /2) - 100)))
             pygame.display.update()
             pygame.time.delay(5000)
-            run = False
+            gstate.get().run = False
 
         #level up the npc's
         if gstate.get().craos.stage == 2:
@@ -458,7 +458,7 @@ class calculateeffects(state):
                         self.gainabilityoffensive(npc)
                         self.gainabilitydefensive(npc)
 
-        log = []
+        gstate.get().log = []
         
         print()
         print("round: " + str(self.roundcount + 1))
@@ -581,16 +581,18 @@ class evolve1(state):
         if self.number <= 0:
             for npc in gstate.get().npcs:
                 if npc.EXP >=evolveprice[npc.stage]:
+                    print("1")
                     npc.EXP -= evolveprice[npc.stage]
                     npc.HP += evolveHPgain[npc.stage]
                     npc.MaxHP += evolveHPgain[npc.stage]
                     npc.EXPtoevolve = evolveEXP[npc.stage + 1]
                     npc.stage += 1
                     npc.abilities = []
+                    print("2")
                     self.gainabilityoffensive(npc)
                     self.gainabilityoffensive(npc)
                     self.gainabilitydefensive(npc)
-            
+            print("3")
             return chooseability(self.roundcount, self.time + 15)
         else:
             return self
