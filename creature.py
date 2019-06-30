@@ -48,7 +48,7 @@ class creature:
         self.renderables = [playerrenderable(self),
                             textrenderable(x + 55, y, self.color, fontHP, lambda: self.name),
 
-                            barrenderable(x-50, y-80, 100, 10, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP)),
+                            barrenderable(x-50, y-80, 100, 10, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP) if self.HP>0 else (0, self.MaxHP)),
                             textrenderable(x+55, y-80, (255,0,0), fontHP, lambda: str(self.HP) + "/" + str(self.MaxHP)),
 
                             barrenderable(x-50, y-60, 100, 10, (0,0,255), (0,0,255), lambda: (self.EXP, self.EXPtoevolve*2), True),

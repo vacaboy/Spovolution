@@ -6,6 +6,7 @@ import gstate
 import math
 
 class state():
+
     def __init__(self, roundcount):
         self.roundcount = roundcount
         
@@ -31,10 +32,7 @@ class state():
             
     def receiveevent(self):
         return self
-
-        
-        
-
+       
 class chooseability(state):
 
     def __init__(self, roundcount, time = 900):
@@ -176,8 +174,6 @@ class chooseability(state):
             player.stage += 1
             return evolve1(self.roundcount, self.time)
             
-
-
 #__________________________________________________________________________________________________________________________________________________________________________________
 class choosetarget(state):
     def __init__(self, roundcount):
@@ -419,29 +415,32 @@ class calculateeffects(state):
 
         #verify if the game ended:
         
-        global height
-        global screen
+        #global height
+        #global screen
         if len(gstate.get().players) == 0:
-            texttie = gstate.get().fontend.render("Its a Tie! :|", 1 ,(255,193,37))
-            screen.blit(texttie, (0, ((height / 2) - 100)))
-            pygame.display.update()
-            pygame.time.delay(5000)
-            gstate.get().run = False
+            return endgame(self.roundcount, "tie")
+            # texttie = gstate.get().fontend.render("Its a Tie! :|", 1 ,(255,193,37))
+            # screen.blit(texttie, (0, ((height / 2) - 100)))
+            # pygame.display.update()
+            # pygame.time.delay(5000)
+            # gstate.get().run = False
         else:
             for corpse in gstate.get().deadcorpses:
                 if corpse.name == "craos":
-                    textlose = gstate.get().fontend.render("LOSER! :( ", 1, (255,0,0))
-                    screen.blit(textlose, (0, ((height /2) - 100)))
-                    pygame.display.update()
-                    pygame.time.delay(5000)
-                    gstate.get().run = False
+                    return endgame(self.roundcount, "lose")
+                    # textlose = gstate.get().fontend.render("LOSER! :( ", 1, (255,0,0))
+                    # screen.blit(textlose, (0, ((height /2) - 100)))
+                    # pygame.display.update()
+                    # pygame.time.delay(5000)
+                    # gstate.get().run = False
 
         if len(gstate.get().players) == 1 and gstate.get().players[0].name == "craos":
-            textwin = gstate.get().fontend.render("YOU WIN! :D ", 1, (0,255,0))
-            screen.blit(textwin, (0, ((height /2) - 100)))
-            pygame.display.update()
-            pygame.time.delay(5000)
-            gstate.get().run = False
+            return endgame(self.rouncount, "win")
+            # textwin = gstate.get().fontend.render("YOU WIN! :D ", 1, (0,255,0))
+            # screen.blit(textwin, (0, ((height /2) - 100)))
+            # pygame.display.update()
+            # pygame.time.delay(5000)
+            # gstate.get().run = False
 
         #level up the npc's
         if gstate.get().craos.stage == 2:
@@ -760,3 +759,39 @@ class gainability2(state):
                     player.abilities.append(utilityabilities[b].clone())
                     a = True
                     player.EXP -= abilityprice[player.stage]
+class endgame(state):
+    def __init__(self, roundcount, victor):
+        super().__init__(roundcount)
+        self.name = "Endgame"
+        self.time = 5
+        self.time1 = 5
+        self.victor = victor
+        self.renderables = []
+        self.texttime = gstate.get().fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
+        self.textround = gstate.get().fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
+        self.texttie = textrenderable(0, 0, (255,193,37), gstate.get().fontend, lambda: "Its a Tie! :|")
+        self.textlose = textrenderable(0, 0, (255,0,0), gstate.get().fontend, lambda: "LOSER! :(")
+        self.textwin = textrenderable(0, 0, (0,255,0), gstate.get().fontend, lambda: "YOU WIN :D")
+        self.renderables = [textrenderable(0, 0, (0,255,0), gstate.get().fontend, lambda: "YOU WIN :D")]
+        
+    def clock(self):
+        super().clock()
+        if self.time <= 0:
+            gstate.get().run = False
+        else:
+            return self
+        
+    
+    
+    def draw(self, screen):
+        #supper().draw(screen)
+        if self.victor == "win":
+            self.textwin.draw(screen)
+        elif self.victor == "tie":
+            self.texttie.draw(screen)
+        elif self.victor == "lose":
+            self.textlose.draw(screen)
+            
+            
+            
+            

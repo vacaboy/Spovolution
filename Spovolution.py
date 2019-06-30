@@ -103,8 +103,8 @@ print("round: 1")
 #______________________________________________________________________________________________________________________________________________________________________
 global run
 #main loop
-#run = True
-while run:
+gstate.get().run = True
+while gstate.get().run:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
