@@ -420,22 +420,23 @@ class calculateeffects(state):
         global run
         global height
         global log
+        global screen
         if len(gstate.get().players) == 0:
             texttie = gstate.get().fontend.render("Its a Tie! :|", 1 ,(255,193,37))
-            screenblit(texttie, (0, ((height / 2) - 100)))
+            screen.blit(texttie, (0, ((height / 2) - 100)))
             pygame.display.update()
             pygame.time.delay(5000)
             run = False
         else:
             for corpse in gstate.get().deadcorpses:
-                if corpse.name == "gstate.get().craos":
+                if corpse.name == "craos":
                     textlose = gstate.get().fontend.render("LOSER! :( ", 1, (255,0,0))
-                    screen.blit(textlose, (0, ((height /2) - 100)))
+                    #screen.blit(textlose, (0, ((height /2) - 100)))
                     pygame.display.update()
                     pygame.time.delay(5000)
                     run = False
 
-        if len(gstate.get().players) == 1 and gstate.get().players[0].name == "gstate.get().craos":
+        if len(gstate.get().players) == 1 and gstate.get().players[0].name == "craos":
             textwin = gstate.get().fontend.render("YOU WIN! :D ", 1, (0,255,0))
             screen.blit(textwin, (0, ((height /2) - 100)))
             pygame.display.update()

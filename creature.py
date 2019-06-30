@@ -31,6 +31,7 @@ class creature:
         self.defenseadd = 0
         self.healmultiplier = 1
         self.healadd = 0
+        self.lifesteal = 0
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -69,6 +70,7 @@ class creature:
         self.attackadd = 0
         self.defensemultiplier = 1
         self.defenseadd = 0
+        self.lifesteal = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         for ab in self.abilitiesincooldown:
@@ -102,8 +104,10 @@ class creature:
             d2 = round( (d1 - t.defenseadd) * t.defensemultiplier )
             if d2 < 0:
                 d2 = 0
+            self.HP += ((d2 * self.lifesteal) * self.healmultiplier) + self.healadd
             self.EXP += d2
-            t.EXP += d2
+            if not (t == self):
+                t.EXP += d2
             t.HP -= d2
             gstate.get().log.append([self, d2, t])
             t.damaged = True
@@ -116,6 +120,7 @@ class creature:
             t.HP += h1
             if t.HP > t.MaxHP:
                 t.HP = t.MaxHP
+            print(self.name + " healed " + str(h1) + " to " + t.name)
 
 class player(creature):
 

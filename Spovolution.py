@@ -101,9 +101,9 @@ roundphase = chooseability(1)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
-
+global run
 #main loop
-run = True
+#run = True
 while run:
 
     for event in pygame.event.get():
@@ -123,21 +123,24 @@ while run:
             elif event.key == pygame.K_g:
                 roundphase.gainabilityforfree(craos)
             elif event.key == pygame.K_p:
-                for player in players:
+                for player in gstate.get().players:
                     print(player.name)
             elif event.key == pygame.K_n:
-                for npc in npcs:
+                for npc in gstate.get().npcs:
                     print(npc.name)
             elif event.key == pygame.K_a:
                 print("clicaste a para ver as habilidades de toda a gente.")
-                for player in players:
+                for player in gstate.get().players:
                     print(player.name)
                     for a in player.abilities:
                         print(a.name)
                     print()
             elif event.key == pygame.K_l:
-                for i in log:
+                for i in gstate.get().log:
                     print(str(i))
+            elif event.key == pygame.K_c:
+                for c in gstate.get().deadcorpses:
+                    print(c.name)
 
 
     roundphase = roundphase.clock()
