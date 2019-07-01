@@ -31,7 +31,9 @@ class creature:
         self.defenseadd = 0
         self.healmultiplier = 1
         self.healadd = 0
-        self.lifesteal = 0
+        self.lifesteal = 0 
+        self.accuracy = 1
+        self.dodge = 0
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -48,7 +50,7 @@ class creature:
         self.renderables = [playerrenderable(self),
                             textrenderable(x + 55, y, self.color, fontHP, lambda: self.name),
 
-                            barrenderable(x-50, y-80, 100, 10, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP) if self.HP>0 else (0, self.MaxHP)),
+                            barrenderable(x-50, y-80, 100, 10, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP)),
                             textrenderable(x+55, y-80, (255,0,0), fontHP, lambda: str(self.HP) + "/" + str(self.MaxHP)),
 
                             barrenderable(x-50, y-60, 100, 10, (0,0,255), (0,0,255), lambda: (self.EXP, self.EXPtoevolve*2), True),
@@ -71,21 +73,20 @@ class creature:
         self.defensemultiplier = 1
         self.defenseadd = 0
         self.lifesteal = 0
+        self.accuracy = 1
+        self.dodge = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
+        print()
         for ab in self.abilitiesincooldown:
             ab[1] -= 1
             print(self.name + " has " + ab[0] + " in cooldown for " + str(ab[1]) + " rounds ")
-        for ab in self.abilitiesincooldown:
-            if ab[1] == 0:
-                self.abilitiesincooldown.remove(ab)
-
+        self.abilitiesincooldown = [ab for ab in self.abilitiesincooldown if ab[1] > 0]
+        self.abilitiesinchannel = [ab for ab in self.abilitiesinchannel if (ab[2] == True and ab[1] > 0)]
         for ab in self.abilitiesinchannel:
-            if ab[2] == False or ab[1] == 0:
-                print(self.name + " stopped channeling " + ab[0])
-                self.abilitiesinchannel.remove(ab)
-            else:
-                ab[2] = False
+            ab[2] = False            
+        self.conditions = [c for c in self.conditions if c.duration > 0]
+         
             
         
     def draw(self, screen):
@@ -95,29 +96,34 @@ class creature:
     def drawabilities(self, screen):
         pass
      
-    def attack(self, targets, damage):
+    def attack(self, targets, damage, accuracy = 1):
         self.dealtdamage = True 
         d3 = 0
         d1 = ( damage * self.attackmultiplier) + self.attackadd
         if d1 < 0:
             d1 = 0
         for t in targets:
-            d2 = round( (d1 - t.defenseadd) * t.defensemultiplier )
-            if d2 < 0:
-                d2 = 0
-            if self.lifesteal != 0:
-                d3 = ((d2 * self.lifesteal) * self.healmultiplier) + self.healadd
-                self.HP += d3
-                print(self.name + " regained " + str(d3) + " HP")
-            self.EXP += d2
-            if not (t == self):
-                t.EXP += d2
-            t.HP -= d2
-            gstate.get().log.append([self, d2, t])
-            t.damaged = True
-            t.attacksreceived += 1
-            print(self.name + " dealt " + str(d2) + " damage to " + t.name)
-            print(str(damage) + " "  +  str(d1) + " "  + str(d2) + " "  + str(d3))
+            hit = True
+            a = R.random()
+            if a <= (self.accuracy * (1 - t.dodge) * accuracy):
+                d2 = round( (d1 - t.defenseadd) * t.defensemultiplier )
+                if d2 < 0:
+                    d2 = 0
+                if self.lifesteal != 0:
+                    d3 = ((d2 * self.lifesteal) * self.healmultiplier) + self.healadd
+                    self.HP += d3
+                    print(self.name + " regained " + str(d3) + " HP")
+                self.EXP += d2
+                if not (t == self):
+                    t.EXP += d2
+                t.HP -= d2
+                gstate.get().log.append([self, d2, t])
+                t.damaged = True
+                t.attacksreceived += 1
+                print(self.name + " dealt " + str(d2) + " damage to " + t.name)
+                print(str(damage) + " "  +  str(d1) + " "  + str(d2) + " "  + str(d3))
+            else:
+                print(self.name + " missed the attack against " + t.name)
        
     def heal(self, targets, amount):
         for t in targets:
@@ -214,3 +220,5 @@ class deadcorpse(creature):
         self.EXPtoevolve = EXPtoevolve
         
         self.renderables.append(textrenderable(x, y, (0,0,0), gstate.get().fontHP, lambda: "R.I.P."))
+        self.renderables.remove(self.renderables[2])
+        self.renderables.append(barrenderable(x-50, y-80, 100, 10, (255,0,0), (255,0,0), lambda: (0, self.MaxHP)))

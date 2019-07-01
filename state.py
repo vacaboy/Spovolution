@@ -9,6 +9,7 @@ class state():
 
     def __init__(self, roundcount):
         self.roundcount = roundcount
+        self.renderables = []
         
     def clock(self):
         self.time1 = self.time1 - 0.1
@@ -22,6 +23,8 @@ class state():
         gstate.get().craos.drawabilities(screen)
         screen.blit(self.texttime, (300, 10))
         screen.blit(self.textround, (300, 30))
+        for r in self.renderables:
+            r.draw(screen)
         for player in gstate.get().players:
             player.draw(screen)
         for corpse in gstate.get().deadcorpses:
@@ -54,9 +57,26 @@ class chooseability(state):
             
             for npc in gstate.get().npcs:#npc's tambem escolhem as habilidades
                         npc.chooseability()            
-            return choosetarget(self.roundcount)
+            return choosetarget(self.roundcount, self.time)
         else:
             return self
+            
+    def effect(self): 
+                #verify if the game ended:
+        if len(gstate.get().players) == 0:
+            return endgame(self.roundcount, "tie")
+
+        else:
+            for corpse in gstate.get().deadcorpses:
+                if corpse.name == "craos":
+                    return endgame(self.roundcount, "lose")
+
+
+        if len(gstate.get().players) == 1 and gstate.get().players[0].name == "craos":
+            return endgame(self.roundcount, "win")
+        else:
+            return self
+
 
     def draw(self, screen):
         super().draw(screen)
@@ -89,7 +109,7 @@ class chooseability(state):
                         for condition in player.conditions:
                             if condition.priority == "chooseability":
                                 condition.effect()
-                    return choosetarget(self.roundcount)
+                    return choosetarget(self.roundcount, self.time)
                 else:
                     print("this ability is in cooldown")# for" " + str(gstate.get().craos.abilitiesincooldown[i]) + " turns.")
 
@@ -176,18 +196,19 @@ class chooseability(state):
             
 #__________________________________________________________________________________________________________________________________________________________________________________
 class choosetarget(state):
-    def __init__(self, roundcount):
+    def __init__(self, roundcount, time = 30):
         super().__init__(roundcount)
         #self.caster = caster
         #self.target = []
         #self.ability = ability
         self.name = "Choose Target"
-        self.time = 30
-        self.time1 = 30
+        self.time = time
+        self.time1 = time
         self.texttime = gstate.get().fonttime.render(self.name + ":" + str(self.time), 1, (255,0,0))
         self.textround = gstate.get().fonttime.render("round:" + str(self.roundcount), 1, (0, 0, 255))
         self.targetnumber = gstate.get().craos.ability.targetnumber
-        
+        self.renderables.append(barrenderable(320, 290, 160, 30, (227,207,87), (227,207,87), lambda: (1,1)))
+        self.renderables.append(textrenderable(330, 295, (0,0,0), gstate.get().fontA, lambda: "return"))
 
     def clock(self):
         super().clock()
@@ -313,7 +334,10 @@ class choosetarget(state):
                     if ((mouseposition[0] - player.pos[0])**2 + (mouseposition[1] - player.pos[1])**2) <= 50**2:
                         gstate.get().craos.target.append(player)
                         self.targetnumber -= 1
-        return self
+        if ((320 <= mouseposition[0] <= 480) and (290 <= mouseposition[1] <= 320)):
+            return chooseability(self.roundcount, self.time)
+        else:
+            return self
 #__________________________________________________________________________________________________________________________________________________________________________________
 class calculateeffects(state):
     def __init__(self, roundcount):
@@ -338,13 +362,15 @@ class calculateeffects(state):
                 if condition.priority == 1:
                     condition.effect()
 
-        for player in gstate.get().players: #check if anyone died
-            if player.HP <= 0:
-                gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
-                gstate.get().players.remove(player)
-        for npc in gstate.get().npcs:
-            if npc.HP <=0:
-                gstate.get().npcs.remove(npc)
+        self.deathcheck() #check if anyone died
+        
+        # for player in gstate.get().players: #check if anyone died
+            # if player.HP <= 0:
+                # gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                # gstate.get().players.remove(player)
+        # for npc in gstate.get().npcs:
+            # if npc.HP <=0:
+                # gstate.get().npcs.remove(npc)
 
 
 
@@ -359,13 +385,15 @@ class calculateeffects(state):
                 if condition.priority == 2:
                     condition.effect()
 
-        for player in gstate.get().players: #check if anyone died
-            if player.HP <= 0:
-                gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
-                gstate.get().players.remove(player)
-        for npc in gstate.get().npcs:
-            if npc.HP <=0:
-                gstate.get().npcs.remove(npc)
+        self.deathcheck() #check if anyone died
+        
+        # for player in gstate.get().players: #check if anyone died
+            # if player.HP <= 0:
+                # gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                # gstate.get().players.remove(player)
+        # for npc in gstate.get().npcs:
+            # if npc.HP <=0:
+                # gstate.get().npcs.remove(npc)
         
 
 
@@ -378,15 +406,16 @@ class calculateeffects(state):
                 if condition.priority == 3:
                     condition.effect()
             
-
-        for player in gstate.get().players: #check if anyone died
-            if player.HP <= 0:
-                gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
-                if player.name in [i.name for i in gstate.get().npcs]:
-                    gstate.get().players.remove(player)
-                    gstate.get().npcs.remove(player)
-                else:
-                    gstate.get().players.remove(player)
+        self.deathcheck() #check if anyone died
+        
+        # for player in gstate.get().players: #check if anyone died
+            # if player.HP <= 0:
+                # gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                # if player.name in [i.name for i in gstate.get().npcs]:
+                    # gstate.get().players.remove(player)
+                    # gstate.get().npcs.remove(player)
+                # else:
+                    # gstate.get().players.remove(player)
 ##        for npc in gstate.get().npcs:
 ##            if npc.HP <=0:
 ##                gstate.get().npcs.remove(npc)
@@ -400,47 +429,19 @@ class calculateeffects(state):
                 if condition.priority == 4:
                     condition.effect()
             
-
-        for player in gstate.get().players: #check if anyone died
-            if player.HP <= 0:
-                gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
-                if player.name in [i.name for i in gstate.get().npcs]:
-                    gstate.get().players.remove(player)
-                    gstate.get().npcs.remove(player)
-                else:
-                    gstate.get().players.remove(player)
+        self.deathcheck() #check if anyone died
+        # for player in gstate.get().players: 
+            # if player.HP <= 0:
+                # gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
+                # if player.name in [i.name for i in gstate.get().npcs]:
+                    # gstate.get().players.remove(player)
+                    # gstate.get().npcs.remove(player)
+                # else:
+                    # gstate.get().players.remove(player)
                 
-        for player in gstate.get().players:
-            player.startnewround()
-
-        #verify if the game ended:
         
-        #global height
-        #global screen
-        if len(gstate.get().players) == 0:
-            return endgame(self.roundcount, "tie")
-            # texttie = gstate.get().fontend.render("Its a Tie! :|", 1 ,(255,193,37))
-            # screen.blit(texttie, (0, ((height / 2) - 100)))
-            # pygame.display.update()
-            # pygame.time.delay(5000)
-            # gstate.get().run = False
-        else:
-            for corpse in gstate.get().deadcorpses:
-                if corpse.name == "craos":
-                    return endgame(self.roundcount, "lose")
-                    # textlose = gstate.get().fontend.render("LOSER! :( ", 1, (255,0,0))
-                    # screen.blit(textlose, (0, ((height /2) - 100)))
-                    # pygame.display.update()
-                    # pygame.time.delay(5000)
-                    # gstate.get().run = False
 
-        if len(gstate.get().players) == 1 and gstate.get().players[0].name == "craos":
-            return endgame(self.rouncount, "win")
-            # textwin = gstate.get().fontend.render("YOU WIN! :D ", 1, (0,255,0))
-            # screen.blit(textwin, (0, ((height /2) - 100)))
-            # pygame.display.update()
-            # pygame.time.delay(5000)
-            # gstate.get().run = False
+
 
         #level up the npc's
         if gstate.get().craos.stage == 2:
@@ -456,17 +457,32 @@ class calculateeffects(state):
                         self.gainabilityoffensive(npc)
                         self.gainabilityoffensive(npc)
                         self.gainabilitydefensive(npc)
-
-        gstate.get().log = []
         
+        
+        
+        #print([[a[0].name, a[1], a[2].name] for a in gstate.get().log])
+        print([[a.name, a.priority, a.duration] for a in gstate.get().craos.conditions])
+        for p in gstate.get().players: #conditions that act at the end of the round.
+            for c in p.conditions:
+                if condition.priority == "endround":
+                    c.effect()
+        
+        
+        for player in gstate.get().players:
+            player.startnewround()
+            
+        gstate.get().log = []   
         print()
         print("round: " + str(self.roundcount + 1))
-        
+       
         return chooseability(self.roundcount + 1)
         
 
-
-
+    def deathcheck(self):
+        gstate.get().deadcorpses = gstate.get().deadcorpses + [deadcorpse(p.pos[0], p.pos[1], p.name, p.color, p.HP, p.MaxHP, p.abilitylastused, p.abilitylasttarget, p.EXP, p.EXPtoevolve) for p in gstate.get().players if p.HP <= 0]
+        gstate.get().players = [p for p in gstate.get().players if p.HP > 0]
+        gstate.get().npcs = [n for n in gstate.get().npcs if n.HP > 0]
+        
     def gainabilityoffensive(self, player):
         a = True
         offensiveabilities = gstate.get().abilities[2][0]
@@ -778,6 +794,7 @@ class endgame(state):
         super().clock()
         if self.time <= 0:
             gstate.get().run = False
+            return self
         else:
             return self
         

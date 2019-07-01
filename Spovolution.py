@@ -13,35 +13,11 @@ import gstate
 pygame.init()
 gstate.init()
 
-#width = pygame.display.info()[current_w]
-#print(str(width))
-
 #screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 screen = pygame.display.set_mode((width, height))
 #screen = pygame.display.set_mode((200, 60))
 
 
-
-#__________________________________________________________________________________________________________________________________________________________________________________
-
-#__________________________________________________________________________________________________________________________________________________________________________________
-
-#_______________________________________________________________________________________________________________________________________________________________________
-
-#______________________________________________________________________________________________________________________________________________________________________
-
-#fonts:
-
-#texts:
-#texttackle = fontA.render("Tackle", 1, (0,0,0))
-#textchoosetarget = fonttime.render("choose target(s)!", 1, (255,0,0))
-#textround = fonttime.render("round:" + str(roundcount), 1, (0, 0, 255))
-
-#______________________________________________________________________________________________________________________________________________________________________
-#players:
-
-        
-#______________________________________________________________________________________________________________________________________________________________________
 
 #abilities:
 abilities = gstate.get().abilities
@@ -54,10 +30,6 @@ abilities[1].append(ability("Uncertain Footing",1, 1, False, 3, True, "Offensive
 abilities[1].append(ability("Stand Tall",1, 1, False, 3, True, "Offensive"))
 abilities[1].append(ability("QuickPoke",1, 3, False, 1, True, "Offensive"))
 
-
-#abilities[1].append(ability("teste", 1, 0, True, 3, False))
-#abilities[1].append(ability("teste2", 1, 2, True, 3, False))
-
 abilities[2][0].append(ability("Spear Throw",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Kick",2, 1,False, 2, True, "Offensive"))
 abilities[2][0].append(ability("Punch",2, 1,False, 2, True, "Offensive"))
@@ -68,13 +40,17 @@ abilities[2][0].append(ability("Everyone... GET IN HERE!",2, 1, False, 3, True, 
 abilities[2][0].append(ability("From The Shadows" ,2, 1, False, 3, True, "Offensive"))
 abilities[2][0].append(ability("Unleash The Power" ,2, 2, False, 2, True, "Offensive", cooldown = 2, channel = 4))
 
-
 abilities[2][1].append(ability("Rock Solid",2, 0,True, 1, False, "Defensive", cooldown = 5))
-abilities[2][1].append(ability("Refreshing Waters",2, 0,True, 2, False, "Defensive"))
-abilities[2][1].append(ability("Regenerate",2, 0,True, 3, False, "Defensive"))
+abilities[2][1].append(ability("Refreshing Waters",2, 0,True, 2, False, "Defensive", cooldown = 1))
+abilities[2][1].append(ability("Regenerate",2, 0,True, 3, False, "Defensive", cooldown = 2))
+abilities[2][1].append(ability("Shocking Response",2, 0,True, 4, False, "Defensive", cooldown = 2))
+abilities[2][1].append(ability("Dodge",2, 0,True, 1, False, "Defensive"))
+abilities[2][1].append(ability("Flight",2, 0,True, 4, False, "Defensive", cooldown = 5))
+abilities[2][1].append(ability("Nature's Call",2, 0,True, 4, False, "Defensive", cooldown = 2))
+abilities[2][1].append(ability("Web Cacoon",2, 0,True, 1, False, "Defensive", cooldown = 3))
 
 abilities[2][2].append(ability("Lullaby",2, 3,False, 3, False, "Utility", cooldown = 5))
-abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility"))
+abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", cooldown = 2))
 abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
 abilities[2][2].append(ability("Intimidate",2, 0,False, 4, False, "Utility", cooldown = 1))
@@ -108,7 +84,7 @@ while gstate.get().run:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
+            gstate.get().run = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: #nao sei como ver se se clicou no lado esquerdo ou direito do rato... o lado esquerdo é 1 e o lado esquerdo é 3
@@ -119,9 +95,9 @@ while gstate.get().run:
                 
                 
             if event.key == pygame.K_DELETE:
-                run = False
-            elif event.key == pygame.K_g:
-                roundphase.gainabilityforfree(craos)
+                gstate.get().run = False
+##            elif event.key == pygame.K_g:
+##                roundphase.gainabilityforfree(craos)
             elif event.key == pygame.K_p:
                 for player in gstate.get().players:
                     print(player.name)
@@ -141,6 +117,32 @@ while gstate.get().run:
             elif event.key == pygame.K_c:
                 for c in gstate.get().deadcorpses:
                     print(c.name)
+            elif event.key == pygame.K_f:
+                for p in gstate.get().players:
+                    p.accuracy = 0
+            elif event.key == pygame.K_g:
+                for p in gstate.get().players:
+                    p.accuracy = 0.5
+            elif event.key == pygame.K_v:
+                for p in gstate.get().players:
+                    p.dodge = 1
+            elif event.key == pygame.K_b:
+                for p in gstate.get().players:
+                    p.dodge = 0.5
+            elif event.key == pygame.K_z:
+                for p in gstate.get().players:
+                    print([p.name, p.accuracy, p.dodge])
+            elif event.key == pygame.K_o:
+                for a in gstate.get().abilities[2][0]:
+                    gstate.get().craos.abilities.append(a)
+            elif event.key == pygame.K_d:
+                for a in gstate.get().abilities[2][1]:
+                    gstate.get().craos.abilities.append(a)
+            elif event.key == pygame.K_u:
+                for a in gstate.get().abilities[2][2]:
+                    gstate.get().craos.abilities.append(a)
+            elif event.key == pygame.K_t:
+                gstate.get().craos.abilities = gstate.get().craos.abilities[1:]
 
 
     roundphase = roundphase.clock()

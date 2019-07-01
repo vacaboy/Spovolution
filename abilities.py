@@ -3,11 +3,12 @@ import random as R
 import gstate
 
 class condition(object):
-    def __init__(self, name, target, priority, duration):
+    def __init__(self, name, target, priority, duration, accuracy = 0):
         self.name = name
         self.target = target
         self.priority = priority
         self.duration = duration
+        self.accuracy = accuracy
 
     def effect(self):
         if self.name == "teste":
@@ -31,12 +32,12 @@ class condition(object):
             self.target.heal([self.target], 3)
 
         elif self.name == "Fight Stance":
-            self.target.attackadd = 7
+            self.target.attackadd += 7
             print(self.target.name + " deals 7 more damage this turn")
 
 
         elif self.name == "Limitless":
-            self.target.attackmultiplier = 2
+            self.target.attackmultiplier *= 2
             print(self.target.name + " dealt double extra damage because of Limiless")
 
         elif self.name == "Asleep":
@@ -46,29 +47,63 @@ class condition(object):
             print(str(a))
             if self.duration == 5 and a <= 30:
                 self.duration = 1
+                print(self.target.name + " Woke UP!")
             elif self.duration == 4 and a <= 50:
                 self.duration = 1
+                print(self.target.name + " Woke UP!")
             elif self.duration == 3 and a <= 70:
                 self.duration = 1
+                print(self.target.name + " Woke UP!")
             elif self.duration == 2 and a <= 80:
                 self.duration = 1
+                print(self.target.name + " Woke UP!")
             elif self.duration == 1 and a <= 90:
                 self.duration = 1
+                print(self.target.name + " Woke UP!")
             else:
                 self.target.ability = ability("passed", 3, 0, True, 1, False)
                 print(self.target.name + " is Asleep this round")
 
         elif self.name == "Intimidated":
-            self.target.attackadd = -5
+            self.target.attackadd -= 5
             print(self.target.name + " dealt minus 5 damage")
+    
+        elif self.name == "Shocking Response":
+            for a in gstate.get().log:
+                if a[2] == self.target:
+                    c = round( (5 - a[0].defenseadd) * a[0].defensemultiplier )
+                    a[0].HP -= c
+                    print(a[0].name + " took " + str(c) + " damage because of shocking response")
+                    b = R.randint(1,100)
+                    print("shocking response dice: " + str(b))
+                    if b <= 10:
+                        a[0].conditions.append(condition("Paralyzed", a[0], "chooseability", 1))
+                        print(a[0].name + " got paralyzed because of Shocking Response from " + a[2].name)
                 
+        elif self.name == "Flight":
+            self.target.dodge = 1 - ( (1 - self.target.dodge) * (1 - 0.8) )
+            print(self.target.name + " is flying!")
+            
+        elif self.name == "Nature's Call":
+            self.target.defenseadd += 3
+            print(self.target.name + " takes 3 less damage this turn.")
+            
+        elif self.name == "Web Cacoon":
+            for a in gstate.get().log:
+                if a[2] == self.target:
+                    a[0].conditions.append(condition("Accuracy", a[0], "chooseability", 1, accuracy = 0.5))
+                    
+        elif self.name == "Accuracy":
+            self.target.accuracy *= self.accuracy
+            print(self.target.name + " has " + str(self.accuracy * 100) + "% less accuracy.")
+            
 
 
         self.duration -= 1
-        if self.duration == 0:
-            if self.name == "Asleep":
-                print(self.target.name + " Woke UP!")
-            self.target.conditions.remove(self)
+        # if self.duration == 0:
+            # if self.name == "Asleep":
+                # print(self.target.name + " Woke UP!")
+            # self.target.conditions.remove(self)
             
             
 
@@ -85,11 +120,6 @@ class ability(object):
         self.worked = worked
         self.cooldown = cooldown
         self.channel = channel
-##    def startnewround(self):
-##        self.worked = False
-##        if self.cooldown >= 1:
-##            self.cooldown -= 1
-##            print(self.name + str(self.cooldown))
 
     def clone(self):
         print(self.name)
@@ -100,6 +130,8 @@ class ability(object):
         caster.abilitylasttarget = self.name
         caster.abilitylasttarget = [p.name for p in targets]
         print(caster.name + " used "+ self.name)
+        if self.cooldown > 0 and self.channel == 0:
+            caster.abilitiesincooldown.append([self.name, self.cooldown + 1])
         
         if self.name == "Tackle":
             caster.attack(targets, 2)
@@ -134,19 +166,19 @@ class ability(object):
             
 
         elif self.name == "Spear Throw":
-            a = R.randint(1, 100)
-            if a <= 55:
-                b=R.randint(1,12)
-                c=R.randint(1,12)
-                d=R.randint(1,12)
-                e = b + c + d
-                caster.attack(targets, e)
-            elif 55 < a <= 65:
-                print("but he missed by a tiny bit")
-            elif 65 < a <= 90:
-                print("but he missed")
-            else:
-                print("but he missed horrobly")
+            # a = R.randint(1, 100)
+            # if a <= 55:
+            b=R.randint(1,12)
+            c=R.randint(1,12)
+            d=R.randint(1,12)
+            e = b + c + d
+            caster.attack(targets, e , 0.55)
+            # elif 55 < a <= 65:
+                # print("but he missed by a tiny bit")
+            # elif 65 < a <= 90:
+                # print("but he missed")
+            # else:
+                # print("but he missed horrobly")
 
 
         elif self.name == "Kick":
@@ -161,16 +193,16 @@ class ability(object):
             
 
         elif self.name == "Blood Drain":
-            d = R.randint(1,100)
-            if d <= 75:
-                a = R.randint(1,8)
-                b = R.randint(1,8)
-                c = a + b
-                caster.lifesteal = 1
-                caster.attack(targets, c)
-            else:
-                print("but he missed")
-            caster.abilitiesincooldown.append(["Blood Drain", 1 + 1])
+            # d = R.randint(1,100)
+            # if d <= 75:
+            a = R.randint(1,8)
+            b = R.randint(1,8)
+            c = a + b
+            caster.lifesteal = 1
+            caster.attack(targets, c, 0.75)
+            # else:
+                # print("but he missed")
+            #caster.abilitiesincooldown.append(["Blood Drain", 1 + 1])
             
         elif self.name == "Headbutt":
             d = R.randint(1,100)
@@ -251,35 +283,60 @@ class ability(object):
                     
         elif self.name == "Refreshing Waters":
             caster.heal([caster], 12) 
-            caster.abilitiesincooldown.append(["Refreshing Waters", 1 + 1])
+            #caster.abilitiesincooldown.append(["Refreshing Waters", 1 + 1])
              
 
         elif self.name == "Rock Solid":
             caster.conditions.append(condition("Rock Solid", caster, 1, 1))
              
-            caster.abilitiesincooldown.append(["Rock Solid", 5 + 1])
+            #caster.abilitiesincooldown.append(["Rock Solid", 5 + 1])
 
         elif self.name == "Regenerate":
             a = R.randint(1,10)
             caster.conditions.append(condition("Regenerate", caster, "after choosetarget", a))
              
             print(caster.name + " will regenerate 3 HP per turn for " + str(a) + " turns")
-            caster.abilitiesincooldown.append(["Regenerate", 1 + 1])
+            #caster.abilitiesincooldown.append(["Regenerate", 1 + 1])
 
+        elif self.name == "Dodge":
+            caster.dodge = (1 - ( (1 - caster.dodge) * (1 - 0.7) ))
+            print(caster.name + " dodged this turn.")
+            
+        elif self.name == "Shocking Response":
+            caster.conditions.append(condition("Shocking Response", caster, 3, 2 ))
+            #caster.abilitiesincooldown.append(["Shocking Response", 2 + 1])
+            
+        elif self.name == "Flight":
+            a = R.randint(1,3)
+            caster.conditions.append(condition("Flight", caster, "chooseability", a))
+            #caster.abilitiesincooldown.append(["Flight", 5 + 1])
+            print(caster.name + " is flying for " + str(a) + " round(s)")
+            
+        elif self.name == "Nature's Call":
+            a = R.randint(1,10)
+            caster.conditions.append(condition("Nature's Call", caster, "chooseability", a))
+            #caster.abilitiesincooldown.append(["Nature's Call", 2 + 1])
+            print(caster.name + " will take 3 less damage for " + str(a) + " turns.")
+            
+        elif self.name == "Web Cacoon":
+            caster.conditions.append(condition("Web Cacoon", caster, 3, 3 + 1))
+            #caster.abilitiesincooldown.append(["Web Cacoon", 3 + 1])
+            print(caster.name + " is encaised in a  Webby Cacoon!")
+            
         elif self.name == "Fight Stance":
             a = R.randint(1,6)
             caster.conditions.append(condition("Fight Stance", caster, "chooseability", a))
             print(caster.name + " will deal 7 more damage for " + str(a) + " turns because of Fight Stance")
+            #caster.abilitiesincooldown.append(["Fight Stance", 2 + 1])
 
         elif self.name == "Limitless":
             caster.conditions.append(condition("Limitless", caster, "chooseability", 1))
-             
-            caster.abilitiesincooldown.append(["Limitless", 999])
+            #caster.abilitiesincooldown.append(["Limitless", 999])
             print(caster.name + " will deal double damage next turn because of Limitless")
 
         elif self.name == "Lullaby":
             print(caster.name + " sang a Lullaby")
-            caster.abilitiesincooldown.append(["Lullaby", 5 + 1])
+            #caster.abilitiesincooldown.append(["Lullaby", 5 + 1])
             for player in gstate.get().players:
                 if player == caster:
                     pass
@@ -290,7 +347,7 @@ class ability(object):
                         print(caster.name + " put " + player.name + " to Sleep. ")
 
         elif self.name == "Intimidate":
-            caster.abilitiesincooldown.append(["Intimidate", 1 + 1])
+            #caster.abilitiesincooldown.append(["Intimidate", 1 + 1])
             a = R.randint(1,6)
             for player in gstate.get().players:
                 if player == caster:
