@@ -47,6 +47,10 @@ class condition(object):
         elif self.name == "Limitless":
             self.target.attackmultiplier *= 2
             print(self.target.name + " dealt double extra damage because of Limiless")
+            
+        elif self.name == "Double Damage":
+            self.target.attackmultiplier *= 2
+            print(self.target.name + " dealt double extra damage")
 
         elif self.name == "Asleep":
             
@@ -398,3 +402,28 @@ class ability(object):
             print(caster.name + " did nothing.")
             pass
         caster.abilitylastused = self.name
+     
+     
+     
+class buff():
+
+    def __init__(self, name, bufftype1, bufftype2, duration = 0): #bufftype1 é se é uma blessing ou uma curse, bufftype2 é se é instantaneo ou dá uma condiçao
+        self.name = name
+        self.renderables = []
+        self.bufftype1 = bufftype1 
+        self.bufftype2 = bufftype2
+        
+    def draw(self,screen):
+        for r in self.renderables:
+            r.draw(screen)
+            
+    def effect(self, target):
+        if self.bufftype2 == "Condition":
+            if self.name == "Double Damage":
+                self.target.conditions.append(condition("Double Damage", self.target, "chooseability", 3))
+                print(self.target.name + " will deal double damage for 3 turns.")
+                
+        elif self.bufftype2 == "Instantaneous":
+            if self.name == "5Heal":
+                self.target.heal([self.target],5)
+                print(self.target.name + " healed 5 HP!")

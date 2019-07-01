@@ -8,10 +8,13 @@ class renderable:
         pass
 
 class rectrenderable(renderable):
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, color = (0,0,0)):
         super().__init__(x, y)
         self.w, self.h = w, h
         self.rect = (x, y, w, h)
+        self.color = color
+    def draw (self, screen):
+        pygame.draw.rect(screen, self.color, self.rect)
 
 class textrenderable(renderable):
     def __init__(self, x, y, color, font, textfun):

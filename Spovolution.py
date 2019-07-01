@@ -57,9 +57,15 @@ abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", coold
 abilities[2][2].append(ability("Intimidate",2, 0,False, 4, False, "Utility", cooldown = 1))
 abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"))
 #______________________________________________________________________________________________________________________________________________________________________
+#buffs:
+buffs = gstate.get().buffs
+
+buffs[1][1].append(buff("Double Damage", "Blessing", "Condition", 3))
+buffs[1][0].append(buff("10Heal", "Blessing", "Instantaneous"))
+buffs[1][0].append(buff("10Damage", "Curse", "Instantaneous"))
 
 
-
+#______________________________________________________________________________________________________________________________________________________________
 craos = player(375, 450, "craos",(255, 0, 255))
 
 robly18 = npc(375, 150, "robly18")
@@ -75,7 +81,7 @@ gstate.get().npcs = [robly18, tavos, tomis]
 
 
 
-roundphase = chooseability(1)
+roundphase = chooseability(1, 1)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________

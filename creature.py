@@ -35,6 +35,7 @@ class creature:
         self.accuracy = 1
         self.dodge = 0
         self.EXPmultiplier = 1
+        self.bet = 0
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -77,6 +78,7 @@ class creature:
         self.accuracy = 1
         self.dodge = 0
         self.EXPmultiplier = 1
+        self.bet = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         print()

@@ -13,6 +13,7 @@ class gstate():
         self.fontHP = pygame.font.SysFont("comicsans",20 ,False ,True)
         self.fontend = pygame.font.SysFont("mayence", 180, True)
         self.run = True
+        self.buffs = [[], [[],[]], [[],[]]] #buffs, cada lista, correspondentes aos buffs de cada stage, tem 2 listas, os buffs normais, e os legendary.
 
         
         
