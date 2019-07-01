@@ -34,6 +34,7 @@ class creature:
         self.lifesteal = 0 
         self.accuracy = 1
         self.dodge = 0
+        self.EXPmultiplier = 1
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -75,6 +76,7 @@ class creature:
         self.lifesteal = 0
         self.accuracy = 1
         self.dodge = 0
+        self.EXPmultiplier = 1
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         print()
@@ -113,9 +115,9 @@ class creature:
                     d3 = ((d2 * self.lifesteal) * self.healmultiplier) + self.healadd
                     self.HP += d3
                     print(self.name + " regained " + str(d3) + " HP")
-                self.EXP += d2
+                self.EXP += (d2 * self.EXPmultiplier)
                 if not (t == self):
-                    t.EXP += d2
+                    t.EXP += (d2 * t.EXPmultiplier)
                 t.HP -= d2
                 gstate.get().log.append([self, d2, t])
                 t.damaged = True

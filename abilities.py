@@ -21,6 +21,14 @@ class condition(object):
         elif self.name == "Paralyzed":
             print(self.target.name + " is paralyzed this round")
             self.target.ability = ability("passed", 3, 0, True, 1, False)
+            
+        elif self.name == "Immobilized":
+            print(self.target.name + " takes 150% damage this turn")
+            self.target.defensemultiplier *= 1.5
+            
+        elif self.name == "Accuracy":
+            self.target.accuracy *= self.accuracy
+            print(self.target.name + " has " + str(self.accuracy * 100) + "% less accuracy.")
 
         elif self.name == "Rock Solid":
             self.target.defensemultiplier = 0
@@ -93,9 +101,14 @@ class condition(object):
                 if a[2] == self.target:
                     a[0].conditions.append(condition("Accuracy", a[0], "chooseability", 1, accuracy = 0.5))
                     
-        elif self.name == "Accuracy":
-            self.target.accuracy *= self.accuracy
-            print(self.target.name + " has " + str(self.accuracy * 100) + "% less accuracy.")
+        elif self.name == "High Jump":
+            for ab in self.target.abilities:
+                if not (ab.abilitytype == "Offensive"):
+                    self.target.abilitiesincooldown.append([ab.name, 1 + 1])
+            print("Next turn, you must choose a offensive ability because you jumped high")
+                
+                    
+        
             
 
 
@@ -109,7 +122,7 @@ class condition(object):
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False):
         self.name = name
         self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
@@ -120,7 +133,8 @@ class ability(object):
         self.worked = worked
         self.cooldown = cooldown
         self.channel = channel
-
+        self.Return = Return 
+        
     def clone(self):
         print(self.name)
         return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel)     
@@ -257,6 +271,7 @@ class ability(object):
                 caster.attack(targets, n)
             else:
                 print("but failed")
+                
 
         elif self.name == "Unleash The Power":
             if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
@@ -323,6 +338,12 @@ class ability(object):
             #caster.abilitiesincooldown.append(["Web Cacoon", 3 + 1])
             print(caster.name + " is encaised in a  Webby Cacoon!")
             
+        elif self.name == "High Jump":
+            caster.conditions.append(condition("High Jump", caster, 4, 1))
+            caster.conditions.append(condition("Immobilized", caster, "chooseability", 1))
+            caster.dodge = 1
+            print(caster.name + " Jumped high in the air!")
+            
         elif self.name == "Fight Stance":
             a = R.randint(1,6)
             caster.conditions.append(condition("Fight Stance", caster, "chooseability", a))
@@ -355,6 +376,11 @@ class ability(object):
                 else:
                     player.conditions.append(condition("Intimidated", player, "chooseability", a))
                     print(caster.name + " intimidated " + player.name + " for " + str(a) + " rounds ")
+        
+        elif self.name == "No Pain, No Gain":
+            caster.EXPmultiplier *= 2
+            print(caster.name + " Gains double experience this turn.")
+            
             
         elif self.name == "teste":
             caster.abilitylasttarget = [player.name for player in targets]

@@ -48,12 +48,14 @@ abilities[2][1].append(ability("Dodge",2, 0,True, 1, False, "Defensive"))
 abilities[2][1].append(ability("Flight",2, 0,True, 4, False, "Defensive", cooldown = 5))
 abilities[2][1].append(ability("Nature's Call",2, 0,True, 4, False, "Defensive", cooldown = 2))
 abilities[2][1].append(ability("Web Cacoon",2, 0,True, 1, False, "Defensive", cooldown = 3))
+abilities[2][1].append(ability("High Jump",2, 0,True, 1, False, "Defensive"))
 
 abilities[2][2].append(ability("Lullaby",2, 3,False, 3, False, "Utility", cooldown = 5))
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", cooldown = 2))
 abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
 abilities[2][2].append(ability("Intimidate",2, 0,False, 4, False, "Utility", cooldown = 1))
+abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"))
 #______________________________________________________________________________________________________________________________________________________________________
 
 

@@ -220,6 +220,10 @@ class choosetarget(state):
         return self
      
     def effect(self):
+    
+        if gstate.get().craos.ability.Return:
+            print("passou aqui")
+            return chooseability(self.roundcount, self.time)
 
         if self.targetnumber <= 0: #se ja estao os targets todos escolhidos, siga em frente
             
@@ -408,17 +412,6 @@ class calculateeffects(state):
             
         self.deathcheck() #check if anyone died
         
-        # for player in gstate.get().players: #check if anyone died
-            # if player.HP <= 0:
-                # gstate.get().deadcorpses.append(deadcorpse(player.pos[0], player.pos[1], player.name, player.color, player.HP, player.MaxHP, player.abilitylastused, player.abilitylasttarget, player.EXP, player.EXPtoevolve))
-                # if player.name in [i.name for i in gstate.get().npcs]:
-                    # gstate.get().players.remove(player)
-                    # gstate.get().npcs.remove(player)
-                # else:
-                    # gstate.get().players.remove(player)
-##        for npc in gstate.get().npcs:
-##            if npc.HP <=0:
-##                gstate.get().npcs.remove(npc)
 
         #phase 4 of combat    
         for player in gstate.get().players:#effects of priority 4 abilities
