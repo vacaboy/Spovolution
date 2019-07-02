@@ -1,6 +1,7 @@
 from globals import *
 import random as R
 import gstate
+import math
 
 class condition(object):
     def __init__(self, name, target, priority, duration, accuracy = 0):
@@ -110,6 +111,10 @@ class condition(object):
                 if not (ab.abilitytype == "Offensive"):
                     self.target.abilitiesincooldown.append([ab.name, 1 + 1])
             print("Next turn, you must choose a offensive ability because you jumped high")
+            
+        elif self.name == "Lifesteal10%":
+            self.target.lifesteals += 0.1
+            print(self.target.name + " has 10% lifesteal")
                 
                     
         
@@ -407,11 +412,12 @@ class ability(object):
      
 class buff():
 
-    def __init__(self, name, bufftype1, bufftype2, duration = 0): #bufftype1 é se é uma blessing ou uma curse, bufftype2 é se é instantaneo ou dá uma condiçao
+    def __init__(self, name, bufftype1, bufftype2, text): #bufftype1 é se é uma blessing ou uma curse, bufftype2 é se é instantaneo ou dá uma condiçao
         self.name = name
         self.renderables = []
         self.bufftype1 = bufftype1 
         self.bufftype2 = bufftype2
+        self.text = text
         
     def draw(self,screen):
         for r in self.renderables:
@@ -420,10 +426,21 @@ class buff():
     def effect(self, target):
         if self.bufftype2 == "Condition":
             if self.name == "Double Damage":
-                self.target.conditions.append(condition("Double Damage", self.target, "chooseability", 3))
-                print(self.target.name + " will deal double damage for 3 turns.")
+                target.conditions.append(condition("Double Damage", target, "chooseability", 5))
+                print(target.name + " will deal double damage for 5 turns.")
+                
+            elif self.name == "Lifesteal10%":
+                target.conditions.append(condition("Lifesteal10%", target, "chooseability", 999))
+                
+            #elif self.name == ""
                 
         elif self.bufftype2 == "Instantaneous":
             if self.name == "5Heal":
-                self.target.heal([self.target],5)
-                print(self.target.name + " healed 5 HP!")
+                target.heal([target],5)
+                print(target.name + " healed 5 HP!")
+                
+            elif self.name == "5Damage":
+                a = max(((5 * target.defensemultiplier) - target.defenseadd), 0)
+                target.HP -= a
+                print(target.name + " took " + str(a) + " damage.")
+                

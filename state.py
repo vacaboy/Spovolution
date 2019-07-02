@@ -2,8 +2,10 @@ import random as R
 from globals import *
 from creature import *
 from abilities import *
+
 import gstate
 import math
+
 
 class state():
 
@@ -35,7 +37,7 @@ class state():
     def effect(self):
         return self
             
-    def receiveevent(self):
+    def receiveevent(self, event):
         return self
        
 class chooseability(state):
@@ -670,8 +672,7 @@ class gainability2(state):
 class buffbet(state):
     def __init__(self, roundcount, stage, time = 30, buffnumber = 1):
         super().__init__(roundcount, stage)
-        self.name = "Beg to get that buff!"
-        self.name = ""
+        self.name = "Betting time!"
         self.time = time
         self.time1 = time
         self.buffnumber = buffnumber
@@ -679,7 +680,6 @@ class buffbet(state):
         self.done = False
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
-                            rectrenderable(320, 240, 300, 100, (227,207,87)),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),
                             rectrenderable(830, 380, 40, 40, (227,207,87)),
                             rectrenderable(890, 380, 40, 40, (227,207,87)),
@@ -688,8 +688,25 @@ class buffbet(state):
                             rectrenderable(830, 460, 40, 40, (227,207,87)),
                             rectrenderable(890, 460, 40, 40, (227,207,87)),
                             rectrenderable(950, 460, 40, 40, (227,207,87)),
-                            rectrenderable(420,405 , 100 , 30,(227,207,87)),
-                            textrenderable(780, 50, (0,255,0), gstate.get().fonttime, lambda : "BET:" + str(gstate.get().craos.bet))]
+                            rectrenderable(780, 90, 100 , 30,(227,207,87)),
+                            textrenderable(780, 50, (0,255,0), gstate.get().fonttime, lambda : "BET:" + str(gstate.get().craos.bet)),
+                            textrenderable(780, 390, (0,0,0), gstate.get().fontA, lambda: "+1"),
+                            textrenderable(840, 390, (0,0,0), gstate.get().fontA, lambda: "+5"),
+                            textrenderable(890, 390, (0,0,0), gstate.get().fontA, lambda: "+10"),
+                            textrenderable(950, 390, (0,0,0), gstate.get().fontA, lambda: "+50"),
+                            textrenderable(780, 470, (0,0,0), gstate.get().fontA, lambda: "-1"),
+                            textrenderable(840, 470, (0,0,0), gstate.get().fontA, lambda: "-5"),
+                            textrenderable(890, 470, (0,0,0), gstate.get().fontA, lambda: "-10"),
+                            textrenderable(950, 470, (0,0,0), gstate.get().fontA, lambda: "-50"),
+                            textrenderable(780, 95, (0,0,0), gstate.get().fontHP, lambda: "Place your Bet")]
+                            
+        if self.buff.bufftype1 == "Blessing":
+            self.renderables.append(rectrenderable(320, 260, 670, 100, (255,185,15)))
+            self.renderables.append(textrenderable(330, 300, (255,0,0), gstate.get().fontA, lambda: self.buff.text))
+        elif self.buff.bufftype1 == "Curse":
+            self.renderables.append(rectrenderable(320, 260, 670, 100, (138,43,226)))
+            self.renderables.append(textrenderable(330, 300, (0,0,255), gstate.get().fontA, lambda: self.buff.text))
+
                             
     def clock(self):
         super().clock()
@@ -697,10 +714,16 @@ class buffbet(state):
             pass
         return self
         
+    def draw(self, screen):
+        super().draw(screen)
+        textrenderable(330, 300, (255,0,0), gstate.get().fontA, lambda: self.buff.text).draw(screen)
+        
             
     def effect(self):
         if self.done:
             if self.buffnumber < 4:
+                for p in gstate.get().players:
+                    p.bet = 0
                 return buffbet(self.roundcount, self.stage, buffnumber = self.buffnumber + 1)
                 
             elif self.buffnumber == 4:
@@ -710,36 +733,47 @@ class buffbet(state):
         else:
             return self
             
-    def receiveevent(self):
+    def receiveevent(self, event):
         mouseposition = event.pos
-        if 770 <= mouseposition[0] <= 810 and 460 <= mouseposition[1] <= 500:
+        print(str(mouseposition))
+        if 770 <= mouseposition[0] <= 810 and 380 <= mouseposition[1] <= 420:
             self.addbet(1)
-        elif 830 <= mouseposition[0] <= 870 and 460 <= mouseposition[1] <= 500:
+        elif 830 <= mouseposition[0] <= 870 and 380 <= mouseposition[1] <= 420:
             self.addbet(5)
-        elif 890 <= mouseposition[0] <= 930 and 460 <= mouseposition[1] <= 500:
-            self.addbet(20)
-        elif 950 <= mouseposition[0] <= 990 and 460 <= mouseposition[1] <= 500:
-            self.addbet(100)
+        elif 890 <= mouseposition[0] <= 930 and 380 <= mouseposition[1] <= 420:
+            self.addbet(10)
+        elif 950 <= mouseposition[0] <= 990 and 380 <= mouseposition[1] <= 420:
+            self.addbet(50)
         elif 770 <= mouseposition[0] <= 810 and 460 <= mouseposition[1] <= 500:
             self.addbet(-1)
         elif 830 <= mouseposition[0] <= 870 and 460 <= mouseposition[1] <= 500:
             self.addbet(-5)
         elif 890 <= mouseposition[0] <= 930 and 460 <= mouseposition[1] <= 500:
-            self.addbet(-20)
+            self.addbet(-10)
         elif 950 <= mouseposition[0] <= 990 and 405 <= mouseposition[1] <= 500:
-            self.addbet(-100)
-        elif 420 <= mouseposition[0] <= 520 and 460 <= mouseposition[1] <= 435:
-            self.calculate()
+            self.addbet(-50)
+        elif 780 <= mouseposition[0] <= 880 and 90 <= mouseposition[1] <= 120:
+            if self.buff.bufftype1 == "Blessing":
+                self.calculateblessing()
+            elif self.buff.bufftype1 == "Curse":
+                self.calculatecurse()
+        return self
     
     def pickbuff(self):
         if self.buffnumber < 4:
             i = R.randint(0, len(gstate.get().buffs[1][0]) - 1)
-            return gstate.get().buffs[1][0][i]
+            r = gstate.get().buffs[1][0][i]
         elif self.buffnumber == 4:
             i = R.randint(0, len(gstate.get().buffs[1][1]) - 1)
-            return gstate.get().buffs[1][1][i]
+            r = gstate.get().buffs[1][1][i]
         else:
             print("wtf? o.O")
+        print(r.name)
+        print(r.text)
+        #self.renderables.append(textrenderable(330, 300, (0,0,0), gstate.get().fontA, lambda: r.text))
+        #r.renderables.append(textrenderable(330, 300, (255,0,0), gstate.get().fontA, lambda: r.text))
+        
+        return r
 
     
     def addbet(self, n):
@@ -750,7 +784,7 @@ class buffbet(state):
             a = gstate.get().craos.EXP
         gstate.get().craos.bet = a
         
-    def calculate(self):
+    def calculateblessing(self):
         for n in gstate.get().npcs: #make npc's bet
             a = R.randint(0, n.EXP)
             n.bet = a
@@ -758,6 +792,25 @@ class buffbet(state):
         winner = []
         for p in gstate.get().players:
             if p.bet > b:
+                winner = [p]
+                b = p.bet
+            elif p.bet == b:
+                winner.append(p)
+        for p in gstate.get().players:
+            p.EXP -= p.bet
+        for w in winner:
+            self.buff.effect(w)
+        
+        self.done = True
+        
+    def calculatecurse(self):
+        for n in gstate.get().npcs: #make npc's bet
+            a = R.randint(0, n.EXP)
+            n.bet = a
+        b = 10000000000
+        winner = []
+        for p in gstate.get().players:
+            if p.bet < b:
                 winner = [p]
                 b = p.bet
             elif p.bet == b:

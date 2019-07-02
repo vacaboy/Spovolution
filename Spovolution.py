@@ -60,9 +60,12 @@ abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"
 #buffs:
 buffs = gstate.get().buffs
 
-buffs[1][1].append(buff("Double Damage", "Blessing", "Condition", 3))
-buffs[1][0].append(buff("10Heal", "Blessing", "Instantaneous"))
-buffs[1][0].append(buff("10Damage", "Curse", "Instantaneous"))
+buffs[1][1].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage for 5 rounds"))
+buffs[1][1].append(buff("Lifesteal10%", "Blessing", "Condition", "For the rest of your life, you have 10% lifesteal"))
+
+
+buffs[1][0].append(buff("5Heal", "Blessing", "Instantaneous", "heal 5 HP"))
+buffs[1][0].append(buff("5Damage", "Curse", "Instantaneous", "take 5 damage"))
 
 
 #______________________________________________________________________________________________________________________________________________________________

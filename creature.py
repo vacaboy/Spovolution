@@ -3,7 +3,7 @@ from abilities import *
 import random as R
 import pygame
 import gstate
-from renderable import playerrenderable, textrenderable, barrenderable
+from renderable import *
 
 class creature:
     def __init__(self, x, y, name = "none", color = "none"):
@@ -110,7 +110,7 @@ class creature:
             hit = True
             a = R.random()
             if a <= (self.accuracy * (1 - t.dodge) * accuracy):
-                d2 = round( (d1 - t.defenseadd) * t.defensemultiplier )
+                d2 = round( (d1 * t.defensemultiplier) - t.defenseadd )
                 if d2 < 0:
                     d2 = 0
                 if self.lifesteal != 0:
