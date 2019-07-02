@@ -716,7 +716,6 @@ class buffbet(state):
         
     def draw(self, screen):
         super().draw(screen)
-        textrenderable(330, 300, (255,0,0), gstate.get().fontA, lambda: self.buff.text).draw(screen)
         
             
     def effect(self):
@@ -768,11 +767,6 @@ class buffbet(state):
             r = gstate.get().buffs[1][1][i]
         else:
             print("wtf? o.O")
-        print(r.name)
-        print(r.text)
-        #self.renderables.append(textrenderable(330, 300, (0,0,0), gstate.get().fontA, lambda: r.text))
-        #r.renderables.append(textrenderable(330, 300, (255,0,0), gstate.get().fontA, lambda: r.text))
-        
         return r
 
     
@@ -800,6 +794,7 @@ class buffbet(state):
             p.EXP -= p.bet
         for w in winner:
             self.buff.effect(w)
+            print(w.name + " won this bet!")
         
         self.done = True
         
@@ -819,6 +814,7 @@ class buffbet(state):
             p.EXP -= p.bet
         for w in winner:
             self.buff.effect(w)
+            print(w.name + " lost this bet!")
         
         self.done = True
         

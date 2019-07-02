@@ -100,7 +100,7 @@ class creature:
     def drawabilities(self, screen):
         pass
      
-    def attack(self, targets, damage, accuracy = 1):
+    def attack(self, targets, damage, a = R.random(), accuracy = 1):
         self.dealtdamage = True 
         d3 = 0
         d1 = ( damage * self.attackmultiplier) + self.attackadd
@@ -108,13 +108,12 @@ class creature:
             d1 = 0
         for t in targets:
             hit = True
-            a = R.random()
             if a <= (self.accuracy * (1 - t.dodge) * accuracy):
                 d2 = round( (d1 * t.defensemultiplier) - t.defenseadd )
                 if d2 < 0:
                     d2 = 0
                 if self.lifesteal != 0:
-                    d3 = ((d2 * self.lifesteal) * self.healmultiplier) + self.healadd
+                    d3 = round(((d2 * self.lifesteal) * self.healmultiplier) + self.healadd)
                     self.HP += d3
                     print(self.name + " regained " + str(d3) + " HP")
                 self.EXP += (d2 * self.EXPmultiplier)

@@ -54,18 +54,21 @@ abilities[2][2].append(ability("Lullaby",2, 3,False, 3, False, "Utility", cooldo
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", cooldown = 2))
 abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
-abilities[2][2].append(ability("Intimidate",2, 0,False, 4, False, "Utility", cooldown = 1))
+abilities[2][2].append(ability("Intimidate",2, 3,False, 4, False, "Utility", cooldown = 1))
 abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"))
 #______________________________________________________________________________________________________________________________________________________________________
 #buffs:
 buffs = gstate.get().buffs
 
-buffs[1][1].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage for 5 rounds"))
-buffs[1][1].append(buff("Lifesteal10%", "Blessing", "Condition", "For the rest of your life, you have 10% lifesteal"))
+#buffs[1][1].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage for 5 rounds", duration = 5))
+buffs[1][1].append(buff("Lifesteal", "Blessing", "Condition", "For Life: you have 10% lifesteal", value = 0.1, duration = 999))
+buffs[1][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive a 3 damage attack per round.", value = 3, duration = 999))
 
 
-buffs[1][0].append(buff("5Heal", "Blessing", "Instantaneous", "heal 5 HP"))
-buffs[1][0].append(buff("5Damage", "Curse", "Instantaneous", "take 5 damage"))
+buffs[1][0].append(buff("Heal", "Blessing", "Condition", "heal 10 HP next round", value = 10, duration = 1))
+buffs[1][0].append(buff("Damage", "Curse", "Condition", "take 10 damage next turn", value = 10, duration = 1))
+buffs[1][0].append(buff("Less Damage", "Curse", "Condition", "For life: You will deal 2 less damage.", value = 2, duration = 999))
+buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
 
 
 #______________________________________________________________________________________________________________________________________________________________
@@ -82,6 +85,7 @@ gstate.get().craos = craos
 gstate.get().players = [craos, robly18, tavos, tomis]
 gstate.get().npcs = [robly18, tavos, tomis]
 
+gstate.get().system = npc(0 ,0, "system", (255,0,0))
 
 
 roundphase = chooseability(1, 1)

@@ -4,12 +4,12 @@ import gstate
 import math
 
 class condition(object):
-    def __init__(self, name, target, priority, duration, accuracy = 0):
+    def __init__(self, name, target, priority, duration, value = 0):
         self.name = name
         self.target = target
         self.priority = priority
         self.duration = duration
-        self.accuracy = accuracy
+        self.value = value
 
     def effect(self):
         if self.name == "teste":
@@ -28,9 +28,17 @@ class condition(object):
             self.target.defensemultiplier *= 1.5
             
         elif self.name == "Accuracy":
-            self.target.accuracy *= self.accuracy
-            print(self.target.name + " has " + str(self.accuracy * 100) + "% less accuracy.")
-
+            self.target.accuracy *= self.value
+            print(self.target.name + " has " + str(self.value * 100) + "% less accuracy.")
+            
+        elif self.name == "Take Damage":
+            gstate.get().system.attack([self.target], self.value, a = 0)
+            print("passou aqui 1")
+            
+        elif self.name == "Take Heal":
+            gstate.get().system.heal([self.target], self.value)
+            print("passou aqui 2")
+            
         elif self.name == "Rock Solid":
             self.target.defensemultiplier = 0
             print("because of Rock Solid, " + str(self.target.name) + " took no damage")
@@ -104,7 +112,7 @@ class condition(object):
         elif self.name == "Web Cacoon":
             for a in gstate.get().log:
                 if a[2] == self.target:
-                    a[0].conditions.append(condition("Accuracy", a[0], "chooseability", 1, accuracy = 0.5))
+                    a[0].conditions.append(condition("Accuracy", a[0], "chooseability", 1, value = 0.5))
                     
         elif self.name == "High Jump":
             for ab in self.target.abilities:
@@ -112,9 +120,17 @@ class condition(object):
                     self.target.abilitiesincooldown.append([ab.name, 1 + 1])
             print("Next turn, you must choose a offensive ability because you jumped high")
             
-        elif self.name == "Lifesteal10%":
-            self.target.lifesteals += 0.1
+        elif self.name == "Lifesteal":
+            self.target.lifesteal += self.value
             print(self.target.name + " has 10% lifesteal")
+            
+        elif self.name == "Less Damage":
+            self.target.attackadd -= self.value
+            print(self.target.name + " deals " + str(self.value) + " less damage this turn")
+            
+        elif self.name == "More Damage":
+            self.target.attackadd += self.value
+            print(self.target.name + " deals " + str(self.value) + " more damage this turn")
                 
                     
         
@@ -221,7 +237,7 @@ class ability(object):
             a = R.randint(1,8)
             b = R.randint(1,8)
             c = a + b
-            caster.lifesteal = 1
+            caster.lifesteal += 1
             caster.attack(targets, c, 0.75)
             # else:
                 # print("but he missed")
@@ -412,12 +428,14 @@ class ability(object):
      
 class buff():
 
-    def __init__(self, name, bufftype1, bufftype2, text): #bufftype1 é se é uma blessing ou uma curse, bufftype2 é se é instantaneo ou dá uma condiçao
+    def __init__(self, name, bufftype1, bufftype2, text, value = 0, duration = 1): #bufftype1 é se é uma blessing ou uma curse, bufftype2 é se é instantaneo ou dá uma condiçao
         self.name = name
         self.renderables = []
         self.bufftype1 = bufftype1 
         self.bufftype2 = bufftype2
         self.text = text
+        self.value = value
+        self.duration = duration
         
     def draw(self,screen):
         for r in self.renderables:
@@ -426,21 +444,29 @@ class buff():
     def effect(self, target):
         if self.bufftype2 == "Condition":
             if self.name == "Double Damage":
-                target.conditions.append(condition("Double Damage", target, "chooseability", 5))
+                target.conditions.append(condition("Double Damage", target, "chooseability", self.duration))
                 print(target.name + " will deal double damage for 5 turns.")
                 
-            elif self.name == "Lifesteal10%":
-                target.conditions.append(condition("Lifesteal10%", target, "chooseability", 999))
+            elif self.name == "Lifesteal":
+                target.conditions.append(condition("Lifesteal", target, "chooseability", duration = self.duration, value = self.value))
                 
-            #elif self.name == ""
+            elif self.name == "Take Damage":
+                target.conditions.append(condition("Take Damage", target, 2, duration = self.duration, value = self.value))
+                
+            elif self.name == "Damage":
+                target.conditions.append(condition("Take Damage", target, 2, duration = self.duration, value = self.value))
+
+            elif self.name == "Heal":
+                target.conditions.append(condition("Take Heal", target, 2, duration = self.duration, value = self.value))
+                
+            elif self.name == "Less Damage":
+                target.conditions.append(condition("Less Damage", target, "chooseability", duration = self.duration, value = self.value))
+                
+            elif self.name == "More Damage":
+                target.conditions.append(condition("More Damage", target, "chooseability", duration = self.duration, value = self.value))
                 
         elif self.bufftype2 == "Instantaneous":
-            if self.name == "5Heal":
-                target.heal([target],5)
-                print(target.name + " healed 5 HP!")
+            pass
                 
-            elif self.name == "5Damage":
-                a = max(((5 * target.defensemultiplier) - target.defenseadd), 0)
-                target.HP -= a
-                print(target.name + " took " + str(a) + " damage.")
+            
                 
