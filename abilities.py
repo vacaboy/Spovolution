@@ -33,11 +33,18 @@ class condition(object):
             
         elif self.name == "Take Damage":
             gstate.get().system.attack([self.target], self.value, a = 0)
-            print("passou aqui 1")
+
             
         elif self.name == "Take Heal":
             gstate.get().system.heal([self.target], self.value)
-            print("passou aqui 2")
+            
+        elif self.name == "Heal Modifier":
+            self.target.healmultiplier *= 0.5
+            
+        elif self.name == "More Experience":
+            self.target.EXPmultiplier *= self.value 
+            print(self.target.name + " gains " + str(self.value) + " EXP")
+
             
         elif self.name == "Rock Solid":
             self.target.defensemultiplier = 0
@@ -45,8 +52,8 @@ class condition(object):
 
 
         elif self.name == "Regenerate":
-            print(self.target.name + " regenerates 3 HP")
-            self.target.heal([self.target], 3)
+            print("Regenerate:")
+            gstate.get().system.heal([self.target], 3)
 
         elif self.name == "Fight Stance":
             self.target.attackadd += 7
@@ -181,8 +188,8 @@ class ability(object):
             caster.attack([caster], 2)
 
         elif self.name == "Stand Tall":
-            if caster.attacksreceived >= 2:
-                caster.attack(targets, 8)
+            if caster.attacksreceived >= 1:
+                caster.attack(targets, 7)
             else:
                 print("but it failed")
             
@@ -366,6 +373,7 @@ class ability(object):
         elif self.name == "High Jump":
             caster.conditions.append(condition("High Jump", caster, 4, 1))
             caster.conditions.append(condition("Immobilized", caster, "chooseability", 1))
+            caster.conditions.append(condition("Double Damage", caster, "chooseability", 1))
             caster.dodge = 1
             print(caster.name + " Jumped high in the air!")
             
@@ -464,6 +472,12 @@ class buff():
                 
             elif self.name == "More Damage":
                 target.conditions.append(condition("More Damage", target, "chooseability", duration = self.duration, value = self.value))
+                
+            elif self.name == "Heal Modifier":
+                target.conditions.append(condition("Heal Modifier", target, "chooseability", duration = self.duration, value = self.value))
+                
+            elif self.name == "More Experience":
+                target.conditions.append(condition("More Experience", target, "chooseability", duration = self.duration, value = self.value))
                 
         elif self.bufftype2 == "Instantaneous":
             pass

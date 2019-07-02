@@ -74,6 +74,8 @@ class creature:
         self.attackadd = 0
         self.defensemultiplier = 1
         self.defenseadd = 0
+        self.healmultiplier = 1
+        self.healadd = 0
         self.lifesteal = 0
         self.accuracy = 1
         self.dodge = 0
@@ -116,9 +118,9 @@ class creature:
                     d3 = round(((d2 * self.lifesteal) * self.healmultiplier) + self.healadd)
                     self.HP += d3
                     print(self.name + " regained " + str(d3) + " HP")
-                self.EXP += (d2 * self.EXPmultiplier)
+                self.EXP += round((d2 * self.EXPmultiplier))
                 if not (t == self):
-                    t.EXP += (d2 * t.EXPmultiplier)
+                    t.EXP += round((d2 * t.EXPmultiplier))
                 t.HP -= d2
                 gstate.get().log.append([self, d2, t])
                 t.damaged = True
@@ -130,7 +132,7 @@ class creature:
        
     def heal(self, targets, amount):
         for t in targets:
-            h1 = (amount * t.healmultiplier) + t.healadd
+            h1 = round((amount * t.healmultiplier) + t.healadd)
             t.HP += h1
             if t.HP > t.MaxHP:
                 t.HP = t.MaxHP

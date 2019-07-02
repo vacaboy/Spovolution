@@ -52,7 +52,7 @@ abilities[2][1].append(ability("High Jump",2, 0,True, 1, False, "Defensive"))
 
 abilities[2][2].append(ability("Lullaby",2, 3,False, 3, False, "Utility", cooldown = 5))
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", cooldown = 2))
-abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
+#abilities[2][2].append(ability("Unleash the Chains",2, 0,True, 3, False, "Utility"))
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
 abilities[2][2].append(ability("Intimidate",2, 3,False, 4, False, "Utility", cooldown = 1))
 abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"))
@@ -60,15 +60,32 @@ abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"
 #buffs:
 buffs = gstate.get().buffs
 
-#buffs[1][1].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage for 5 rounds", duration = 5))
+buffs[1][1].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage for 6 rounds", duration = 6))
 buffs[1][1].append(buff("Lifesteal", "Blessing", "Condition", "For Life: you have 10% lifesteal", value = 0.1, duration = 999))
-buffs[1][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive a 3 damage attack per round.", value = 3, duration = 999))
+buffs[1][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive 3 damage per round.", value = 3, duration = 999))
+buffs[1][1].append(buff("Heal Modifier", "Curse", "Condition", "For Life: Heal against you are halfed", value = 0.5, duration = 999))
+buffs[1][1].append(buff("More Experience", "Blessing", "Condition", "For Life: you will receive 20% more experience", value = 1.2, duration = 999))
+buffs[1][1].append(buff("More Experience", "Curse", "Condition", "For Life: you will receive a 20% less experience", value = 0.8, duration = 999))
+
+##buffs[1][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive a 3 damage attack per round.", value = 3, duration = 999))
 
 
 buffs[1][0].append(buff("Heal", "Blessing", "Condition", "heal 10 HP next round", value = 10, duration = 1))
 buffs[1][0].append(buff("Damage", "Curse", "Condition", "take 10 damage next turn", value = 10, duration = 1))
 buffs[1][0].append(buff("Less Damage", "Curse", "Condition", "For life: You will deal 2 less damage.", value = 2, duration = 999))
 buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
+
+buffs[1][0].append(buff("More Experience", "Blessing", "Condition", "For 5 turns, you will receive double experience", value = 2, duration = 5))
+buffs[1][0].append(buff("More Experience", "Curse", "Condition", "For 5 turns, you will receive half experience", value = 0.5, duration = 5))
+##
+##buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
+##buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
+##
+##buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
+##buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
+##
+##buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
+##buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
 
 
 #______________________________________________________________________________________________________________________________________________________________
