@@ -7,6 +7,7 @@ from globals import *
 from creature import player, npc, deadcorpse
 from abilities import *
 from state import *
+from simulation import simulation
 
 import gstate
 
@@ -108,6 +109,8 @@ gstate.get().npcs = [robly18, tavos, tomis]
 
 gstate.get().system = npc(0 ,0, "system", (255,0,0))
 
+gstate.get().simulation = simulation()
+
 
 roundphase = chooseability(1, 1)
 print("round: 1")
@@ -180,7 +183,15 @@ while gstate.get().run:
             elif event.key == pygame.K_t:
                 gstate.get().craos.abilities = gstate.get().craos.abilities[1:]
 
-
+    decided = [ai for ai in gstate.get().undecided if ai.decided()]
+    gstate.get().undecided = [ai for ai in gstate.get().undecided if not ai.decided()]
+    for ai in decided:
+        gstate.get().decisionlist.append(ai.decide())
+    
+    if gstate.get().undecided == []:
+        gstate.get().undecided = gstate.get().simulation.run(gstate.get().decisionlist)
+        gstate.get().decisionlist = []
+    
     roundphase = roundphase.clock()
     roundphase.draw(screen)
     pygame.display.update()
