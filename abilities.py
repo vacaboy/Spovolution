@@ -23,6 +23,12 @@ class condition(object):
             print(self.target.name + " is paralyzed this round")
             self.target.ability = ability("passed", 3, 0, True, 1, False)
             
+        elif self.name == "Become Paralyzed":
+            a = R.random()
+            if a < self.value:
+                print(self.target.name + " is paralyzed this round")
+                self.target.ability = ability("passed", 3, 0, True, 1, False)
+            
         elif self.name == "Immobilized":
             print(self.target.name + " takes 150% damage this turn")
             self.target.defensemultiplier *= 1.5
@@ -478,6 +484,9 @@ class buff():
                 
             elif self.name == "More Experience":
                 target.conditions.append(condition("More Experience", target, "chooseability", duration = self.duration, value = self.value))
+                
+            elif self.name == "Become Paralyzed":
+                target.conditions.append(condition("Become Paralyzed", target, "chooseability", duration = self.duration, value = self.value))
                 
         elif self.bufftype2 == "Instantaneous":
             pass
