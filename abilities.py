@@ -151,10 +151,7 @@ class condition(object):
 
 
         self.duration -= 1
-        # if self.duration == 0:
-            # if self.name == "Asleep":
-                # print(self.target.name + " Woke UP!")
-            # self.target.conditions.remove(self)
+
             
             
 

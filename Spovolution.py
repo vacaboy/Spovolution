@@ -8,6 +8,7 @@ from creature import player, npc, deadcorpse
 from abilities import *
 from state import *
 from simulation import simulation
+from aicomponent import *
 
 import gstate
 
@@ -95,12 +96,16 @@ buffs[1][0].append(buff("Become Paralyzed", "Curse", "Condition", "For life: the
 
 #______________________________________________________________________________________________________________________________________________________________
 craos = player(375, 450, "craos",(255, 0, 255))
+craos.ai = playeraicomponent(craos)
 
 robly18 = npc(375, 150, "robly18")
+robly18.ai = attackwhoattackedme(robly18)
 
 tavos = npc(670,150, "tavos")
+tavos.ai = npcaicomponent(tavos)
 
 tomis = npc(670, 450, "tomis")
+tomis.ai = npcaicomponent(tomis)
 
 gstate.get().craos = craos
 
@@ -183,15 +188,18 @@ while gstate.get().run:
             elif event.key == pygame.K_t:
                 gstate.get().craos.abilities = gstate.get().craos.abilities[1:]
 
-    decided = [ai for ai in gstate.get().undecided if ai.decided()]
-    gstate.get().undecided = [ai for ai in gstate.get().undecided if not ai.decided()]
-    for ai in decided:
-        gstate.get().decisionlist.append(ai.decide())
+    #decided = [ai for ai in gstate.get().undecided if ai.Qdecided]
+    #gstate.get().undecided = [ai for ai in gstate.get().undecided if not ai.decided()]
+    #for ai in decided:
+    #    gstate.get().decisionlist.append(ai.decide())
     
-    if gstate.get().undecided == []:
-        gstate.get().undecided = gstate.get().simulation.run(gstate.get().decisionlist)
-        gstate.get().decisionlist = []
+    #if gstate.get().undecided == []:
+    #    gstate.get().undecided = gstate.get().simulation.run(gstate.get().decisionlist)
+    #    gstate.get().decisionlist = []
     
+    for p in gstate.get().players:
+        p.ai.decide()
+        
     roundphase = roundphase.clock()
     roundphase.draw(screen)
     pygame.display.update()

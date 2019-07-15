@@ -65,7 +65,7 @@ class creature:
             
 
     def startnewround(self):
-
+        
         self.damaged = False
         self.dealtdamage = False
         self.target = []
@@ -92,6 +92,7 @@ class creature:
         for ab in self.abilitiesinchannel:
             ab[2] = False            
         self.conditions = [c for c in self.conditions if c.duration > 0]
+        self.ai.Qdecided = False
          
             
         
@@ -139,7 +140,10 @@ class creature:
             print(self.name + " healed " + str(h1) + " to " + t.name)
 
 class player(creature):
-
+        
+    def startnewround(self):
+        super().startnewround(self)
+        self.ai.ready = False
 
     def drawabilities(self, screen):
         pygame.draw.rect(screen, (255,246,143),(0 ,0 ,300 , height)) #ability tab
@@ -189,7 +193,7 @@ class npc(creature):
                     else:
                         self.target.append(gstate.get().players[a])
                         n -= 1
-        else:#se nao de podes dar target a ti mesmo...
+        else:#se nao de podes dar target a ti mesmo
             if n >= (len(gstate.get().players) - 1): #entao se o numero de targets for maior ou igual que o numero de gstate.get().players - 1, entao os targets sao todos os inimigos
                 for p in gstate.get().players:
                     if p == self:

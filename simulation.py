@@ -2,8 +2,28 @@
 class simulation:
     def __init__(self):
         pass
+        
+    def deathcheck(self):
+        gstate.get().deadcorpses = gstate.get().deadcorpses + [deadcorpse(p.pos[0], p.pos[1], p.name, p.color, p.HP, p.MaxHP, p.abilitylastused, p.abilitylasttarget, p.EXP, p.EXPtoevolve) for p in gstate.get().players if p.HP <= 0]
+        gstate.get().players = [p for p in gstate.get().players if p.HP > 0]
+        gstate.get().npcs = [n for n in gstate.get().npcs if n.HP > 0]
     
     def run(self, info):
-        #do things with info
-        print(info)
-        return []
+        for i in [1,2,3,4]:#ha 4 fazes de combate
+            for a in info:#fazer as decisoes.
+                if a[1].priority == i:
+                    a[1].effect(a[2], a[0])
+
+                
+            for p in gstate.get().players:#as condiçoes atuam.
+                for cond in p.conditions:
+                    if cond.priority == i:
+                        condition.effect()
+                        
+            self.deathcheck()
+
+        
+        
+        
+        
+  

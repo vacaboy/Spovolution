@@ -104,16 +104,17 @@ class chooseability(state):
                 if not(gstate.get().craos.abilities[i].name in [j[0] for j in gstate.get().craos.abilitiesincooldown]):
                     gstate.get().craos.target = []
                     gstate.get().craos.ability = gstate.get().craos.abilities[i]
-                    for npc in gstate.get().npcs:#npc's tambem escolhem as habilidades
-                        npc.chooseability()
+                    #for npc in gstate.get().npcs:#npc's tambem escolhem as habilidades
+                    #    npc.chooseability()
 
                     for player in gstate.get().players:#fazer os efeitos que atuam agora
                         for condition in player.conditions:
                             if condition.priority == "chooseability":
                                 condition.effect()
+                    
                     return choosetarget(self.roundcount, self.stage, self.time)
                 else:
-                    print("this ability is in cooldown")# for" " + str(gstate.get().craos.abilitiesincooldown[i]) + " turns.")
+                    print("this ability is in cooldown")
 
         #ganhar habilidade
         if 320 <= mouseposition[0] <= 480 and 290 <= mouseposition[1] <= 320:
@@ -303,59 +304,134 @@ class calculateeffects(state):
         self.name = "calculating effects"
         self.time = 30
         self.time1 = 30
+        gstate.get().craos.ai.ready = True
 
     def clock(self):
         super().clock()
         return self
 
     def effect(self):
-        #phase 1 of combat:
-        for player in gstate.get().players:#effects of priority 1 abilities
-            if player.ability.priority == 1:
-                player.ability.effect(player.target, player)
+        if [p for p in gstate.get().players if p.ai.Qdecided] == gstate.get().players: #se todos ja se decidiram:
+            gstate.get().simulation.run(gstate.get().decisionlist)
+            return endround(roundphase.roundcount, roundphase.stage)
+        
+        
+        # #phase 1 of combat:
+        # for player in gstate.get().players:#effects of priority 1 abilities
+            # if player.ability.priority == 1:
+                # player.ability.effect(player.target, player)
                 
-            for condition in player.conditions: #conditions with priority 1
-                if condition.priority == 1:
-                    condition.effect()
+            # for condition in player.conditions: #conditions with priority 1
+                # if condition.priority == 1:
+                    # condition.effect()
 
-        self.deathcheck() #check if anyone died
+        # self.deathcheck() #check if anyone died
 
         
-        #phase 2 of combat:     
-        for player in gstate.get().players:#effects of priority 2 abilities
-            if player.ability.priority == 2:
-                player.ability.effect(player.target, player)
+        # #phase 2 of combat:     
+        # for player in gstate.get().players:#effects of priority 2 abilities
+            # if player.ability.priority == 2:
+                # player.ability.effect(player.target, player)
                 
-            for condition in player.conditions: #conditions of priority 2
-                if condition.priority == 2:
-                    condition.effect()
+            # for condition in player.conditions: #conditions of priority 2
+                # if condition.priority == 2:
+                    # condition.effect()
 
-        self.deathcheck() #check if anyone died
+        # self.deathcheck() #check if anyone died
 
-        #phase 3 of combat    
-        for player in gstate.get().players:#effects of priority 3 abilities
-            if player.ability.priority == 3:
-                player.ability.effect(player.target, player)
+        # #phase 3 of combat    
+        # for player in gstate.get().players:#effects of priority 3 abilities
+            # if player.ability.priority == 3:
+                # player.ability.effect(player.target, player)
 
-            for condition in player.conditions: #conditions of priority 3
-                if condition.priority == 3:
-                    condition.effect()
+            # for condition in player.conditions: #conditions of priority 3
+                # if condition.priority == 3:
+                    # condition.effect()
             
-        self.deathcheck() #check if anyone died
+        # self.deathcheck() #check if anyone died
         
 
-        #phase 4 of combat    
-        for player in gstate.get().players:#effects of priority 4 abilities
-            if player.ability.priority == 4:
-                player.ability.effect(player.target, player)
+        # #phase 4 of combat    
+        # for player in gstate.get().players:#effects of priority 4 abilities
+            # if player.ability.priority == 4:
+                # player.ability.effect(player.target, player)
 
-            for condition in player.conditions: #conditions of priority 4
-                if condition.priority == 4:
-                    condition.effect()
+            # for condition in player.conditions: #conditions of priority 4
+                # if condition.priority == 4:
+                    # condition.effect()
             
-        self.deathcheck() #check if anyone died
+        # self.deathcheck() #check if anyone died
 
-        print([[a.name, a.priority, a.duration] for a in gstate.get().craos.conditions])
+        # print([[a.name, a.priority, a.duration] for a in gstate.get().craos.conditions])
+        # for p in gstate.get().players: #conditions that act at the end of the round.
+            # for c in p.conditions:
+                # if condition.priority == "endround":
+                    # c.effect()
+        
+        
+        # for player in gstate.get().players:
+            # player.startnewround()
+            
+        # gstate.get().log = []   
+        # print()
+        # print("round: " + str(self.roundcount + 1))
+        
+        # if (self.roundcount + 1) == evolveround[1]:
+            # #return evolve1(self.roundcount + 1, self.stage)
+            # return buffbet(self.roundcount + 1, self.stage)
+        # else:
+            # return chooseability(self.roundcount + 1, self.stage)
+        
+
+    # def deathcheck(self):
+        # gstate.get().deadcorpses = gstate.get().deadcorpses + [deadcorpse(p.pos[0], p.pos[1], p.name, p.color, p.HP, p.MaxHP, p.abilitylastused, p.abilitylasttarget, p.EXP, p.EXPtoevolve) for p in gstate.get().players if p.HP <= 0]
+        # gstate.get().players = [p for p in gstate.get().players if p.HP > 0]
+        # gstate.get().npcs = [n for n in gstate.get().npcs if n.HP > 0]
+        
+    # def gainabilityoffensive(self, player):
+        # a = True
+        # offensiveabilities = gstate.get().abilities[2][0]
+        # while a:
+            # b = R.randint(0,len(offensiveabilities) - 1)
+            # #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            # if not (offensiveabilities[b].name in [i.name for i in player.abilities]):
+                # player.abilities.append(offensiveabilities[b].clone())
+                # a = False
+
+    # def gainabilitydefensive(self, player):
+        # a = True
+        # defensiveabilities = gstate.get().abilities[2][1]
+        # while a:
+            # b = R.randint(0,len(defensiveabilities) - 1)
+            # #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            # if not (defensiveabilities[b].name in [i.name for i in player.abilities]):
+                # player.abilities.append(defensiveabilities[b].clone())
+                # a = False
+
+
+    # def gainabilityutility(self, player):
+        # a = True
+        # utilityabilities = gstate.get().abilities[2][2]
+        # while a:
+            # b = R.randint(0,len(utilityabilities) - 1)
+            # #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+            # if not (utilityabilities[b].name in [i.name for i in player.abilities]):
+                # player.abilities.append(utilityabilities[b].clone())
+                # a = False
+
+#________________________________________________________________________________________________________________________________________________________
+class endround(state):
+    def __init__(self, roundcount, stage):
+        super().__init__(roundcount, stage)
+        self.name = "endturn"
+        self.time = 30
+        self.time1 = 30
+
+    def clock(self):
+        super().clock()
+        return self
+
+    def effect(self):
         for p in gstate.get().players: #conditions that act at the end of the round.
             for c in p.conditions:
                 if condition.priority == "endround":
@@ -364,55 +440,17 @@ class calculateeffects(state):
         
         for player in gstate.get().players:
             player.startnewround()
+            player.ai.gatherinfo()
             
         gstate.get().log = []   
         print()
         print("round: " + str(self.roundcount + 1))
         
         if (self.roundcount + 1) == evolveround[1]:
-            #return evolve1(self.roundcount + 1, self.stage)
             return buffbet(self.roundcount + 1, self.stage)
         else:
             return chooseability(self.roundcount + 1, self.stage)
-        
-
-    def deathcheck(self):
-        gstate.get().deadcorpses = gstate.get().deadcorpses + [deadcorpse(p.pos[0], p.pos[1], p.name, p.color, p.HP, p.MaxHP, p.abilitylastused, p.abilitylasttarget, p.EXP, p.EXPtoevolve) for p in gstate.get().players if p.HP <= 0]
-        gstate.get().players = [p for p in gstate.get().players if p.HP > 0]
-        gstate.get().npcs = [n for n in gstate.get().npcs if n.HP > 0]
-        
-    def gainabilityoffensive(self, player):
-        a = True
-        offensiveabilities = gstate.get().abilities[2][0]
-        while a:
-            b = R.randint(0,len(offensiveabilities) - 1)
-            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
-            if not (offensiveabilities[b].name in [i.name for i in player.abilities]):
-                player.abilities.append(offensiveabilities[b].clone())
-                a = False
-
-    def gainabilitydefensive(self, player):
-        a = True
-        defensiveabilities = gstate.get().abilities[2][1]
-        while a:
-            b = R.randint(0,len(defensiveabilities) - 1)
-            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
-            if not (defensiveabilities[b].name in [i.name for i in player.abilities]):
-                player.abilities.append(defensiveabilities[b].clone())
-                a = False
-
-
-    def gainabilityutility(self, player):
-        a = True
-        utilityabilities = gstate.get().abilities[2][2]
-        while a:
-            b = R.randint(0,len(utilityabilities) - 1)
-            #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
-            if not (utilityabilities[b].name in [i.name for i in player.abilities]):
-                player.abilities.append(utilityabilities[b].clone())
-                a = False
-
-#_____________________________________________________________________________________________________________________________________________________________________
+#__________________________________________________________________________________________________________________________________________________________________
 class loseability(state):
 
     def __init__(self, roundcount, stage, time = 30):
