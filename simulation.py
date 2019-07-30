@@ -1,3 +1,5 @@
+import gstate
+from creature import *
 
 class simulation:
     def __init__(self):
@@ -18,7 +20,7 @@ class simulation:
             for p in gstate.get().players:#as condiçoes atuam.
                 for cond in p.conditions:
                     if cond.priority == i:
-                        condition.effect()
+                        cond.effect()
                         
             self.deathcheck()
 

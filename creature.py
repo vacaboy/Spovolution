@@ -135,14 +135,12 @@ class creature:
         for t in targets:
             h1 = round((amount * t.healmultiplier) + t.healadd)
             t.HP += h1
-            if t.HP > t.MaxHP:
-                t.HP = t.MaxHP
             print(self.name + " healed " + str(h1) + " to " + t.name)
 
 class player(creature):
         
     def startnewround(self):
-        super().startnewround(self)
+        super().startnewround()
         self.ai.ready = False
 
     def drawabilities(self, screen):

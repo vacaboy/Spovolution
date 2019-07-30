@@ -456,7 +456,7 @@ class buff():
         if self.bufftype2 == "Condition":
             if self.name == "Double Damage":
                 target.conditions.append(condition("Double Damage", target, "chooseability", self.duration))
-                print(target.name + " will deal double damage for 5 turns.")
+                print(target.name + " will deal double damage for " + str(self.duration) + " turns.")
                 
             elif self.name == "Lifesteal":
                 target.conditions.append(condition("Lifesteal", target, "chooseability", duration = self.duration, value = self.value))

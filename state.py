@@ -313,7 +313,7 @@ class calculateeffects(state):
     def effect(self):
         if [p for p in gstate.get().players if p.ai.Qdecided] == gstate.get().players: #se todos ja se decidiram:
             gstate.get().simulation.run(gstate.get().decisionlist)
-            return endround(roundphase.roundcount, roundphase.stage)
+            return endround(self.roundcount, self.stage)
         
         
         # #phase 1 of combat:
@@ -434,7 +434,7 @@ class endround(state):
     def effect(self):
         for p in gstate.get().players: #conditions that act at the end of the round.
             for c in p.conditions:
-                if condition.priority == "endround":
+                if c.priority == "endround":
                     c.effect()
         
         
@@ -443,6 +443,7 @@ class endround(state):
             player.ai.gatherinfo()
             
         gstate.get().log = []   
+        gstate.get().decisionlist = []
         print()
         print("round: " + str(self.roundcount + 1))
         
@@ -830,6 +831,7 @@ class buffbet(state):
                 winner.append(p)
         for p in gstate.get().players:
             p.EXP -= p.bet
+            print(p.name + " placed a bet of " + str(p.bet))
         for w in winner:
             self.buff.effect(w)
             print(w.name + " won this bet!")
