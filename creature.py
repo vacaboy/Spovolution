@@ -92,7 +92,9 @@ class creature:
         for ab in self.abilitiesinchannel:
             ab[2] = False            
         self.conditions = [c for c in self.conditions if c.duration > 0]
+        
         self.ai.Qdecided = False
+        self.ai.decisions = []
          
             
         

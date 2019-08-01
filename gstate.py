@@ -6,6 +6,7 @@ class gstate():
         self.npcs = [] #has all player except craos. note: "player" and "npc" are different classes
         self.abilities = [[],[],[[],[],[]],[],[]] #keeps track of all abilities in the game, each sublist is the abilities of the correspondend stage. the first sublist are the stage 0 abilities and so on
         #the abilities in stage 2 divide into 3 sublists, offensive, defensive and utility
+        self.starterpacks = [[],[],[],[],[],[]] #starter packs are the elemental abilities they gain when they level. there is fire and ice now.
         self.deadcorpses = [] #has all the dead folk
         self.log = [] #isto mantem, ao longo de cada turno, quem da dano a quem. [caster, damage, target]
         self.fonttime = pygame.font.SysFont("comicsans", 50, True)

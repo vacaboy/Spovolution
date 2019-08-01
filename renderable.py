@@ -15,7 +15,15 @@ class rectrenderable(renderable):
         self.color = color
     def draw (self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
-
+        
+class circlerenderable(renderable):
+    def __init__(self, x, y, r, color = (0,0,0)):
+        super().__init__(x, y)
+        self.color = color
+        self.r = r
+    def draw(self, screen):
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.r)
+    
 class textrenderable(renderable):
     def __init__(self, x, y, color, font, textfun):
         super().__init__(x, y)
@@ -58,3 +66,5 @@ class playerrenderable(rectrenderable):
         
         pygame.draw.circle(screen, (0,0,0), (x+10, y-30), 5)
         pygame.draw.circle(screen, (0,0,0), (x+10, y-30), 1)
+        
+        

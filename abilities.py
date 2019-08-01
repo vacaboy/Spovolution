@@ -20,22 +20,24 @@ class condition(object):
                     self.target.EXP += 3
         
         elif self.name == "Paralyzed":
-            print(self.target.name + " is paralyzed this round")
-            self.target.ability = ability("passed", 3, 0, True, 1, False)
+            pass
+            #print(self.target.name + " is paralyzed this round")
+            #self.target.ability = ability("passed", 3, 0, True, 1, False)
             
         elif self.name == "Become Paralyzed":
             a = R.random()
             if a < self.value:
-                print(self.target.name + " is paralyzed this round")
-                self.target.ability = ability("passed", 3, 0, True, 1, False)
+                #print(self.target.name + " is paralyzed next round")
+                self.target.conditions.append(condition("Paralyzed", a[0], 3, 1))
+                #self.target.ability = ability("passed", 3, 0, True, 1, False)
             
         elif self.name == "Immobilized":
-            print(self.target.name + " takes 150% damage this turn")
+            #print(self.target.name + " takes 150% damage this turn")
             self.target.defensemultiplier *= 1.5
             
         elif self.name == "Accuracy":
             self.target.accuracy *= self.value
-            print(self.target.name + " has " + str(self.value * 100) + "% less accuracy.")
+            #print(self.target.name + " has " + str(self.value * 100) + "% less accuracy.")
             
         elif self.name == "Take Damage":
             gstate.get().system.attack([self.target], self.value, a = 0)
@@ -49,30 +51,30 @@ class condition(object):
             
         elif self.name == "More Experience":
             self.target.EXPmultiplier *= self.value 
-            print(self.target.name + " gains " + str(self.value) + " EXP")
+            #print(self.target.name + " gains " + str(self.value) + " EXP")
 
             
         elif self.name == "Rock Solid":
             self.target.defensemultiplier = 0
-            print("because of Rock Solid, " + str(self.target.name) + " took no damage")
+            #print("because of Rock Solid, " + str(self.target.name) + " took no damage")
 
 
         elif self.name == "Regenerate":
-            print("Regenerate:")
+            #print("Regenerate:")
             gstate.get().system.heal([self.target], 3)
 
         elif self.name == "Fight Stance":
             self.target.attackadd += 7
-            print(self.target.name + " deals 7 more damage this turn")
+            #print(self.target.name + " deals 7 more damage this turn")
 
 
         elif self.name == "Limitless":
             self.target.attackmultiplier *= 2
-            print(self.target.name + " dealt double extra damage because of Limiless")
+            #print(self.target.name + " dealt double extra damage because of Limiless")
             
         elif self.name == "Double Damage":
             self.target.attackmultiplier *= 2
-            print(self.target.name + " dealt double extra damage")
+            #print(self.target.name + " dealt double extra damage")
 
         elif self.name == "Asleep":
             
@@ -95,37 +97,38 @@ class condition(object):
                 self.duration = 1
                 print(self.target.name + " Woke UP!")
             else:
-                self.target.ability = ability("passed", 3, 0, True, 1, False)
+                self.target.conditions.append(condition("Paralyzed", self.target, 1, 1))
+                #self.target.ability = ability("Asleep", 3, 0, True, 1, False)
                 print(self.target.name + " is Asleep this round")
 
         elif self.name == "Intimidated":
             self.target.attackadd -= 5
-            print(self.target.name + " dealt minus 5 damage")
+            #print(self.target.name + " dealt minus 5 damage")
     
         elif self.name == "Shocking Response":
             for a in gstate.get().log:
                 if a[2] == self.target:
                     c = round( (5 - a[0].defenseadd) * a[0].defensemultiplier )
                     a[0].HP -= c
-                    print(a[0].name + " took " + str(c) + " damage because of shocking response")
+                    #print(a[0].name + " took " + str(c) + " damage because of shocking response")
                     b = R.randint(1,100)
-                    print("shocking response dice: " + str(b))
+                    #print("shocking response dice: " + str(b))
                     if b <= 10:
-                        a[0].conditions.append(condition("Paralyzed", a[0], "chooseability", 1))
+                        a[0].conditions.append(condition("Paralyzed", a[0], 1, 1))
                         print(a[0].name + " got paralyzed because of Shocking Response from " + a[2].name)
                 
         elif self.name == "Flight":
             self.target.dodge = 1 - ( (1 - self.target.dodge) * (1 - 0.8) )
-            print(self.target.name + " is flying!")
+            #print(self.target.name + " is flying!")
             
         elif self.name == "Nature's Call":
             self.target.defenseadd += 3
-            print(self.target.name + " takes 3 less damage this turn.")
+            #print(self.target.name + " takes 3 less damage this turn.")
             
         elif self.name == "Web Cacoon":
             for a in gstate.get().log:
                 if a[2] == self.target:
-                    a[0].conditions.append(condition("Accuracy", a[0], "chooseability", 1, value = 0.5))
+                    a[0].conditions.append(condition("Accuracy", a[0], 1, 1, value = 0.5))
                     
         elif self.name == "High Jump":
             for ab in self.target.abilities:
@@ -135,17 +138,31 @@ class condition(object):
             
         elif self.name == "Lifesteal":
             self.target.lifesteal += self.value
-            print(self.target.name + " has 10% lifesteal")
+            #print(self.target.name + " has 10% lifesteal")
             
         elif self.name == "Less Damage":
             self.target.attackadd -= self.value
-            print(self.target.name + " deals " + str(self.value) + " less damage this turn")
+            #print(self.target.name + " deals " + str(self.value) + " less damage this turn")
             
         elif self.name == "More Damage":
             self.target.attackadd += self.value
-            print(self.target.name + " deals " + str(self.value) + " more damage this turn")
+            #print(self.target.name + " deals " + str(self.value) + " more damage this turn")
+            
+        elif self.name == "More Defense":
+            self.target.defenseadd +=self.value
+            #print(self.target.name + " receives " + str(self.value) + " less damage this turn")
                 
+        elif self.name == "Thorns":
+            for a in gstate.get().log:
+                if a[2] == self.target:
+                    gstate.get().system.attack([a[0]], self.value, a = 0)
                     
+        elif self.name == "Ice Thorns":
+            for a in gstate.get().log:
+                if a[2] == self.target:
+                    b = R.random()
+                    if b <= self.value:
+                        a[0].freezestacks += 1
         
             
 
@@ -256,7 +273,7 @@ class ability(object):
         elif self.name == "Headbutt":
             d = R.randint(1,100)
             if d <= 10:
-                caster.conditions.append(condition("Paralyzed", caster, "chooseability", 1))
+                caster.conditions.append(condition("Paralyzed", caster, 1, 1))
                 print(caster.name + " paralyzed himself with Headbutt")
             a = R.randint(1,11)
             b = R.randint(1,11)
@@ -343,7 +360,7 @@ class ability(object):
 
         elif self.name == "Regenerate":
             a = R.randint(1,10)
-            caster.conditions.append(condition("Regenerate", caster, "after choosetarget", a))
+            caster.conditions.append(condition("Regenerate", caster, 1, a))
              
             print(caster.name + " will regenerate 3 HP per turn for " + str(a) + " turns")
             #caster.abilitiesincooldown.append(["Regenerate", 1 + 1])
@@ -358,13 +375,13 @@ class ability(object):
             
         elif self.name == "Flight":
             a = R.randint(1,3)
-            caster.conditions.append(condition("Flight", caster, "chooseability", a))
+            caster.conditions.append(condition("Flight", caster, 1, a))
             #caster.abilitiesincooldown.append(["Flight", 5 + 1])
             print(caster.name + " is flying for " + str(a) + " round(s)")
             
         elif self.name == "Nature's Call":
             a = R.randint(1,10)
-            caster.conditions.append(condition("Nature's Call", caster, "chooseability", a))
+            caster.conditions.append(condition("Nature's Call", caster, 1, a))
             #caster.abilitiesincooldown.append(["Nature's Call", 2 + 1])
             print(caster.name + " will take 3 less damage for " + str(a) + " turns.")
             
@@ -375,19 +392,19 @@ class ability(object):
             
         elif self.name == "High Jump":
             caster.conditions.append(condition("High Jump", caster, 4, 1))
-            caster.conditions.append(condition("Immobilized", caster, "chooseability", 1))
-            caster.conditions.append(condition("Double Damage", caster, "chooseability", 1))
+            caster.conditions.append(condition("Immobilized", caster, 1, 1))
+            caster.conditions.append(condition("Double Damage", caster, 1, 1))
             caster.dodge = 1
             print(caster.name + " Jumped high in the air!")
             
         elif self.name == "Fight Stance":
             a = R.randint(1,6)
-            caster.conditions.append(condition("Fight Stance", caster, "chooseability", a))
+            caster.conditions.append(condition("Fight Stance", caster, 1, a))
             print(caster.name + " will deal 7 more damage for " + str(a) + " turns because of Fight Stance")
             #caster.abilitiesincooldown.append(["Fight Stance", 2 + 1])
 
         elif self.name == "Limitless":
-            caster.conditions.append(condition("Limitless", caster, "chooseability", 1))
+            caster.conditions.append(condition("Limitless", caster, 1, 1))
             #caster.abilitiesincooldown.append(["Limitless", 999])
             print(caster.name + " will deal double damage next turn because of Limitless")
 
@@ -400,7 +417,7 @@ class ability(object):
                 else:
                     a = R.randint(1,2)
                     if a == 1:
-                        player.conditions.append(condition("Asleep", player, "chooseability", 5))
+                        player.conditions.append(condition("Asleep", player, 3, 5))
                         print(caster.name + " put " + player.name + " to Sleep. ")
 
         elif self.name == "Intimidate":
@@ -410,29 +427,47 @@ class ability(object):
                 if player == caster:
                     pass
                 else:
-                    player.conditions.append(condition("Intimidated", player, "chooseability", a))
+                    player.conditions.append(condition("Intimidated", player, 1, a))
                     print(caster.name + " intimidated " + player.name + " for " + str(a) + " rounds ")
         
         elif self.name == "No Pain, No Gain":
             caster.EXPmultiplier *= 2
             print(caster.name + " Gains double experience this turn.")
             
+        elif self.name == "Fire Burst":
+            caster.attack(targets, 35)
+            caster.orbs["Fire"] += 1
             
-        elif self.name == "teste":
-            caster.abilitylasttarget = [player.name for player in targets]
-            caster.conditions.append(condition("teste", caster, 3, 4))
-
-
-        elif self.name == "teste2":
-            caster.abilitylasttarget = [player.name for player in targets]
-            for target in targets:
-                target.conditions.append(condition("Paralyzed", target, "chooseability", 1))
-                    
+        elif self.name == "Fire Shield":
+            caster.conditions.append(condition("More Defense", caster, 1, 2+1, value = 10))
+            caster.conditions.append(condition("Thorns", caster, 3, 2+1, value = 5))
+            caster.orbs["Fire"] += 1
+            
+        elif self.name == "Fire Charge":
+            caster.orbs["Fire"] += 2
+            
+        elif self.name == "Icicle Spike":
+            caster.attack(targets, 25)
+            for t in targets:
+                a = R.randint(0,1)
+                if a == 0:
+                    t.freezestacks += 1
+            caster.orbs["Ice"] += 1
+            
+        elif self.name == "Ice Shield":
+            caster.conditions.append(condition("More Defense", caster, 1, 2+1, value = 10))
+            caster.conditions.append(condition("Ice Thorns", caster, 3, 2+1, value = 0.5))
+            caster.orbs["Ice"] += 1
+            
+        elif self.name == "Ice Charge":
+            caster.orbs["Ice"] += 2
+            
         elif self.name == "passed":
             caster.abilitylasttarget = []
-             
             print(caster.name + " did nothing.")
-            pass
+        elif self.name == "Asleep":
+            caster.abilitylasttarget = []
+            
         caster.abilitylastused = self.name
      
      
@@ -455,11 +490,11 @@ class buff():
     def effect(self, target):
         if self.bufftype2 == "Condition":
             if self.name == "Double Damage":
-                target.conditions.append(condition("Double Damage", target, "chooseability", self.duration))
+                target.conditions.append(condition("Double Damage", target, 1, self.duration))
                 print(target.name + " will deal double damage for " + str(self.duration) + " turns.")
                 
             elif self.name == "Lifesteal":
-                target.conditions.append(condition("Lifesteal", target, "chooseability", duration = self.duration, value = self.value))
+                target.conditions.append(condition("Lifesteal", target, 1, duration = self.duration, value = self.value))
                 
             elif self.name == "Take Damage":
                 target.conditions.append(condition("Take Damage", target, 2, duration = self.duration, value = self.value))
@@ -471,19 +506,19 @@ class buff():
                 target.conditions.append(condition("Take Heal", target, 2, duration = self.duration, value = self.value))
                 
             elif self.name == "Less Damage":
-                target.conditions.append(condition("Less Damage", target, "chooseability", duration = self.duration, value = self.value))
+                target.conditions.append(condition("Less Damage", target, 1, duration = self.duration, value = self.value))
                 
             elif self.name == "More Damage":
-                target.conditions.append(condition("More Damage", target, "chooseability", duration = self.duration, value = self.value))
+                target.conditions.append(condition("More Damage", target, 1, duration = self.duration, value = self.value))
                 
             elif self.name == "Heal Modifier":
-                target.conditions.append(condition("Heal Modifier", target, "chooseability", duration = self.duration, value = self.value))
+                target.conditions.append(condition("Heal Modifier", target, 1, duration = self.duration, value = self.value))
                 
             elif self.name == "More Experience":
-                target.conditions.append(condition("More Experience", target, "chooseability", duration = self.duration, value = self.value))
+                target.conditions.append(condition("More Experience", target, 1, duration = self.duration, value = self.value))
                 
             elif self.name == "Become Paralyzed":
-                target.conditions.append(condition("Become Paralyzed", target, "chooseability", duration = self.duration, value = self.value))
+                target.conditions.append(condition("Become Paralyzed", target, 3, duration = self.duration, value = self.value))
                 
         elif self.bufftype2 == "Instantaneous":
             pass

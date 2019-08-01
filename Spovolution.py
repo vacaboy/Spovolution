@@ -50,7 +50,7 @@ abilities[2][1].append(ability("Dodge",2, 0,True, 1, False, "Defensive"))
 abilities[2][1].append(ability("Flight",2, 0,True, 4, False, "Defensive", cooldown = 5))
 abilities[2][1].append(ability("Nature's Call",2, 0,True, 4, False, "Defensive", cooldown = 2))
 abilities[2][1].append(ability("Web Cacoon",2, 0,True, 1, False, "Defensive", cooldown = 3))
-abilities[2][1].append(ability("High Jump",2, 0,True, 1, False, "Defensive"))
+#abilities[2][1].append(ability("High Jump",2, 0,True, 1, False, "Defensive"))
 
 abilities[2][2].append(ability("Lullaby",2, 3,False, 3, False, "Utility", cooldown = 5))
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", cooldown = 2))
@@ -72,34 +72,59 @@ buffs[1][1].append(buff("Less Damage", "Curse", "Condition", "For Life: you will
 buffs[1][1].append(buff("More Damage", "Blessing", "Condition", "For Life: you will Deal 5 More damage", value = 5, duration = 999))
 
 
-#buffs[1][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive 3 damage per round.", value = 3, duration = 999))
-#buffs[1][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive 3 damage per round.", value = 3, duration = 999))
-##buffs[1][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive a 3 damage attack per round.", value = 3, duration = 999))
-
-
 buffs[1][0].append(buff("Heal", "Blessing", "Condition", "heal 10 HP next round", value = 10, duration = 1))
 buffs[1][0].append(buff("Damage", "Curse", "Condition", "take 10 damage next turn", value = 10, duration = 1))
 buffs[1][0].append(buff("Less Damage", "Curse", "Condition", "For life: You will deal 2 less damage.", value = 2, duration = 999))
 buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 2 more damage.", value = 2, duration = 999))
-buffs[1][0].append(buff("More Experience", "Blessing", "Condition", "For 5 turns, you will receive double experience", value = 2, duration = 5))
-buffs[1][0].append(buff("More Experience", "Curse", "Condition", "For 5 turns, you will receive half experience", value = 0.5, duration = 5))
+buffs[1][0].append(buff("More Experience", "Blessing", "Condition", "For 3 turns, you will receive double experience", value = 2, duration = 3))
+buffs[1][0].append(buff("More Experience", "Curse", "Condition", "For 3 turns, you will receive half experience", value = 0.5, duration = 3))
 buffs[1][0].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage next round", duration = 1))
 buffs[1][0].append(buff("More Damage", "Blessing", "Condition", "For the next 2 rounds, you deal 10 extra damage", value = 10, duration = 2))
 buffs[1][0].append(buff("Less Damage", "Curse", "Condition", "For the next 2 rounds, you deal 10 less damage", value = 10, duration = 2))
-
-##
-#buffs[1][0].append(buff("Extra Ability", "Blessing", "Condition", "Gain one extra ability", value = 1 duration = 1))
-#buffs[1][0].append(buff("Extra Ability", "Curse", "Condition", "Gain one less ability", value = -1, duration = 1))
 buffs[1][0].append(buff("Become Paralyzed", "Curse", "Condition", "For life: there is a 1% chance you get paralyzed at the beginning of the round", value = 0.01, duration = 999))
 
 
+buffs[2][1].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage for 6 rounds", duration = 6))
+buffs[2][1].append(buff("Lifesteal", "Blessing", "Condition", "For Life: you have 10% lifesteal", value = 0.1, duration = 999))
+buffs[2][1].append(buff("Take Damage", "Curse", "Condition", "For Life: you will receive 6 damage per round.", value = 3, duration = 999))
+buffs[2][1].append(buff("Heal Modifier", "Curse", "Condition", "For Life: Heal against you are halfed", value = 0.5, duration = 999))
+buffs[2][1].append(buff("More Experience", "Blessing", "Condition", "For Life: you will receive 20% more experience", value = 1.2, duration = 999))
+buffs[2][1].append(buff("More Experience", "Curse", "Condition", "For Life: you will receive a 20% less experience", value = 0.8, duration = 999))
+buffs[2][1].append(buff("Less Damage", "Curse", "Condition", "For Life: you will Deal 10 less damage", value = 5, duration = 999))
+buffs[2][1].append(buff("More Damage", "Blessing", "Condition", "For Life: you will Deal 10 More damage", value = 5, duration = 999))
 
-#______________________________________________________________________________________________________________________________________________________________
+
+buffs[2][0].append(buff("Heal", "Blessing", "Condition", "heal 50 HP next round", value = 10, duration = 1))
+buffs[2][0].append(buff("Damage", "Curse", "Condition", "take 50 damage next turn", value = 10, duration = 1))
+buffs[2][0].append(buff("Less Damage", "Curse", "Condition", "For life: You will deal 5 less damage.", value = 2, duration = 999))
+buffs[2][0].append(buff("More Damage", "Blessing", "Condition", "For life: You will deal 5 more damage.", value = 2, duration = 999))
+buffs[2][0].append(buff("More Experience", "Blessing", "Condition", "For 3 turns, you will receive double experience", value = 2, duration = 3))
+buffs[2][0].append(buff("More Experience", "Curse", "Condition", "For 3 turns, you will receive half experience", value = 0.5, duration = 3))
+buffs[2][0].append(buff("Double Damage", "Blessing", "Condition", "You deal double damage next round", duration = 1))
+buffs[2][0].append(buff("More Damage", "Blessing", "Condition", "For the next 2 rounds, you deal 30 extra damage", value = 10, duration = 2))
+buffs[2][0].append(buff("Less Damage", "Curse", "Condition", "For the next 2 rounds, you deal 20 less damage", value = 10, duration = 2))
+buffs[2][0].append(buff("Become Paralyzed", "Curse", "Condition", "For life: there is a 1% chance you get paralyzed at the beginning of the round", value = 0.01, duration = 999))
+
+#_________________________________________________________________________________________________________________________________________________________________
+#starter packs:
+starterpacks = gstate.get().starterpacks
+
+starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True, "Offensive"))
+starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False, "Defensive"))
+starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False, "Utility"))
+
+starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True, "Offensive"))
+starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False, "Defensive"))
+starterpacks[1].append(ability("Ice Charge", 3, 0, True, 2, False, "Utility"))
+
+
+#_________________________________________________________________________________________________________________________________________________________________
 craos = player(375, 450, "craos",(255, 0, 255))
 craos.ai = playeraicomponent(craos)
 
 robly18 = npc(375, 150, "robly18")
-robly18.ai = attackwhoattackedme(robly18)
+#robly18.ai = attackwhoattackedme(robly18)
+robly18.ai = npcaicomponent(robly18)
 
 tavos = npc(670,150, "tavos")
 tavos.ai = npcaicomponent(tavos)
@@ -161,9 +186,9 @@ while gstate.get().run:
             elif event.key == pygame.K_c:
                 for c in gstate.get().deadcorpses:
                     print(c.name)
-            elif event.key == pygame.K_f:
-                for p in gstate.get().players:
-                    p.accuracy = 0
+
+
+                
             elif event.key == pygame.K_g:
                 for p in gstate.get().players:
                     p.accuracy = 0.5
@@ -187,15 +212,6 @@ while gstate.get().run:
                     gstate.get().craos.abilities.append(a)
             elif event.key == pygame.K_t:
                 gstate.get().craos.abilities = gstate.get().craos.abilities[1:]
-
-    #decided = [ai for ai in gstate.get().undecided if ai.Qdecided]
-    #gstate.get().undecided = [ai for ai in gstate.get().undecided if not ai.decided()]
-    #for ai in decided:
-    #    gstate.get().decisionlist.append(ai.decide())
-    
-    #if gstate.get().undecided == []:
-    #    gstate.get().undecided = gstate.get().simulation.run(gstate.get().decisionlist)
-    #    gstate.get().decisionlist = []
     
     for p in gstate.get().players:
         p.ai.decide()

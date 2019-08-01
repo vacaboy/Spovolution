@@ -5,9 +5,25 @@ class aicomponent:
     def __init__(self, creature):
         self.creature = creature
         self.Qdecided = False
+        self.decisions = []
+        self.decisionnumber = 1
         
     def gatherinfo(self):
-        pass
+        if self.creature.stage == 3:
+            self.decisionnumber = 2
+            
+    def decide(self):
+        if "Paralyzed" in [i.name for i in self.creature.conditions]:
+            for i in range(self.decisionnumber):
+                self.decisions.append((self.creature, ability("passed", 3, 0, True, 1, False), []))
+                
+    def decided(self):
+        if len(self.decisions) == self.decisionnumber:
+            self.Qdecided = True
+            for d in self.decisions:
+                gstate.get().decisionlist.append(d)
+            self.decisions = []
+            
     
         
     
@@ -16,17 +32,25 @@ class npcaicomponent(aicomponent):
         super().__init__(creature)
         
     def decide(self):
+        super().decide()
+        
+        self.decided()
+            
         if self.Qdecided == False:
-            self.creature.chooseability()
+            w = True
+            while w:
+                self.creature.chooseability()
+                if not(self.creature.ability in [i[1] for i in self.decisions]):
+                    w = False
             self.creature.choosetarget(self.creature.ability.targetnumber, self.creature.ability.selftarget)
-            self.Qdecided = True
-            gstate.get().decisionlist.append((self.creature, self.creature.ability, self.creature.target))
+            self.decisions.append((self.creature, self.creature.ability, self.creature.target)) 
+        
+        self.decided()
+
         
     def gatherinfo(self):
-        pass
+        super().gatherinfo()
             
-    def decided(self):
-        pass
 
 
 class playeraicomponent(aicomponent):
@@ -35,14 +59,20 @@ class playeraicomponent(aicomponent):
         self.ready = False
         
     def decide(self):
+        super().decide()
         if self.ready == True:
-            self.Qdecided = True
-            self.ready = False
-            gstate.get().decisionlist.append((self.creature, self.creature.ability, self.creature.target))
-        
-    def decided(self):
-        return False
-        
+            if self.creature.ability in [i[1] for i in self.decisions]:
+                print("You can't use the same ability twice in a turn!")
+                self.ready = False
+            else:
+                self.decided()
+                    
+                if self.Qdecided == False:
+                    self.decisions.append((self.creature, self.creature.ability, self.creature.target))
+                self.ready = False
+                
+                self.decided()
+
         
         
 class attackwhoattackedme(npcaicomponent):
@@ -51,9 +81,10 @@ class attackwhoattackedme(npcaicomponent):
         self.whoattackedme = []
         
     def gatherinfo(self):
+        super().gatherinfo()
         for i in gstate.get().log:
             if i[2] == self.creature:
-                if not(i[0] in self.whoattackedme) and not(i[0] == self.creature): 
+                if not(i[0] in self.whoattackedme) and not(i[0] == self.creature) and not(i[0] == gstate.get().system): 
                     self.whoattackedme.append(i[0])
         
     def decide(self):

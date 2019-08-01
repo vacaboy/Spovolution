@@ -12,15 +12,18 @@ class simulation:
     
     def run(self, info):
         for i in [1,2,3,4]:#ha 4 fazes de combate
+            print()
             for a in info:#fazer as decisoes.
                 if a[1].priority == i:
                     a[1].effect(a[2], a[0])
 
+            print()
                 
             for p in gstate.get().players:#as condiçoes atuam.
                 for cond in p.conditions:
                     if cond.priority == i:
                         cond.effect()
+            print()
                         
             self.deathcheck()
 
