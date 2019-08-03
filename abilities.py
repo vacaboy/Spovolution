@@ -3,6 +3,8 @@ import random as R
 import gstate
 import math
 
+#channel [ability.name, turns left, True or False, ability]
+
 class condition(object):
     def __init__(self, name, target, priority, duration, value = 0):
         self.name = name
@@ -34,6 +36,10 @@ class condition(object):
         elif self.name == "Immobilized":
             #print(self.target.name + " takes 150% damage this turn")
             self.target.defensemultiplier *= 1.5
+            
+        elif self.name == "Anti-Immobilized":
+            #print(self.target.name + " takes 150% damage this turn")
+            self.target.defensemultiplier *= 1/1.5
             
         elif self.name == "Accuracy":
             self.target.accuracy *= self.value
@@ -74,6 +80,10 @@ class condition(object):
             
         elif self.name == "Double Damage":
             self.target.attackmultiplier *= 2
+            #print(self.target.name + " dealt double extra damage")
+            
+        elif self.name == "Half Damage":
+            self.target.attackmultiplier *= 1/2
             #print(self.target.name + " dealt double extra damage")
 
         elif self.name == "Asleep":
@@ -131,10 +141,7 @@ class condition(object):
                     a[0].conditions.append(condition("Accuracy", a[0], 1, 1, value = 0.5))
                     
         elif self.name == "High Jump":
-            for ab in self.target.abilities:
-                if not (ab.abilitytype == "Offensive"):
-                    self.target.abilitiesincooldown.append([ab.name, 1 + 1])
-            print("Next turn, you must choose a offensive ability because you jumped high")
+            pass
             
         elif self.name == "Lifesteal":
             self.target.lifesteal += self.value
@@ -163,6 +170,12 @@ class condition(object):
                     b = R.random()
                     if b <= self.value:
                         a[0].freezestacks += 1
+                        
+        elif self.name == "Taunt":
+            pass
+            
+        elif self.name == "Taunt Origin":
+            pass
         
             
 
@@ -188,7 +201,7 @@ class ability(object):
         self.Return = Return 
         
     def clone(self):
-        print(self.name)
+        #print(self.name)
         return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel)     
         
         
@@ -283,14 +296,14 @@ class ability(object):
         elif self.name == "On The Edge":
             a = 0
             b = 0
-            for p in gstate.get().players:
-                if p == caster:
+            for d in gstate.get().decisionlist:
+                if d[0] == caster:
                     pass
                 else:
-                    if p.ability.abilitytype == "Offensive":
+                    if d[1].abilitytype == "Offensive":
                         a += 1
-                    if caster in p.target:
-                        b += 1    
+                    if caster in d[2]:
+                        b += 1 
             if a == b and a > 0:
                 caster.attack(targets, 30)
             else:
@@ -300,20 +313,20 @@ class ability(object):
         
         elif self.name == "Everyone... GET IN HERE!":
             a = 0
-            for p in gstate.get().players: #calcular quantos ataques te tao a dar target
-                if p == caster:
+            for d in gstate.get().decisionlist: #calcular quantos ataques te tao a dar target
+                if d[0] == caster:
                     pass
-                elif (caster in p.target) and p.ability.abilitytype == "Offensive":
+                elif (caster in d[2]) and d[1].abilitytype == "Offensive":
                     a = a + 1
             n = 15 * a
             caster.attack(targets, n)        
 
         elif self.name == "From The Shadows":
             a = 0
-            for p in gstate.get().players: #verificar quantas pessoas te deram target:
-                if p == caster:
+            for d in gstate.get().decisionlist: #verificar quantas pessoas te deram target:
+                if d[0] == caster:
                     pass
-                elif caster in p.target:
+                elif caster in d[2]:
                     a = a + 1
             if a == 0:
                 n = 0
@@ -327,7 +340,7 @@ class ability(object):
 
         elif self.name == "Unleash The Power":
             if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
-                caster.abilitiesinchannel.append([self.name, self.channel - 1, True])
+                caster.abilitiesinchannel.append([self.name, self.channel - 1, True, self.clone()])
                 #este "True" é verdadeiro ou falso consuante esta habilidade foi usada esta ronda, visto que se a habilidade channel nao for usada uma ronda, entao o channel para.
                 print(caster.name + " began channeling " + self.name + " for 4 rounds")
                  
@@ -391,9 +404,11 @@ class ability(object):
             print(caster.name + " is encaised in a  Webby Cacoon!")
             
         elif self.name == "High Jump":
-            caster.conditions.append(condition("High Jump", caster, 4, 1))
-            caster.conditions.append(condition("Immobilized", caster, 1, 1))
-            caster.conditions.append(condition("Double Damage", caster, 1, 1))
+            caster.conditions.append(condition("High Jump", caster, 3, 1 + 1))
+            caster.conditions.append(condition("Immobilized", caster, 1, 1 + 1))
+            caster.conditions.append(condition("Anti-Immobilized", caster, 1, 1))
+            caster.conditions.append(condition("Double Damage", caster, 1, 1 + 1))
+            caster.conditions.append(condition("Half Damage", caster, 1, 1))
             caster.dodge = 1
             print(caster.name + " Jumped high in the air!")
             
@@ -423,7 +438,7 @@ class ability(object):
         elif self.name == "Intimidate":
             #caster.abilitiesincooldown.append(["Intimidate", 1 + 1])
             a = R.randint(1,6)
-            for player in gstate.get().players:
+            for player in targets:
                 if player == caster:
                     pass
                 else:
@@ -433,6 +448,29 @@ class ability(object):
         elif self.name == "No Pain, No Gain":
             caster.EXPmultiplier *= 2
             print(caster.name + " Gains double experience this turn.")
+            
+        elif self.name == "Reflective Mirror":
+            for d in gstate.get().decisionlist:
+                if caster in d[2] and d[1].abilitytype == "Offensive":
+                    d[2].remove(caster)
+                    d[2].append(d[0])
+            print("every attack that targeted " + caster.name + " was rederected to the attacker!")
+            
+        elif self.name == "Target Enemy":
+            caster.conditions.append(condition())
+            
+        elif self.name == "Taunt":
+            for p in gstate.get().players:
+                if p == caster:
+                    p.conditions.append(condition("Taunt Origin", caster, 1, 1))
+                else:
+                    p.conditions.append(condition("Taunt", p, 1, 1))
+            
+            
+            
+            
+            
+            
             
         elif self.name == "Fire Burst":
             caster.attack(targets, 35)
@@ -468,7 +506,7 @@ class ability(object):
         elif self.name == "Asleep":
             caster.abilitylasttarget = []
             
-        caster.abilitylastused = self.name
+        #caster.abilitylastused = self.name
      
      
      

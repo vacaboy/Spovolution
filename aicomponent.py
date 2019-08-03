@@ -1,28 +1,75 @@
 import random as R
 from creature import *
-
+from globals import *
+#decision: (creature, ability, targets)
 class aicomponent:
     def __init__(self, creature):
         self.creature = creature
         self.Qdecided = False
         self.decisions = []
         self.decisionnumber = 1
+        self.verified = True
+        self.tries = 1
         
     def gatherinfo(self):
         if self.creature.stage == 3:
             self.decisionnumber = 2
             
     def decide(self):
-        if "Paralyzed" in [i.name for i in self.creature.conditions]:
-            for i in range(self.decisionnumber):
-                self.decisions.append((self.creature, ability("passed", 3, 0, True, 1, False), []))
+        if not self.Qdecided:
+            if "Paralyzed" in [i.name for i in self.creature.conditions]:
+                for i in range(self.decisionnumber):
+                    self.decisions.append((self.creature, ability("passed", 3, 0, True, 1, False), []))
+                        
                 
     def decided(self):
         if len(self.decisions) == self.decisionnumber:
             self.Qdecided = True
             for d in self.decisions:
-                gstate.get().decisionlist.append(d)
+                if d[2] == []:
+                    gstate.get().decisionlist.append(d)
+                for t in d[2]:
+                    gstate.get().decisionlist.append((d[0], d[1], [t]))
             self.decisions = []
+        if self.tries > 5000:
+            self.Qdecided = True
+            gstate.get().decisionlist.append((self.creature, passed, []))
+            return " "
+            
+    def verify(self):
+        if "High Jump" in [i.name for i in self.creature.conditions]:
+            if self.creature.ability.abilitytype != "Offensive":
+                self.verified = False
+        if "Taunt" in [i.name for i in self.creature.conditions]:
+            if self.creature.ability.abilitytype != "Offensive":
+                self.verified = False
+            for p in gstate.get().players:
+                for cond in p.conditions:
+                    if cond.name == "Taunt Origin":
+                        pla = p
+            if pla not in self.creature.target:
+                self.verified = False
+                
+    def senddecision(self):
+        self.verified = True
+        self.verify()
+        if self.Qdecided == False and self.verified:
+            self.decisions.append((self.creature, self.creature.ability, self.creature.target))
+            
+            # self.creature.abilitylastused = self.creature.abilitylastused[1:]
+            # self.creature.abilitylastused.append(self.creature.ability.name)
+            
+            # self.creature.abilitylasttarget = self.creature.abilitylasttarget[1:]
+            # self.creature.abilitylasttarget.append([i.name for i in self.creature.target])
+            
+            self.creature.ability = passed
+            self.creature.target = []
+            
+        elif not self.verified:
+            self.creature.ability = passed
+            self.creature.target = []
+            self.tries += 1
+        
             
     
         
@@ -33,19 +80,26 @@ class npcaicomponent(aicomponent):
         
     def decide(self):
         super().decide()
-        
-        self.decided()
+        if not self.Qdecided:
+            if self.creature.abilitiesinchannel != []:
+                a = R.randint(0, len(self.creature.abilitiesinchannel) - 1)
+                self.creature.ability =self.creature.abilitiesinchannel[a][3].clone()
             
-        if self.Qdecided == False:
-            w = True
-            while w:
-                self.creature.chooseability()
-                if not(self.creature.ability in [i[1] for i in self.decisions]):
-                    w = False
-            self.creature.choosetarget(self.creature.ability.targetnumber, self.creature.ability.selftarget)
-            self.decisions.append((self.creature, self.creature.ability, self.creature.target)) 
+        # self.decided()
+            
+        # if self.Qdecided == False:
+            # w = True
+            # while w:
+                # self.creature.chooseability()
+                # if not(self.creature.ability in [i[1] for i in self.decisions]):
+                    # w = False
+            # self.creature.choosetarget(self.creature.ability.targetnumber, self.creature.ability.selftarget)
+            # self.verified = True
+            # self.verify()
+            # if self.verified:
+                # self.decisions.append((self.creature, self.creature.ability, self.creature.target)) 
         
-        self.decided()
+        # self.decided()
 
         
     def gatherinfo(self):
@@ -60,20 +114,40 @@ class playeraicomponent(aicomponent):
         
     def decide(self):
         super().decide()
+        self.decided()
         if self.ready == True:
             if self.creature.ability in [i[1] for i in self.decisions]:
                 print("You can't use the same ability twice in a turn!")
                 self.ready = False
             else:
                 self.decided()
-                    
-                if self.Qdecided == False:
-                    self.decisions.append((self.creature, self.creature.ability, self.creature.target))
-                self.ready = False
-                
+                self.senddecision()
                 self.decided()
 
+class randomaicomponent(npcaicomponent):
+    def __init__(self, creature):
+        super().__init__(creature)
         
+    def decide(self):
+        super().decide()
+        
+        self.decided()
+            
+        if self.Qdecided == False:
+            if self.creature.ability == passed:
+                w = True
+                while w:
+                    self.creature.chooseability()
+                    if not(self.creature.ability in [i[1] for i in self.decisions]):
+                        w = False
+                self.creature.choosetarget(self.creature.ability.targetnumber, self.creature.ability.selftarget)
+            self.senddecision()
+        
+        self.decided()
+
+        
+    def gatherinfo(self):
+        super().gatherinfo()
         
 class attackwhoattackedme(npcaicomponent):
     def __init__(self,creature):

@@ -55,10 +55,7 @@ class chooseability(state):
         super().clock()
         if self.time <= 0:
             gstate.get().craos.ability = ability("passed",3, 0, True, 1, False)
-            print(str(gstate.get().craos.ability.name))
-            
-            for npc in gstate.get().npcs:#npc's tambem escolhem as habilidades
-                        npc.chooseability()            
+            print(str(gstate.get().craos.ability.name))          
             return choosetarget(self.roundcount, self.stage, self.time)
         else:
             return self
@@ -104,8 +101,6 @@ class chooseability(state):
                 if not(gstate.get().craos.abilities[i].name in [j[0] for j in gstate.get().craos.abilitiesincooldown]):
                     gstate.get().craos.target = []
                     gstate.get().craos.ability = gstate.get().craos.abilities[i]
-                    #for npc in gstate.get().npcs:#npc's tambem escolhem as habilidades
-                    #    npc.chooseability()
 
                     for player in gstate.get().players:#fazer os efeitos que atuam agora
                         for condition in player.conditions:
@@ -182,9 +177,6 @@ class choosetarget(state):
             return chooseability(self.roundcount, self.stage, self.time)
 
         if self.targetnumber <= 0: #se ja estao os targets todos escolhidos, siga em frente
-            
-            for npc in gstate.get().npcs: #escolher target dos gstate.get().npcs
-                npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
             for player in gstate.get().players: #condiçoes que atuam agora:
                 for condition in player.conditions:
@@ -198,8 +190,6 @@ class choosetarget(state):
             if gstate.get().craos.ability.name in [i[0] for i in gstate.get().craos.abilitiesinchannel]: #se o player ja esta a dar channel à habilidade
                 a = [i[0] == gstate.get().craos.ability.name for i in gstate.get().craos.abilitiesinchannel].index(True)
                 if gstate.get().craos.abilitiesinchannel[a][1] >= 2: #se a habilidade nao vai atuar este turno
-                    for npc in gstate.get().npcs: #escolher target dos gstate.get().npcs
-                        npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
                     for player in gstate.get().players: #condiçoes que atuam agora:
                         for condition in player.conditions:
@@ -211,8 +201,6 @@ class choosetarget(state):
                     if ((self.targetnumber >= (len(gstate.get().players) - 1)) and not gstate.get().craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
                         for p in gstate.get().npcs:    
                             gstate.get().craos.target.append(p)
-                        for npc in gstate.get().npcs:#escolher o target dos gstate.get().npcs
-                            npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
                         for player in gstate.get().players: #condiçoes que atuam agora:
                             for condition in player.conditions:
@@ -224,8 +212,6 @@ class choosetarget(state):
                     elif self.targetnumber >= len(gstate.get().players):
                         for p in gstate.get().players:    
                             gstate.get().craos.target.append(p)
-                        for npc in gstate.get().npcs:#escolher o target dos gstate.get().npcs
-                            npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
                         for player in gstate.get().players: #condiçoes que atuam agora:
                             for condition in player.conditions:
@@ -237,8 +223,6 @@ class choosetarget(state):
                     
                     
             elif not (gstate.get().craos.ability.name in [i[0] for i in gstate.get().craos.abilitiesinchannel]): #se o player ainda nao esta a dar channel à habilidade:
-                for npc in gstate.get().npcs: #escolher target dos gstate.get().npcs
-                    npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
                 for player in gstate.get().players: #condiçoes que atuam agora:
                     for condition in player.conditions:
@@ -252,8 +236,6 @@ class choosetarget(state):
             for p in gstate.get().npcs:    
                 gstate.get().craos.target.append(p)
             
-            for npc in gstate.get().npcs:#escolher o target dos gstate.get().npcs
-                npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
             for player in gstate.get().players: #condiçoes que atuam agora:
                 for condition in player.conditions:
@@ -266,8 +248,6 @@ class choosetarget(state):
             for p in gstate.get().players:    
                 gstate.get().craos.target.append(p)
             
-            for npc in gstate.get().npcs:#escolher o target dos gstate.get().npcs
-                npc.choosetarget(npc.ability.targetnumber, npc.ability.selftarget)
 
             for player in gstate.get().players: #condiçoes que atuam agora:
                 for condition in player.conditions:
@@ -342,7 +322,6 @@ class endround(state):
             
         print()
         a = [[l[0].name, l[1], l[2].name] for l in gstate.get().log]
-        print()
         print(str(a))
         
         gstate.get().log = []   
@@ -444,8 +423,10 @@ class evolve1(state):
                 if not (p == gstate.get().craos):
                     p.abilities = []
                     self.gainabilityoffensive(p)
+                    #p.abilities.append(ability("Unleash The Power" ,2, 2, False, 2, True, "Offensive", cooldown = 2, channel = 4))
                     self.gainabilitydefensive(p)
                     self.gainabilityutility(p)
+                    #p.abilities.append(ability("Reflective Mirror",2, 3, False, 1, False, "Utility", cooldown = 999))
                     
                 p.startnewround()
                 
@@ -528,10 +509,11 @@ class evolve2(state):
     def effect(self):
         if self.done:
             for p in gstate.get().players:
-                p.HP += evolveHPgain[p.stage]
-                p.MaxHP += evolveHPgain[p.stage]
-                p.EXPtoevolve = evolveEXP[p.stage + 1]
-                p.stage += 1
+                p.HP += evolveHPgain[self.stage]
+                p.MaxHP += evolveHPgain[self.stage]
+                p.EXPtoevolve = evolveEXP[self.stage + 1]
+                p.stage = 3
+                p.ai.decisionnumber += 1
                 if not (p == gstate.get().craos):
                     p.abilities = []
                     a = R.randint(0,1)
@@ -690,9 +672,11 @@ class buffbet1(state):
         self.name = "Betting time!"
         self.time = time
         self.time1 = time
-        self.buffnumber = buffnumber
+        #self.buffnumber = buffnumber
+        self.buffnumber = 4
         self.buff = self.pickbuff()
-        self.done = False
+        #self.done = False
+        self.done = True
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),
@@ -842,9 +826,11 @@ class buffbet2(state):
         self.name = "Betting time!"
         self.time = time
         self.time1 = time
-        self.buffnumber = buffnumber
+        #self.buffnumber = buffnumber
+        self.buffnumber = 4
         self.buff = self.pickbuff()
-        self.done = False
+        #self.done = False
+        self.done = True
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),

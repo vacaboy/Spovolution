@@ -50,7 +50,7 @@ abilities[2][1].append(ability("Dodge",2, 0,True, 1, False, "Defensive"))
 abilities[2][1].append(ability("Flight",2, 0,True, 4, False, "Defensive", cooldown = 5))
 abilities[2][1].append(ability("Nature's Call",2, 0,True, 4, False, "Defensive", cooldown = 2))
 abilities[2][1].append(ability("Web Cacoon",2, 0,True, 1, False, "Defensive", cooldown = 3))
-#abilities[2][1].append(ability("High Jump",2, 0,True, 1, False, "Defensive"))
+abilities[2][1].append(ability("High Jump",2, 0,True, 1, False, "Defensive", cooldown = 4))
 
 abilities[2][2].append(ability("Lullaby",2, 3,False, 3, False, "Utility", cooldown = 5))
 abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", cooldown = 2))
@@ -58,6 +58,9 @@ abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", co
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
 abilities[2][2].append(ability("Intimidate",2, 3,False, 4, False, "Utility", cooldown = 1))
 abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"))
+abilities[2][2].append(ability("Reflective Mirror",2, 3, False, 1, False, "Utility", cooldown = 999))
+#abilities[2][2].append(ability("Target Enemy",2, 3, False, 3, False, "Utility", cooldown = 999))
+#abilities[2][2].append(ability("Taunt",2, 3, False, 3, False, "Utility", cooldown = 0))
 #______________________________________________________________________________________________________________________________________________________________________
 #buffs:
 buffs = gstate.get().buffs
@@ -124,13 +127,13 @@ craos.ai = playeraicomponent(craos)
 
 robly18 = npc(375, 150, "robly18")
 #robly18.ai = attackwhoattackedme(robly18)
-robly18.ai = npcaicomponent(robly18)
+robly18.ai = randomaicomponent(robly18)
 
 tavos = npc(670,150, "tavos")
-tavos.ai = npcaicomponent(tavos)
+tavos.ai = randomaicomponent(tavos)
 
 tomis = npc(670, 450, "tomis")
-tomis.ai = npcaicomponent(tomis)
+tomis.ai = randomaicomponent(tomis)
 
 gstate.get().craos = craos
 
@@ -142,7 +145,9 @@ gstate.get().system = npc(0 ,0, "system", (255,0,0))
 gstate.get().simulation = simulation()
 
 
-roundphase = chooseability(1, 1)
+#roundphase = chooseability(1, 1)
+roundphase = chooseability(6, 1)
+#roundphase = chooseability(19, 2)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
@@ -195,12 +200,17 @@ while gstate.get().run:
             elif event.key == pygame.K_v:
                 for p in gstate.get().players:
                     p.dodge = 1
+                    
             elif event.key == pygame.K_b:
+                print()
+                print("decisionlist:")
+                for d in gstate.get().decisionlist:
+                    print(d[0].name + " , " + d[1].name + " , " + str([i.name for i in d[2]]))
+                    
+            elif event.key == pygame.K_i: #info
                 for p in gstate.get().players:
-                    p.dodge = 0.5
-            elif event.key == pygame.K_z:
-                for p in gstate.get().players:
-                    print([p.name, p.accuracy, p.dodge])
+                    print(p.name + " , " + " decisionnumber: " + str(p.ai.decisionnumber) + " , stage: " + str(p.stage))
+                    
             elif event.key == pygame.K_o:
                 for a in gstate.get().abilities[2][0]:
                     gstate.get().craos.abilities.append(a)

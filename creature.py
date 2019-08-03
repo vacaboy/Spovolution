@@ -14,9 +14,9 @@ class creature:
         self.EXP = 0
         self.stage = 1
         self.EXPtoevolve = 20
-        self.abilitylastused = " "
-        self.abilitylasttarget = " "
-        self.ability = " "
+        self.abilitylastused = []
+        self.abilitylasttarget = []
+        self.ability = passed
         self.target = []
         self.damaged = False #True or False if this player was damaged this turn or not.
         self.dealtdamage = False #True of False if this player dealt damage this turn or not.
@@ -61,7 +61,7 @@ class creature:
                             textrenderable(x-55, y+55, self.color, fontHP, lambda: "ability last used:"),
                             textrenderable(x-55, y+65, self.color, fontHP, lambda: "target:"),
                             textrenderable(x-55, y+80, self.color, fontHP, lambda: str(self.abilitylasttarget)),
-                            textrenderable(x-50, y+95, self.color, fontHP, lambda: self.abilitylastused)]
+                            textrenderable(x-50, y+95, self.color, fontHP, lambda: str(self.abilitylastused))]
             
 
     def startnewround(self):
@@ -83,10 +83,10 @@ class creature:
         self.bet = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
-        print()
+        #print()
         for ab in self.abilitiesincooldown:
             ab[1] -= 1
-            print(self.name + " has " + ab[0] + " in cooldown for " + str(ab[1]) + " rounds ")
+            #print(self.name + " has " + ab[0] + " in cooldown for " + str(ab[1]) + " rounds ")
         self.abilitiesincooldown = [ab for ab in self.abilitiesincooldown if ab[1] > 0]
         self.abilitiesinchannel = [ab for ab in self.abilitiesinchannel if (ab[2] == True and ab[1] > 0)]
         for ab in self.abilitiesinchannel:
@@ -95,6 +95,9 @@ class creature:
         
         self.ai.Qdecided = False
         self.ai.decisions = []
+        self.ai.tries = 1
+        #self.abilitylastused = []
+        #self.abilitylasttarget = []
          
             
         

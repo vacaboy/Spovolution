@@ -1,4 +1,4 @@
-
+from abilities import *
         
 width = 1000
 height = 600
@@ -8,3 +8,4 @@ evolveprice = [0, 20, 100, 1000] #the same but for evolving
 evolveHPgain = [0, 75, 400, 2000] #HP and MaxHP gained when evolving, per stage.
 evolveEXP = [0, 20, 100, 1000] #EXP needed to evolve, per stage.
 evolveround = [0, 7, 20, 45] #round when everyone evolves.
+passed = ability("passed", 3, 0, True, 1, False)
