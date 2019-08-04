@@ -61,6 +61,14 @@ abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"
 abilities[2][2].append(ability("Reflective Mirror",2, 0, False, 1, False, "Utility", cooldown = 999))
 #abilities[2][2].append(ability("Target Enemy",2, 3, False, 3, False, "Utility", cooldown = 999))
 #abilities[2][2].append(ability("Taunt",2, 3, False, 3, False, "Utility", cooldown = 0))
+
+
+
+#fire:
+abilities[3][0][0].append(ability("Fire Blast", 3, 1, False, 2, True, "Offensive", cooldown = 1, element = 0, proficiency = 5))
+abilities[3][0][0].append(ability("The Floor Is Lava", 3, 3, False, 4, False, "Offensive", cooldown = 4, element = 0, orbs = 2))
+abilities[3][0][0].append(ability("Fire Rain", 3, 3, False, 2, True, "Offensive", element = 0, orbs = 6, proficiency = 10))
+
 #______________________________________________________________________________________________________________________________________________________________________
 #buffs:
 buffs = gstate.get().buffs
@@ -112,13 +120,13 @@ buffs[2][0].append(buff("Become Paralyzed", "Curse", "Condition", "For life: the
 #starter packs:
 starterpacks = gstate.get().starterpacks
 
-starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True, "Offensive"))
-starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False, "Defensive", cooldown = 5))
-starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False, "Utility"))
+starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True, "Offensive", element = 0))
+starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False, "Defensive", element = 0))
+starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False, "Utility", element = 0))
 
-starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True, "Offensive"))
-starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False, "Defensive", cooldown = 5))
-starterpacks[1].append(ability("Ice Charge", 3, 0, True, 2, False, "Utility"))
+starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True, "Offensive", element = 1))
+starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False, "Defensive", element = 1))
+starterpacks[1].append(ability("Ice Charge", 3, 0, True, 2, False, "Utility", element = 1))
 
 
 #_________________________________________________________________________________________________________________________________________________________________
@@ -172,9 +180,6 @@ while gstate.get().run:
                 gstate.get().run = False
 ##            elif event.key == pygame.K_g:
 ##                roundphase.gainabilityforfree(craos)
-            elif event.key == pygame.K_p:
-                for player in gstate.get().players:
-                    print(player.name)
             elif event.key == pygame.K_n:
                 for npc in gstate.get().npcs:
                     print(npc.name)
@@ -212,7 +217,10 @@ while gstate.get().run:
                     
             elif event.key == pygame.K_i: #info
                 for p in gstate.get().players:
-                    print(p.name + " , " + " decisionnumber: " + str(p.ai.decisionnumber) + " , stage: " + str(p.stage) + " , freezestacks: " + str(p.freezestacks))
+                    print(p.name + " , " + " proficiencies: " + str(p.proficiencies) + " , freezestacks: " + str(p.freezestacks) + " , " + str(p.orbs))
+            elif event.key == pygame.K_p:
+                for p in gstate.get().players:
+                    print(p.name + " , " + " proficiencies: " + str(p.proficiencies))
                     
             elif event.key == pygame.K_o:
                 for a in gstate.get().abilities[2][0]:

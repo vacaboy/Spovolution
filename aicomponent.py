@@ -28,10 +28,10 @@ class aicomponent:
         if len(self.decisions) == self.decisionnumber:
             self.Qdecided = True
             for d in self.decisions:
-                if d[2] == []:
-                    gstate.get().decisionlist.append(d)
-                for t in d[2]:
-                    gstate.get().decisionlist.append((d[0], d[1], [t]))
+                #if d[2] == []:
+                gstate.get().decisionlist.append(d)
+                #for t in d[2]:
+                 #   gstate.get().decisionlist.append((d[0], d[1], [t]))
             self.decisions = []
         if self.tries > 5000:
             self.Qdecided = True
@@ -40,6 +40,8 @@ class aicomponent:
             return " "
             
     def verify(self):
+        if self.creature.ability.orbs > self.creature.orbs[self.creature.ability.element]:
+            self.verified = False
         if self.creature.ability.name in [i[1].name for i in self.decisions]:
             self.verified = False
         if "High Jump" in [i.name for i in self.creature.conditions]:
@@ -61,12 +63,6 @@ class aicomponent:
         if self.Qdecided == False and self.verified:
             self.decisions.append((self.creature, self.creature.ability, self.creature.target))
             
-            # self.creature.abilitylastused = self.creature.abilitylastused[1:]
-            # self.creature.abilitylastused.append(self.creature.ability.name)
-            
-            # self.creature.abilitylasttarget = self.creature.abilitylasttarget[1:]
-            # self.creature.abilitylasttarget.append([i.name for i in self.creature.target])
-            
             self.creature.ability = passed
             self.creature.target = []
             
@@ -74,6 +70,7 @@ class aicomponent:
             self.creature.ability = passed
             self.creature.target = []
             self.tries += 1
+            
         
             
     
@@ -90,21 +87,6 @@ class npcaicomponent(aicomponent):
                 a = R.randint(0, len(self.creature.abilitiesinchannel) - 1)
                 self.creature.ability = self.creature.abilitiesinchannel[a][3].clone()
             
-        # self.decided()
-            
-        # if self.Qdecided == False:
-            # w = True
-            # while w:
-                # self.creature.chooseability()
-                # if not(self.creature.ability in [i[1] for i in self.decisions]):
-                    # w = False
-            # self.creature.choosetarget(self.creature.ability.targetnumber, self.creature.ability.selftarget)
-            # self.verified = True
-            # self.verify()
-            # if self.verified:
-                # self.decisions.append((self.creature, self.creature.ability, self.creature.target)) 
-        
-        # self.decided()
 
         
     def gatherinfo(self):
@@ -123,12 +105,13 @@ class playeraicomponent(aicomponent):
         if self.ready == True:
             if self.creature.ability in [i[1] for i in self.decisions]:
                 print("You can't use the same ability twice in a turn!")
-                self.ready = False
             else:
                 self.decided()
                 self.senddecision()
-                self.ready = False
+                if self.verified == False:
+                    print("This option is not valid")
                 self.decided()
+            self.ready = False
 
 class randomaicomponent(npcaicomponent):
     def __init__(self, creature):

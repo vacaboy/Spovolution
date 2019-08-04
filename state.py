@@ -121,6 +121,8 @@ class chooseability(state):
                     self.gainability(gstate.get().craos)
                 elif gstate.get().craos.stage == 2:
                     return gainability1(self.roundcount, self.stage, self.time)
+                elif gstate.get().craos.stage == 3:
+                    return gainability2(self.roundcount, self.stage, self.time)
         #desaprender habilidade:
         elif 720 <= mouseposition[0] <= 880 and 290 <= mouseposition[1] <= 320:
             print("desaprender habilidade")
@@ -320,9 +322,9 @@ class endround(state):
             player.startnewround()
             player.ai.gatherinfo()
             
-        print()
-        a = [[l[0].name, l[1], l[2].name] for l in gstate.get().log]
-        print(str(a))
+        #print()
+        #a = [[l[0].name, l[1], l[2].name] for l in gstate.get().log]
+        #print(str(a))
         
         gstate.get().log = []   
         gstate.get().decisionlist = []
@@ -521,7 +523,6 @@ class evolve2(state):
                         p.element = "Fire"
                     else:
                         p.element = "Ice"
-                p.orbs = {"Fire":0, "Ice":0}
                 self.gainstarterpack(p)
                 
                 p.startnewround()
@@ -663,6 +664,162 @@ class gainability1(state):
                     player.abilities.append(utilityabilities[b].clone())
                     a = True
                     player.EXP -= abilityprice[player.stage]
+
+#
+
+class gainability2(state):
+    def __init__(self, roundcount, stage, time = 30):
+        super().__init__(roundcount,stage)
+        self.name = "choose ability type"
+        self.time = time
+        self.time1 = time
+        #self.textoffensive = gstate.get().fontA.render("Offensive", 1, (0,0,0))
+        #self.textdefensive = gstate.get().fontA.render("Defensive", 1, (0,0,0))
+        #self.textutility = gstate.get().fontA.render("Utility", 1, (0,0,0))
+        #circle1 = circlerenderable(380, 300, 40, (255,0,0))
+        #circle2 = circlerenderable(480, 300, 40, (135,206,250))
+        self.renderables.append(circle1)
+        self.renderables.append(circle2)
+        self.done1 = False
+        self.done2 = False
+        self.element = " "
+        
+    def clock(self):
+        super().clock()
+        if self.time <= 0:
+            return chooseability(self.roundcount, self.stage, self.time)
+        else:
+            return self
+
+    def draw(self, screen):
+        super().draw(screen)
+
+        # if gstate.get().craos.stage == 2:
+            # #escolha de tipo de habilidade :
+            # pygame.draw.rect(screen, (255,48,48), (320, 290, 160, 30))
+            # pygame.draw.rect(screen, (30,144,255), (520, 290, 160, 30))
+            # pygame.draw.rect(screen, (0,201,87), (720, 290, 160, 30))
+    # ##        pygame.draw.rect(screen, (227,207,87), (490, 295, 20, 20))
+    # ##        pygame.draw.line(screen, (255,0,0),(490, 295) , (510, 315))
+    # ##        pygame.draw.line(screen, (255,0,0),(510, 295) , (490, 315))
+
+            # screen.blit(self.textoffensive, (330, 295))
+            # screen.blit(self.textdefensive, (530, 295))
+            # screen.blit(self.textutility, (730, 295))
+    def effect(self):
+        if self.element != " " and not self.done1:
+            self.done1 = True
+            self.renderables.remove(circle1)
+            self.renderables.remove(circle2)
+            
+            self.renderables.append(rectrenderable(320, 290, 160, 30, (255, 48, 48)))
+            self.renderables.append(rectrenderable(520, 290, 160, 30, (30, 144, 255)))
+            self.renderables.append(rectrenderable(720, 290, 160, 30, (0, 201, 87)))
+            self.renderables.append(textrenderable(330, 295, (0,0,0), gstate.get().fontA, lambda: "Offensive"))
+            self.renderables.append(textrenderable(530, 295, (0,0,0), gstate.get().fontA, lambda: "Defensive"))
+            self.renderables.append(textrenderable(730, 295, (0,0,0), gstate.get().fontA, lambda: "Utility"))
+        return self
+
+    def receiveevent(self, event):
+        mouseposition = event.pos
+        print(mouseposition)
+        if not self.done1:
+            if ((mouseposition[0] - 380)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+                self.element = 0
+            elif ((mouseposition[0] - 480)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+                self.element = 1
+            return self
+        else:
+            if  320 <= mouseposition[0]  <= 480 and 290 <= mouseposition[1] <= 320:
+                self.gainabilityoffensive(gstate.get().craos)
+                return chooseability(self.roundcount, self.stage, self.time)
+            elif  520 <= mouseposition[0]  <= 680 and 290 <= mouseposition[1] <= 320:
+                self.gainabilitydefensive(gstate.get().craos)
+                return chooseability(self.roundcount, self.stage, self.time)
+            elif  720 <= mouseposition[0]  <= 880 and 290 <= mouseposition[1] <= 320:
+                self.gainabilityutility(gstate.get().craos)
+                return chooseability(self.roundcount, self.stage, self.time)
+            return self
+            
+        
+
+    def gainabilityoffensive(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        offensiveabilities = gstate.get().abilities[player.stage][self.element][0] #a list of the offensive abilities of the third stage
+        for ab in offensiveabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
+                a = False
+        if a:
+            pass
+        #verify if the player has enough EXP:
+        elif player.EXP < abilityprice[player.stage]:
+            pass
+        else:
+            offensiveabilities1 = [ab for ab in offensiveabilities if ab.proficiency <= player.proficiencies[self.element]]
+            if offensiveabilities1 == []:
+                pass
+            else:
+                while not a:
+                    b = R.randint(0,len(offensiveabilities1) - 1)
+                    #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                    if (not (offensiveabilities1[b].name in [i.name for i in player.abilities])) and ( not (offensiveabilities1[b].name in [i.name for i in player.unlearnedabilities])): 
+                        
+                        player.abilities.append(offensiveabilities1[b].clone())
+                        a = True
+                        player.EXP -= abilityprice[player.stage]
+
+    def gainabilitydefensive(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        defensiveabilities = gstate.get().abilities[player.stage][self.element][1]
+        for ab in defensiveabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
+                a = False
+        if a:
+            pass
+        #verify if the player has enough EXP:
+        elif player.EXP < abilityprice[player.stage]:
+            pass
+        else:
+            defensiveabilities1 = [ab for ab in defensiveabilities if ab.proficiency <= player.proficiencies[self.element]]
+            if defensiveabilities1 == []:
+                pass
+            else:
+                while not a:
+                    b = R.randint(0,len(defensiveabilities1) - 1)
+                    #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                    if (not (defensiveabilities1[b].name in [i.name for i in player.abilities])) and ( not (defensiveabilities1[b].name in [i.name for i in player.unlearnedabilities])):
+                    #if not (defensiveabilities[b].name in [i.name for i in player.abilities]):
+                        player.abilities.append(defensiveabilities1[b].clone())
+                        a = True
+                        player.EXP -= abilityprice[player.stage]
+                    
+    def gainabilityutility(self, player):
+        #verify if the player already has all the abilities:
+        a = True
+        utilityabilities = gstate.get().abilities[player.stage][self.element][2]
+        for ab in utilityabilities:
+            if (not (ab.name in [i.name for i in player.abilities])) and (not (ab.name in [i.name for i in player.unlearnedabilities])):
+                a = False
+        if a:
+            pass
+        #verify if the player has enough EXP:
+        elif player.EXP < abilityprice[player.stage]:
+            pass
+        else:
+            utilityabilities1 = [ab for ab in utilityeabilities if ab.proficiency <= player.proficiencies[self.element]]
+            if utilityabilities1 == []:
+                pass
+            else:
+                while not a:
+                    b = R.randint(0,len(utilityabilities1) - 1)
+                    #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
+                    if (not (utilityabilities1[b].name in [i.name for i in player.abilities])) and ( not (utilityabilities1[b].name in [i.name for i in player.unlearnedabilities])):
+                    #if not (utilityabilities[b].name in [i.name for i in player.abilities]):
+                        player.abilities.append(utilityabilities1[b].clone())
+                        a = True
+                        player.EXP -= abilityprice[player.stage]
 
 #
 class buffbet1(state):

@@ -37,6 +37,8 @@ class creature:
         self.EXPmultiplier = 1
         self.bet = 0
         self.freezestacks = 0
+        self.orbs = [0,0,0,0,0]
+        self.proficiencies = [0,0,0,0,0]
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -114,6 +116,7 @@ class creature:
         pass
      
     def attack(self, targets, damage, a = R.random(), accuracy = 1):
+        a = R.random()
         self.dealtdamage = True 
         d3 = 0
         d1 = ( damage * self.attackmultiplier) + self.attackadd
@@ -121,6 +124,7 @@ class creature:
             d1 = 0
         for t in targets:
             hit = True
+            print(" a: " + str(a) +" , " + str((self.accuracy * (1 - t.dodge) * accuracy)))
             if a <= (self.accuracy * (1 - t.dodge) * accuracy):
                 d2 = round( (d1 * t.defensemultiplier) - t.defenseadd )
                 if d2 < 0:

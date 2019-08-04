@@ -1,4 +1,5 @@
 from abilities import *
+from renderable import *
         
 width = 1000
 height = 600
@@ -9,3 +10,6 @@ evolveHPgain = [0, 75, 400, 2000] #HP and MaxHP gained when evolving, per stage.
 evolveEXP = [0, 20, 100, 1000] #EXP needed to evolve, per stage.
 evolveround = [0, 7, 20, 45] #round when everyone evolves.
 passed = ability("passed", 3, 0, True, 1, False)
+
+circle1 = circlerenderable(380, 300, 40, (255,0,0))
+circle2 = circlerenderable(480, 300, 40, (135,206,250))

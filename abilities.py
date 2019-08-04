@@ -204,7 +204,7 @@ class condition(object):
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False, element = 0, orbs = 0, proficiency = 0):
         self.name = name
         self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
@@ -216,10 +216,13 @@ class ability(object):
         self.cooldown = cooldown
         self.channel = channel
         self.Return = Return 
+        self.element = element
+        self.orbs = orbs
+        self.proficiency = proficiency
         
     def clone(self):
         #print(self.name)
-        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel)     
+        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel, self.Return, self.element, self.orbs, self.proficiency)     
         
         
     def effect(self, targets, caster):
@@ -228,6 +231,10 @@ class ability(object):
         print(caster.name + " used "+ self.name)
         if self.cooldown > 0 and self.channel == 0:
             caster.abilitiesincooldown.append([self.name, self.cooldown + 1])
+        
+        if self.orbs > 0:
+            caster.orbs[self.element] -= self.orbs
+            print(caster.name + " spent " + str(self.orbs) + " orbs ")
         
         if self.name == "Tackle":
             caster.attack(targets, 2)
@@ -268,7 +275,7 @@ class ability(object):
             c=R.randint(1,12)
             d=R.randint(1,12)
             e = b + c + d
-            caster.attack(targets, e , 0.55)
+            caster.attack(targets, e , accuracy = 0.55)
             # elif 55 < a <= 65:
                 # print("but he missed by a tiny bit")
             # elif 65 < a <= 90:
@@ -295,7 +302,7 @@ class ability(object):
             b = R.randint(1,8)
             c = a + b
             caster.lifesteal += 1
-            caster.attack(targets, c, 0.75)
+            caster.attack(targets, c, accuracy = 0.75)
             # else:
                 # print("but he missed")
             #caster.abilitiesincooldown.append(["Blood Drain", 1 + 1])
@@ -489,19 +496,44 @@ class ability(object):
             
             
             
-            
+            #______________________________________________________________________________________________________________________________________________________________________
+            #_______________________________________________________________________________________________________________________________________________________--
+            #________________________________________________________-----------------------____________________________________________________________________
+            #fire:
             
         elif self.name == "Fire Burst":
             caster.attack(targets, 35)
-            caster.orbs["Fire"] += 1
+            caster.orbs[0] += 1
+            caster.proficiencies[0] += 1
             
         elif self.name == "Fire Shield":
-            caster.conditions.append(condition("More Defense", caster, 1, 2+1, value = 10))
-            caster.conditions.append(condition("Thorns", caster, 3, 2+1, value = 5))
-            caster.orbs["Fire"] += 1
+            caster.conditions.append(condition("More Defense", caster, 1, 1, value = 10))
+            caster.conditions.append(condition("Thorns", caster, 3, 1, value = 5))
+            caster.orbs[0] += 1
+            caster.proficiencies[0] += 1
             
         elif self.name == "Fire Charge":
-            caster.orbs["Fire"] += 2
+            caster.orbs[0] += 2
+            caster.proficiencies[0] += 1
+            
+        elif self.name == "Fire Blast":
+            caster.attack(targets, 45)
+            caster.orbs[0] += 1
+            caster.proficiencies[0] += 1.2
+            
+        elif self.name == "The Floor Is Lava":
+            for t in targets:
+                t.conditions.append(condition("Take Damage", t, 1, duration = 4, value = 10))
+            caster.proficiencies[0] += 2
+            
+        elif self.name == "Fire Rain":
+            for t in targets:
+                caster.attack([t], 60, accuracy = 0.7)
+            
+            #______________________________________________________________________________________________________________________________________________________________________
+            #_______________________________________________________________________________________________________________________________________________________--
+            #________________________________________________________-----------------------____________________________________________________________________
+            #ice:
             
         elif self.name == "Icicle Spike":
             caster.attack(targets, 25)
@@ -510,15 +542,18 @@ class ability(object):
                 if a == 0:
                     t.freezestacks += 1
                     print(t.name + " was frozen ")
-            caster.orbs["Ice"] += 1
+            caster.orbs[1] += 1
+            caster.proficiencies[1] += 1
             
         elif self.name == "Ice Shield":
-            caster.conditions.append(condition("More Defense", caster, 1, 2+1, value = 10))
-            caster.conditions.append(condition("Ice Thorns", caster, 3, 2+1, value = 0.5))
-            caster.orbs["Ice"] += 1
+            caster.conditions.append(condition("More Defense", caster, 1, 1, value = 10))
+            caster.conditions.append(condition("Ice Thorns", caster, 3, 1, value = 0.5))
+            caster.orbs[1] += 1
+            caster.proficiencies[1] += 1
             
         elif self.name == "Ice Charge":
-            caster.orbs["Ice"] += 2
+            caster.orbs[1] += 2
+            caster.proficiencies[1] += 1
             
         elif self.name == "passed":
             caster.abilitylasttarget = []
