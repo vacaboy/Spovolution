@@ -170,12 +170,29 @@ class condition(object):
                     b = R.random()
                     if b <= self.value:
                         a[0].freezestacks += 1
+                        print(a[0].name + " was frozen ")
                         
         elif self.name == "Taunt":
             pass
             
         elif self.name == "Taunt Origin":
             pass
+            
+        elif self.name == "Freezestacks":
+            if self.target.freezestacks > 0:
+                print("freezestacks damage " + self.name)
+                if 1 <= self.target.freezestacks <= 5:
+                    gstate.get().system.attack([self.target], 5, a = 0)
+                if 6 <= self.target.freezestacks <= 10:
+                    gstate.get().system.attack([self.target], 10, a = 0)
+                if 11 <= self.target.freezestacks <= 15:
+                    gstate.get().system.attack([self.target], 15, a = 0)
+                if 16 <= self.target.freezestacks <= 20:
+                    gstate.get().system.attack([self.target], 20, a = 0)
+                if 21 <= self.target.freezestacks <= 25:
+                    gstate.get().system.attack([self.target], 25, a = 0)
+                if 26 <= self.target.freezestacks <= 30:
+                    gstate.get().system.attack([self.target], 30, a = 0)
         
             
 
@@ -302,8 +319,10 @@ class ability(object):
                 else:
                     if d[1].abilitytype == "Offensive":
                         a += 1
+                        
                     if caster in d[2]:
                         b += 1 
+            print("On the edge: attacks: " + str(a) + " , on caster: " + str(b))
             if a == b and a > 0:
                 caster.attack(targets, 30)
             else:
@@ -346,7 +365,7 @@ class ability(object):
                  
             else: #a é o indice das habilidades que estao em channel que é o desta habilidade
                 a = [i[0] == "Unleash The Power" for i in caster.abilitiesinchannel].index(True)
-                if caster.abilitiesinchannel[a][1] == 1: #se o channel chegou ao fim, a habilidade atua
+                if caster.abilitiesinchannel[a][1] == 1 or caster.abilitiesinchannel[a][1] == 0: #se o channel chegou ao fim, a habilidade atua
                     caster.abilitiesinchannel[a][1] -= 1
                     b = R.randint(1,14)
                     c = R.randint(1,14)
@@ -424,9 +443,9 @@ class ability(object):
             print(caster.name + " will deal double damage next turn because of Limitless")
 
         elif self.name == "Lullaby":
-            print(caster.name + " sang a Lullaby")
+            #print(caster.name + " sang a Lullaby")
             #caster.abilitiesincooldown.append(["Lullaby", 5 + 1])
-            for player in gstate.get().players:
+            for player in targets:
                 if player == caster:
                     pass
                 else:
@@ -490,6 +509,7 @@ class ability(object):
                 a = R.randint(0,1)
                 if a == 0:
                     t.freezestacks += 1
+                    print(t.name + " was frozen ")
             caster.orbs["Ice"] += 1
             
         elif self.name == "Ice Shield":

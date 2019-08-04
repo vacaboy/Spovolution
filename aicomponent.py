@@ -19,7 +19,9 @@ class aicomponent:
         if not self.Qdecided:
             if "Paralyzed" in [i.name for i in self.creature.conditions]:
                 for i in range(self.decisionnumber):
-                    self.decisions.append((self.creature, ability("passed", 3, 0, True, 1, False), []))
+                    #self.decisions.append((self.creature, ability("passed", 3, 0, True, 1, False), []))
+                    self.decisions.append((self.creature, passed, []))
+
                         
                 
     def decided(self):
@@ -33,10 +35,13 @@ class aicomponent:
             self.decisions = []
         if self.tries > 5000:
             self.Qdecided = True
-            gstate.get().decisionlist.append((self.creature, passed, []))
+            for i in range(self.decisionnumber):
+                self.decisions.append((self.creature, passed, []))
             return " "
             
     def verify(self):
+        if self.creature.ability.name in [i[1].name for i in self.decisions]:
+            self.verified = False
         if "High Jump" in [i.name for i in self.creature.conditions]:
             if self.creature.ability.abilitytype != "Offensive":
                 self.verified = False
@@ -81,9 +86,9 @@ class npcaicomponent(aicomponent):
     def decide(self):
         super().decide()
         if not self.Qdecided:
-            if self.creature.abilitiesinchannel != []:
+            if self.creature.abilitiesinchannel != [] and self.tries < 10:
                 a = R.randint(0, len(self.creature.abilitiesinchannel) - 1)
-                self.creature.ability =self.creature.abilitiesinchannel[a][3].clone()
+                self.creature.ability = self.creature.abilitiesinchannel[a][3].clone()
             
         # self.decided()
             
@@ -122,6 +127,7 @@ class playeraicomponent(aicomponent):
             else:
                 self.decided()
                 self.senddecision()
+                self.ready = False
                 self.decided()
 
 class randomaicomponent(npcaicomponent):
@@ -130,20 +136,19 @@ class randomaicomponent(npcaicomponent):
         
     def decide(self):
         super().decide()
-        
-        self.decided()
-            
         if self.Qdecided == False:
+            self.decided()
+            
             if self.creature.ability == passed:
                 w = True
                 while w:
                     self.creature.chooseability()
                     if not(self.creature.ability in [i[1] for i in self.decisions]):
                         w = False
-                self.creature.choosetarget(self.creature.ability.targetnumber, self.creature.ability.selftarget)
+            self.creature.choosetarget(self.creature.ability.targetnumber, self.creature.ability.selftarget)
             self.senddecision()
         
-        self.decided()
+            self.decided()
 
         
     def gatherinfo(self):

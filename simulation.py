@@ -37,7 +37,8 @@ class simulation:
                         
             self.deathcheck()
         self.stuff(info)
-
+        
+        
         
         
         

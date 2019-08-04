@@ -21,7 +21,7 @@ class creature:
         self.damaged = False #True or False if this player was damaged this turn or not.
         self.dealtdamage = False #True of False if this player dealt damage this turn or not.
         self.attacksreceived = 0 #keeps track of how many attacks has this player received
-        self.conditions = []
+        self.conditions = [condition("Freezestacks", self, 4, 999)]
         self.unlearnedabilities = []
         self.abilitiesincooldown = []
         self.abilitiesinchannel = []
@@ -36,6 +36,7 @@ class creature:
         self.dodge = 0
         self.EXPmultiplier = 1
         self.bet = 0
+        self.freezestacks = 0
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -69,6 +70,7 @@ class creature:
         self.damaged = False
         self.dealtdamage = False
         self.target = []
+        self.ability = passed
         self.attacksreceived = 0
         self.attackmultiplier = 1
         self.attackadd = 0
@@ -98,6 +100,9 @@ class creature:
         self.ai.tries = 1
         #self.abilitylastused = []
         #self.abilitylasttarget = []
+        
+        #freezestacks:
+        
          
             
         
@@ -214,7 +219,7 @@ class npc(creature):
         if self.ability.channel > 0: #se a habilidade escolhida tem channel:
             if self.ability.name in [i[0] for i in self.abilitiesinchannel]: #se o player ja esta a dar channel à habilidade
                 a = [i[0] == self.ability.name for i in self.abilitiesinchannel].index(True)
-                if self.abilitiesinchannel[a][1] > 1: #se a habilidade nao vai atuar este turno
+                if self.abilitiesinchannel[a][1] >= 2: #se a habilidade nao vai atuar este turno
                     self.target = []
             elif not (self.ability.name in [i[0] for i in self.abilitiesinchannel]): #se o player ainda nao esta a dar channel à habilidade:
                 self.target = []

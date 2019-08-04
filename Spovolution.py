@@ -58,7 +58,7 @@ abilities[2][2].append(ability("Fight Stance",2, 0,True, 3, False, "Utility", co
 abilities[2][2].append(ability("Limitless",2, 0,True, 3, False, "Utility", cooldown = 999))
 abilities[2][2].append(ability("Intimidate",2, 3,False, 4, False, "Utility", cooldown = 1))
 abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False, "Utility"))
-abilities[2][2].append(ability("Reflective Mirror",2, 3, False, 1, False, "Utility", cooldown = 999))
+abilities[2][2].append(ability("Reflective Mirror",2, 0, False, 1, False, "Utility", cooldown = 999))
 #abilities[2][2].append(ability("Target Enemy",2, 3, False, 3, False, "Utility", cooldown = 999))
 #abilities[2][2].append(ability("Taunt",2, 3, False, 3, False, "Utility", cooldown = 0))
 #______________________________________________________________________________________________________________________________________________________________________
@@ -113,11 +113,11 @@ buffs[2][0].append(buff("Become Paralyzed", "Curse", "Condition", "For life: the
 starterpacks = gstate.get().starterpacks
 
 starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True, "Offensive"))
-starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False, "Defensive"))
+starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False, "Defensive", cooldown = 5))
 starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False, "Utility"))
 
 starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True, "Offensive"))
-starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False, "Defensive"))
+starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False, "Defensive", cooldown = 5))
 starterpacks[1].append(ability("Ice Charge", 3, 0, True, 2, False, "Utility"))
 
 
@@ -146,8 +146,8 @@ gstate.get().simulation = simulation()
 
 
 #roundphase = chooseability(1, 1)
-roundphase = chooseability(6, 1)
-#roundphase = chooseability(19, 2)
+#roundphase = chooseability(6, 1)
+roundphase = chooseability(19, 2)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
@@ -194,9 +194,12 @@ while gstate.get().run:
 
 
                 
-            elif event.key == pygame.K_g:
-                for p in gstate.get().players:
-                    p.accuracy = 0.5
+            elif event.key == pygame.K_t:
+                tomis.abilities = tomis.abilities[1:]
+                tomis.abilities.append(ability("Unleash The Power" ,2, 2, False, 2, True, "Offensive", cooldown = 2, channel = 4))
+            elif event.key == pygame.K_y:
+                tomis.abilities = tomis.abilities[1:]        
+                
             elif event.key == pygame.K_v:
                 for p in gstate.get().players:
                     p.dodge = 1
@@ -209,7 +212,7 @@ while gstate.get().run:
                     
             elif event.key == pygame.K_i: #info
                 for p in gstate.get().players:
-                    print(p.name + " , " + " decisionnumber: " + str(p.ai.decisionnumber) + " , stage: " + str(p.stage))
+                    print(p.name + " , " + " decisionnumber: " + str(p.ai.decisionnumber) + " , stage: " + str(p.stage) + " , freezestacks: " + str(p.freezestacks))
                     
             elif event.key == pygame.K_o:
                 for a in gstate.get().abilities[2][0]:
@@ -220,7 +223,7 @@ while gstate.get().run:
             elif event.key == pygame.K_u:
                 for a in gstate.get().abilities[2][2]:
                     gstate.get().craos.abilities.append(a)
-            elif event.key == pygame.K_t:
+            elif event.key == pygame.K_r:
                 gstate.get().craos.abilities = gstate.get().craos.abilities[1:]
     
     for p in gstate.get().players:

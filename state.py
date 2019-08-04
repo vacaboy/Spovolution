@@ -515,14 +515,13 @@ class evolve2(state):
                 p.stage = 3
                 p.ai.decisionnumber += 1
                 if not (p == gstate.get().craos):
-                    p.abilities = []
+                    #p.abilities = []
                     a = R.randint(0,1)
                     if a == 0:
                         p.element = "Fire"
                     else:
                         p.element = "Ice"
                 p.orbs = {"Fire":0, "Ice":0}
-                p.freezestacks = 0
                 self.gainstarterpack(p)
                 
                 p.startnewround()
