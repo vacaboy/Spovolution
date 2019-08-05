@@ -25,6 +25,7 @@ class creature:
         self.unlearnedabilities = []
         self.abilitiesincooldown = []
         self.abilitiesinchannel = []
+        self.abilitiesinforget = []
         self.attackmultiplier = 1
         self.attackadd = 0
         self.defensemultiplier = 1
@@ -39,6 +40,7 @@ class creature:
         self.freezestacks = 0
         self.orbs = [0,0,0,0,0]
         self.proficiencies = [0,0,0,0,0]
+        self.starterpacks = [False,False,False,False,False]
         
         if color == "none":
             self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
@@ -87,6 +89,8 @@ class creature:
         self.bet = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
+        if self.MaxHP <= 0:
+            self.MaxHP = 1
         #print()
         for ab in self.abilitiesincooldown:
             ab[1] -= 1
@@ -96,6 +100,13 @@ class creature:
         for ab in self.abilitiesinchannel:
             ab[2] = False            
         self.conditions = [c for c in self.conditions if c.duration > 0]
+        
+        for ab in self.abilitiesinforget:
+            ab[1] -= 1
+        for ab in self.abilitiesinforget:
+            if ab[1] == 0:
+                self.abilities.append(ab[0].clone())
+        self.abilitiesinforget = [ab for ab in self.abilitiesinforget if ab[1] > 0]
         
         self.ai.Qdecided = False
         self.ai.decisions = []
@@ -124,7 +135,6 @@ class creature:
             d1 = 0
         for t in targets:
             hit = True
-            print(" a: " + str(a) +" , " + str((self.accuracy * (1 - t.dodge) * accuracy)))
             if a <= (self.accuracy * (1 - t.dodge) * accuracy):
                 d2 = round( (d1 * t.defensemultiplier) - t.defenseadd )
                 if d2 < 0:
@@ -144,6 +154,24 @@ class creature:
                 print(str(damage) + " "  +  str(d1) + " "  + str(d2) + " "  + str(d3))
             else:
                 print(self.name + " missed the attack against " + t.name)
+                
+    def soulattack(self, targets, damage, a = R.random(), accuracy = 1):
+        a = R.random()
+        d3 = 0
+        d1 = damage
+        if d1 < 0:
+            d1 = 0
+        for t in targets:
+            hit = True
+            if a <= (self.accuracy * (1 - t.dodge) * accuracy):
+                self.EXP += round((d1 * self.EXPmultiplier))
+                if not (t == self):
+                    t.EXP += round((d1 * t.EXPmultiplier))
+                t.MaxHP -= d1
+                t.attacksreceived += 1
+                print(t.name + " lost " + str(d1) + " Max HP")
+            else:
+                print(self.name + " missed the soul attack against " + t.name)
        
     def heal(self, targets, amount):
         for t in targets:

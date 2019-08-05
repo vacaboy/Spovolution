@@ -40,8 +40,9 @@ class aicomponent:
             return " "
             
     def verify(self):
-        if self.creature.ability.orbs > self.creature.orbs[self.creature.ability.element]:
-            self.verified = False
+        for i in [0,1,2,3,4]:
+            if self.creature.ability.orbs[i] > self.creature.orbs[i]:
+                self.verified = False
         if self.creature.ability.name in [i[1].name for i in self.decisions]:
             self.verified = False
         if "High Jump" in [i.name for i in self.creature.conditions]:

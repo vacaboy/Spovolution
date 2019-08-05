@@ -65,10 +65,41 @@ abilities[2][2].append(ability("Reflective Mirror",2, 0, False, 1, False, "Utili
 
 
 #fire:
-abilities[3][0][0].append(ability("Fire Blast", 3, 1, False, 2, True, "Offensive", cooldown = 1, element = 0, proficiency = 5))
-abilities[3][0][0].append(ability("The Floor Is Lava", 3, 3, False, 4, False, "Offensive", cooldown = 4, element = 0, orbs = 2))
-abilities[3][0][0].append(ability("Fire Rain", 3, 3, False, 2, True, "Offensive", element = 0, orbs = 6, proficiency = 10))
+abilities[3][0][0].append(ability("Fire Blast", 3, 1, False, 2, True, "Offensive", cooldown = 1, element = 0, proficiencyneeded = 5, proficiencygiven = [1.2,0,0,0,0]))
+abilities[3][0][0].append(ability("The Floor Is Lava", 3, 3, False, 4, False, "Offensive", cooldown = 4, element = 0, orbs = [2,0,0,0,0],  proficiencygiven = [2,0,0,0,0]))
+abilities[3][0][0].append(ability("Fire Rain", 3, 3, False, 2, True, "Offensive", element = 0, orbs = [6,0,0,0,0], proficiencyneeded = 10,  proficiencygiven = [3.5,0,0,0,0]))
+abilities[3][0][0].append(ability("Lava Burst", 3, 1, False, 2, True, "Offensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 10,  proficiencygiven = [1.5,0,0,0,0]))
+abilities[3][0][0].append(ability("Explosion", 3, 3, False, 2, True, "Offensive", element = 0, orbs = [4,0,0,0,0], proficiencyneeded = 25,  proficiencygiven = [6,0,0,0,0]))
+abilities[3][0][0].append(ability("Living Inferno", 3, 5, False, 2, True, "Offensive", channel = 3, element = 0, orbs = [5,0,0,0,0], proficiencyneeded = 50,  proficiencygiven = [10,0,0,0,0]))
+abilities[3][0][0].append(ability("Cold Flame", 3, 1, False, 2, True, "Offensive", element = 0, orbs = [3,1,0,0,0], proficiencyneeded = 10,  proficiencygiven = [4,1.5,0,0,0]))
+abilities[3][0][0].append(ability("Mystical Flame", 3, 1, False, 2, True, "Offensive", element = 0, orbs = [3,0,0,0,1], proficiencyneeded = 10,  proficiencygiven = [4,0,0,0,1.5]))
+abilities[3][0][0].append(ability("Corrosive Flame", 3, 1, False, 2, True, "Offensive", element = 0, orbs = [3,0,0,1,0], proficiencyneeded = 10,  proficiencygiven = [4,0,0,1.5,0]))
+abilities[3][0][0].append(ability("Flame Of Death", 3, 2, False, 2, False, "Offensive", element = 0, orbs = [7,0,0,3,0], proficiencyneeded = 30,  proficiencygiven = [8,0,0,3,0]))
+abilities[3][0][0].append(ability("Forgetfull Combustion", 3, 4, False, 2, True, "Offensive", element = 0, orbs = [7,0,0,0,3], proficiencyneeded = 30,  proficiencygiven = [8,0,0,0,3]))
 
+#_________________________________________________________________________________________________________________________________________________________________
+#starter packs:
+starterpacks = gstate.get().starterpacks
+
+starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True, "Offensive", element = 0,  proficiencygiven = [1,0,0,0,0]))
+starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False, "Defensive", element = 0,  proficiencygiven = [1,0,0,0,0]))
+starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False, "Utility", element = 0,  proficiencygiven = [1,0,0,0,0]))
+
+starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True, "Offensive", element = 1,  proficiencygiven = [0,1,0,0,0]))
+starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False, "Defensive", element = 1,  proficiencygiven = [0,1,0,0,0]))
+starterpacks[1].append(ability("Ice Charge", 3, 0, True, 2, False, "Utility", element = 1,  proficiencygiven = [0,1,0,0,0]))
+
+starterpacks[2].append(ability("Discharge", 3, 1, False, 2, True, "Offensive", element = 2,  proficiencygiven = [0,0,1,0,0]))
+starterpacks[2].append(ability("Wind Shield", 3, 0, True, 1, False, "Defensive", element = 2,  proficiencygiven = [0,0,1,0,0]))
+starterpacks[2].append(ability("Storm Charge", 3, 0, True, 2, False, "Utility", element = 2,  proficiencygiven = [0,0,1,0,0]))
+
+starterpacks[3].append(ability("Necrotic Wave", 3, 1, False, 2, True, "Offensive", element = 3,  proficiencygiven = [0,0,0,1,0]))
+starterpacks[3].append(ability("Paralyzing Gaze", 3, 1, False, 3, False, "Utility", element = 3,  proficiencygiven = [0,0,0,1,0]))
+starterpacks[3].append(ability("Necrotic Charge", 3, 0, True, 2, False, "Utility", element = 3,  proficiencygiven = [0,0,0,1,0]))
+
+starterpacks[4].append(ability("Mind Burst", 3, 1, False, 2, True, "Offensive", element = 4,  proficiencygiven = [0,0,0,0,1]))
+starterpacks[4].append(ability("Dull Mind", 3, 1, False, 3, False, "Utility", element = 4,  proficiencygiven = [0,0,0,0,1]))
+starterpacks[4].append(ability("Mind Charge", 3, 0, True, 2, False, "Utility", element = 4,  proficiencygiven = [0,0,0,0,1]))
 #______________________________________________________________________________________________________________________________________________________________________
 #buffs:
 buffs = gstate.get().buffs
@@ -116,17 +147,7 @@ buffs[2][0].append(buff("More Damage", "Blessing", "Condition", "For the next 2 
 buffs[2][0].append(buff("Less Damage", "Curse", "Condition", "For the next 2 rounds, you deal 20 less damage", value = 10, duration = 2))
 buffs[2][0].append(buff("Become Paralyzed", "Curse", "Condition", "For life: there is a 1% chance you get paralyzed at the beginning of the round", value = 0.01, duration = 999))
 
-#_________________________________________________________________________________________________________________________________________________________________
-#starter packs:
-starterpacks = gstate.get().starterpacks
 
-starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True, "Offensive", element = 0))
-starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False, "Defensive", element = 0))
-starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False, "Utility", element = 0))
-
-starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True, "Offensive", element = 1))
-starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False, "Defensive", element = 1))
-starterpacks[1].append(ability("Ice Charge", 3, 0, True, 2, False, "Utility", element = 1))
 
 
 #_________________________________________________________________________________________________________________________________________________________________
@@ -231,6 +252,10 @@ while gstate.get().run:
             elif event.key == pygame.K_u:
                 for a in gstate.get().abilities[2][2]:
                     gstate.get().craos.abilities.append(a)
+            elif event.key == pygame.K_k:
+                for a in gstate.get().abilities[3][0][0]:
+                    gstate.get().craos.abilities.append(a)
+                gstate.get().craos.orbs[0] += 50
             elif event.key == pygame.K_r:
                 gstate.get().craos.abilities = gstate.get().craos.abilities[1:]
     

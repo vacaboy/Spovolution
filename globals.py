@@ -11,5 +11,8 @@ evolveEXP = [0, 20, 100, 1000] #EXP needed to evolve, per stage.
 evolveround = [0, 7, 20, 45] #round when everyone evolves.
 passed = ability("passed", 3, 0, True, 1, False)
 
-circle1 = circlerenderable(380, 300, 40, (255,0,0))
-circle2 = circlerenderable(480, 300, 40, (135,206,250))
+circle0 = circlerenderable(380, 300, 40, (255,0,0))
+circle1 = circlerenderable(480, 300, 40, (135,206,250))
+circle2 = circlerenderable(580, 300, 40, (10,50,255))
+circle3 = circlerenderable(680, 300, 40, (200,206,200))
+circle4 = circlerenderable(780, 300, 40, (255,0,100))

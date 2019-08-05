@@ -322,6 +322,11 @@ class endround(state):
             player.startnewround()
             player.ai.gatherinfo()
             
+        for p in gstate.get().players: #conditions that act at the end of the round.
+            for c in p.conditions:
+                if c.priority == "Afterstartnewround":
+                    c.effect()
+            
         #print()
         #a = [[l[0].name, l[1], l[2].name] for l in gstate.get().log]
         #print(str(a))
@@ -487,7 +492,7 @@ class evolve1(state):
 
 class evolve2(state):
 
-    def __init__(self, roundcount, stage, time = 30):
+    def __init__(self, roundcount, stage, time = 300):
         super().__init__(roundcount, stage)
         self.name = "You are Evolving!"
         self.time = time
@@ -495,6 +500,9 @@ class evolve2(state):
         self.done = False
         self.renderables.append(circlerenderable(380, 300, 40, (255,0,0)))
         self.renderables.append(circlerenderable(480, 300, 40, (135,206,250)))
+        self.renderables.append(circle2)
+        self.renderables.append(circle3)
+        self.renderables.append(circle4)
         
     def clock(self):
         super().clock()
@@ -518,11 +526,17 @@ class evolve2(state):
                 p.ai.decisionnumber += 1
                 if not (p == gstate.get().craos):
                     #p.abilities = []
-                    a = R.randint(0,1)
+                    a = R.randint(0,4)
                     if a == 0:
                         p.element = "Fire"
-                    else:
+                    elif a == 1:
                         p.element = "Ice"
+                    elif a == 2:
+                        p.element = "Tempest"
+                    elif a == 3:
+                        p.element = "Necrotic"
+                    elif a == 4:
+                        p.element = "Mind"
                 self.gainstarterpack(p)
                 
                 p.startnewround()
@@ -541,15 +555,35 @@ class evolve2(state):
             gstate.get().craos.element = "Fire"
         elif ((mouseposition[0] - 480)**2 + (mouseposition[1] - 300)**2) <= 40**2:
             gstate.get().craos.element = "Ice"
+        elif ((mouseposition[0] - 580)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+            gstate.get().craos.element = "Tempest"
+        elif ((mouseposition[0] - 680)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+            gstate.get().craos.element = "Necrotic"
+        elif ((mouseposition[0] - 780)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+            gstate.get().craos.element = "Mind"
         self.done = True
         return self
         
     def gainstarterpack(self, creature):
         if creature.element == "Fire":
+            creature.starterpacks[0] = True
             for ab in gstate.get().starterpacks[0]:
                 creature.abilities.append(ab.clone())
         elif creature.element == "Ice":
+            creature.starterpacks[1] = True
             for ab in gstate.get().starterpacks[1]:
+                creature.abilities.append(ab.clone())
+        elif creature.element == "tempest":
+            creature.starterpacks[2] = True
+            for ab in gstate.get().starterpacks[2]:
+                creature.abilities.append(ab.clone())
+        elif creature.element == "Necrotic":
+            creature.starterpacks[3] = True
+            for ab in gstate.get().starterpacks[3]:
+                creature.abilities.append(ab.clone())
+        elif creature.element == "Mind":
+            creature.starterpacks[4] = True
+            for ab in gstate.get().starterpacks[4]:
                 creature.abilities.append(ab.clone())
 #_____________________________________________________________________________________________________________________________________________________________________
 class gainability1(state):
@@ -678,8 +712,11 @@ class gainability2(state):
         #self.textutility = gstate.get().fontA.render("Utility", 1, (0,0,0))
         #circle1 = circlerenderable(380, 300, 40, (255,0,0))
         #circle2 = circlerenderable(480, 300, 40, (135,206,250))
+        self.renderables.append(circle0)
         self.renderables.append(circle1)
         self.renderables.append(circle2)
+        self.renderables.append(circle3)
+        self.renderables.append(circle4)
         self.done1 = False
         self.done2 = False
         self.element = " "
@@ -709,8 +746,11 @@ class gainability2(state):
     def effect(self):
         if self.element != " " and not self.done1:
             self.done1 = True
+            self.renderables.remove(circle0)
             self.renderables.remove(circle1)
             self.renderables.remove(circle2)
+            self.renderables.remove(circle3)
+            self.renderables.remove(circle4)
             
             self.renderables.append(rectrenderable(320, 290, 160, 30, (255, 48, 48)))
             self.renderables.append(rectrenderable(520, 290, 160, 30, (30, 144, 255)))
@@ -728,6 +768,15 @@ class gainability2(state):
                 self.element = 0
             elif ((mouseposition[0] - 480)**2 + (mouseposition[1] - 300)**2) <= 40**2:
                 self.element = 1
+            elif ((mouseposition[0] - 580)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+                self.element = 2
+            elif ((mouseposition[0] - 680)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+                self.element = 3
+            elif ((mouseposition[0] - 780)**2 + (mouseposition[1] - 300)**2) <= 40**2:
+                self.element = 4
+            if not gstate.get().craos.starterpacks[self.element]:
+                self.gainstarterpack(gstate.get().craos, self.element)
+                return chooseability(self.roundcount, self.stage, self.time)
             return self
         else:
             if  320 <= mouseposition[0]  <= 480 and 290 <= mouseposition[1] <= 320:
@@ -756,7 +805,7 @@ class gainability2(state):
         elif player.EXP < abilityprice[player.stage]:
             pass
         else:
-            offensiveabilities1 = [ab for ab in offensiveabilities if ab.proficiency <= player.proficiencies[self.element]]
+            offensiveabilities1 = [ab for ab in offensiveabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
             if offensiveabilities1 == []:
                 pass
             else:
@@ -782,7 +831,7 @@ class gainability2(state):
         elif player.EXP < abilityprice[player.stage]:
             pass
         else:
-            defensiveabilities1 = [ab for ab in defensiveabilities if ab.proficiency <= player.proficiencies[self.element]]
+            defensiveabilities1 = [ab for ab in defensiveabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
             if defensiveabilities1 == []:
                 pass
             else:
@@ -808,7 +857,7 @@ class gainability2(state):
         elif player.EXP < abilityprice[player.stage]:
             pass
         else:
-            utilityabilities1 = [ab for ab in utilityeabilities if ab.proficiency <= player.proficiencies[self.element]]
+            utilityabilities1 = [ab for ab in utilityeabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
             if utilityabilities1 == []:
                 pass
             else:
@@ -820,6 +869,28 @@ class gainability2(state):
                         player.abilities.append(utilityabilities1[b].clone())
                         a = True
                         player.EXP -= abilityprice[player.stage]
+                        
+    def gainstarterpack(self, creature, element):
+        if element == 0:
+            creature.starterpacks[0] = True
+            for ab in gstate.get().starterpacks[0]:
+                creature.abilities.append(ab.clone())
+        elif element == 1:
+            creature.starterpacks[1] = True
+            for ab in gstate.get().starterpacks[1]:
+                creature.abilities.append(ab.clone())
+        elif element == 2:
+            creature.starterpacks[2] = True
+            for ab in gstate.get().starterpacks[2]:
+                creature.abilities.append(ab.clone())
+        elif element == 3:
+            creature.starterpacks[3] = True
+            for ab in gstate.get().starterpacks[3]:
+                creature.abilities.append(ab.clone())
+        elif element == 4:
+            creature.starterpacks[4] = True
+            for ab in gstate.get().starterpacks[4]:
+                creature.abilities.append(ab.clone())
 
 #
 class buffbet1(state):
@@ -828,11 +899,11 @@ class buffbet1(state):
         self.name = "Betting time!"
         self.time = time
         self.time1 = time
-        #self.buffnumber = buffnumber
-        self.buffnumber = 4
+        self.buffnumber = buffnumber
+        #self.buffnumber = 4
         self.buff = self.pickbuff()
-        #self.done = False
-        self.done = True
+        self.done = False
+        #self.done = True
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),

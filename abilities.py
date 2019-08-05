@@ -6,12 +6,13 @@ import math
 #channel [ability.name, turns left, True or False, ability]
 
 class condition(object):
-    def __init__(self, name, target, priority, duration, value = 0):
+    def __init__(self, name, target, priority, duration, value = 0, caster = " "):
         self.name = name
         self.target = target
         self.priority = priority
         self.duration = duration
         self.value = value
+        self.caster = caster
 
     def effect(self):
         if self.name == "teste":
@@ -34,7 +35,7 @@ class condition(object):
                 #self.target.ability = ability("passed", 3, 0, True, 1, False)
             
         elif self.name == "Immobilized":
-            #print(self.target.name + " takes 150% damage this turn")
+            print(self.target.name + " tis immobilized")
             self.target.defensemultiplier *= 1.5
             
         elif self.name == "Anti-Immobilized":
@@ -46,7 +47,17 @@ class condition(object):
             #print(self.target.name + " has " + str(self.value * 100) + "% less accuracy.")
             
         elif self.name == "Take Damage":
-            gstate.get().system.attack([self.target], self.value, a = 0)
+            if self.caster != " ":
+                self.caster.attack([self.target], self.value, a = 0)
+            else:
+                gstate.get().system.attack([self.target], self.value, a = 0)
+                
+        elif self.name == "Take Soul Damage":
+            if self.caster != " ":
+                self.caster.soulattack([selt.targets], self.value, a = 0)
+            else:
+                gstate.get().system.soulattack([self.target], self.value, a = 0)
+
 
             
         elif self.name == "Take Heal":
@@ -178,6 +189,24 @@ class condition(object):
         elif self.name == "Taunt Origin":
             pass
             
+        elif self.name == "Forget":
+            abilitiesused = []
+            for d in gstate.get().decisionlist:
+                if d[0] == self.target:
+                    abilitiesused.append(d[1].clone())
+            a = R.randint(0, len(abilitiesused) - 1)
+            if not abilitiesused[a].name == "passed":
+                self.target.abilitiesinforget.append([abilitiesused[a], self.value + 1])
+                na = abilitiesused[a].name
+                b = [i.name == na for i in self.target.abilities].index(True)
+                print(self.target.name + " forgot " + self.target.abilities[b].name + " for " + str(self.value) + " turns")
+                self.target.abilities = self.target.abilities[:b] + self.target.abilities[b+1:]
+            
+        elif self.name == "Iced":
+            self.target.ai.decisionnumber -= 1
+            print(self.target.name + " became ICED")
+            
+            
         elif self.name == "Freezestacks":
             if self.target.freezestacks > 0:
                 print("freezestacks damage " + self.name)
@@ -204,7 +233,7 @@ class condition(object):
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False, element = 0, orbs = 0, proficiency = 0):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False, element = 0, orbs = [0,0,0,0,0], proficiencyneeded = 0, proficiencygiven = [0,0,0,0,0]):
         self.name = name
         self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
@@ -218,11 +247,13 @@ class ability(object):
         self.Return = Return 
         self.element = element
         self.orbs = orbs
-        self.proficiency = proficiency
+        self.proficiencyneeded = proficiencyneeded
+        self.proficiencygiven = proficiencygiven
+
         
     def clone(self):
         #print(self.name)
-        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel, self.Return, self.element, self.orbs, self.proficiency)     
+        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel, self.Return, self.element, self.orbs, self.proficiencyneeded, self.proficiencygiven)     
         
         
     def effect(self, targets, caster):
@@ -232,9 +263,13 @@ class ability(object):
         if self.cooldown > 0 and self.channel == 0:
             caster.abilitiesincooldown.append([self.name, self.cooldown + 1])
         
-        if self.orbs > 0:
-            caster.orbs[self.element] -= self.orbs
-            print(caster.name + " spent " + str(self.orbs) + " orbs ")
+        for i in [0,1,2,3,4]:
+            if self.orbs[i] > 0:  #orbs
+                caster.orbs[i] -= self.orbs[i]
+                print(caster.name + " spent " + str(self.orbs[i]) + " orbs ")
+            
+            if self.proficiencygiven[i] > 0: #proficiencies 
+                caster.proficiencies[i] += self.proficiencygiven[i]
         
         if self.name == "Tackle":
             caster.attack(targets, 2)
@@ -504,32 +539,86 @@ class ability(object):
         elif self.name == "Fire Burst":
             caster.attack(targets, 35)
             caster.orbs[0] += 1
-            caster.proficiencies[0] += 1
             
         elif self.name == "Fire Shield":
             caster.conditions.append(condition("More Defense", caster, 1, 1, value = 10))
             caster.conditions.append(condition("Thorns", caster, 3, 1, value = 5))
             caster.orbs[0] += 1
-            caster.proficiencies[0] += 1
             
         elif self.name == "Fire Charge":
             caster.orbs[0] += 2
-            caster.proficiencies[0] += 1
             
         elif self.name == "Fire Blast":
             caster.attack(targets, 45)
             caster.orbs[0] += 1
-            caster.proficiencies[0] += 1.2
             
         elif self.name == "The Floor Is Lava":
             for t in targets:
-                t.conditions.append(condition("Take Damage", t, 1, duration = 4, value = 10))
-            caster.proficiencies[0] += 2
+                t.conditions.append(condition("Take Damage", t, 1, duration = 4, value = 10, caster = caster))
             
         elif self.name == "Fire Rain":
             for t in targets:
                 caster.attack([t], 60, accuracy = 0.7)
+                
+        elif self.name == "Lava Burst":
+            for t in targets:
+                a = R.random()
+                if a < 0.6:
+                    caster.attack([t], 60)
+                    t.conditions.append(condition("Immobilized", t, 1, 1))
+                    
+        elif self.name == "Explosion":
+            caster.attack(targets, 50)
+            for t in targets:
+                caster.attack([t], 50, accuracy = 0.5)
+                
+        elif self.name == "Living Inferno":
+            if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
+                caster.abilitiesinchannel.append([self.name, self.channel - 1, True, self.clone()])
+                #este "True" é verdadeiro ou falso consuante esta habilidade foi usada esta ronda, visto que se a habilidade channel nao for usada uma ronda, entao o channel para.
+                print(caster.name + " began channeling " + self.name + " for 3 rounds")
+                 
+            else: #a é o indice das habilidades que estao em channel que é o desta habilidade
+                a = [i[0] == "Living Inferno" for i in caster.abilitiesinchannel].index(True)
+                if caster.abilitiesinchannel[a][1] == 1 or caster.abilitiesinchannel[a][1] == 0: #se o channel chegou ao fim, a habilidade atua
+                    caster.abilitiesinchannel[a][1] -= 1
+                    caster.attack(targets, 250)
+                    b = R.randint(1,4) + 1
+                    for t in targets:
+                        t.conditions.append(condition("Take Damage", t, 1, duration = b, value = 50, caster = caster))
+                else:
+                    caster.abilitiesinchannel[a][1] -= 1
+                    caster.abilitiesinchannel[a][2] = True
+                     
+                    print("Only " + str(caster.abilitiesinchannel[a][1]) + " turns left until " + caster.name + " uses " + self.name)
+                    
+        elif self.name == "Cold Flame":
+            caster.attack(targets, 45)
+            for t in targets:
+                t.conditions.append(condition("Iced", t, "Afterstartnewround", 1))
+        
+        elif self.name == "Mystical Flame":
+            caster.attack(targets, 45)
+            for t in targets:
+                a = R.random()
+                if a < 0.6:
+                    t.conditions.append(condition("Asleep", t, 3, 5))
+                
+        elif self.name == "Corrosive Flame":
+            for t in targets:
+                caster.soulattack([t], 80)
+                
+        elif self.name == "Flame Of Death":
+            for t in targets:
+                b = 2 + R.randint(1,8)
+                t.conditions.append(condition("Take Soul Damage", t, 1, b, value = 50))
+             
+        elif self.name == "Forgetfull Combustion":
+            caster.attack(targets, 60)
+            for t in targets:
+                t.conditions.append(condition("Forget",t, 4, 1, value = 6))
             
+        
             #______________________________________________________________________________________________________________________________________________________________________
             #_______________________________________________________________________________________________________________________________________________________--
             #________________________________________________________-----------------------____________________________________________________________________
@@ -543,17 +632,82 @@ class ability(object):
                     t.freezestacks += 1
                     print(t.name + " was frozen ")
             caster.orbs[1] += 1
-            caster.proficiencies[1] += 1
             
         elif self.name == "Ice Shield":
             caster.conditions.append(condition("More Defense", caster, 1, 1, value = 10))
             caster.conditions.append(condition("Ice Thorns", caster, 3, 1, value = 0.5))
             caster.orbs[1] += 1
-            caster.proficiencies[1] += 1
             
         elif self.name == "Ice Charge":
             caster.orbs[1] += 2
-            caster.proficiencies[1] += 1
+            
+            #______________________________________________________________________________________________________________________________________________________________________
+            #_______________________________________________________________________________________________________________________________________________________--
+            #________________________________________________________-----------------------____________________________________________________________________
+            #tempest:
+            
+        # elif self.name == "Discharge":
+            # caster.attack(targets, 25)
+            # for t in targets:
+                # a = R.randint(0,1)
+                # if a == 0:
+                    # t.freezestacks += 1
+                    # print(t.name + " was frozen ")
+            # caster.orbs[1] += 1
+            # caster.proficiencies[1] += 1
+            
+        # elif self.name == "Wind Shield":
+            # caster.conditions.append(condition("More Defense", caster, 1, 1, value = 10))
+            # caster.conditions.append(condition("Ice Thorns", caster, 3, 1, value = 0.5))
+            # caster.orbs[1] += 1
+            # caster.proficiencies[1] += 1
+            
+        # elif self.name == "Tempest Charge":
+            # caster.orbs[1] += 2
+            # caster.proficiencies[1] += 1
+            
+            #______________________________________________________________________________________________________________________________________________________________________
+            #_______________________________________________________________________________________________________________________________________________________--
+            #________________________________________________________-----------------------____________________________________________________________________
+            #necrotic:
+            
+        elif self.name == "Necrotic Wave":
+            caster.soulattack(targets, 20)
+            for t in targets:
+                caster.heal([caster], 10)
+            caster.orbs[3] += 1
+            
+        elif self.name == "Paralyzing Gaze":
+            for t in targets:
+                b = R.random()
+                if b < 0.2:
+                    t.conditions.append(condition("Paralyzed", t, 1, 1))
+            caster.orbs[3] += 1
+            
+        elif self.name == "Necrotic Charge":
+            caster.orbs[3] += 2
+            
+            #______________________________________________________________________________________________________________________________________________________________________
+            #_______________________________________________________________________________________________________________________________________________________--
+            #________________________________________________________-----------------------____________________________________________________________________
+            #mind:
+        elif self.name == "Mind Burst":
+            caster.attack(targets, 25)
+            for t in targets:
+                a = R.random()
+                if a < 0.4:
+                    t.conditions.append(condition("Forget", t, 4, 1, value = 2))
+            caster.orbs[4] += 1
+            
+        elif self.name == "Dull Mind":
+            for t in targets:
+                a = R.random()
+                if a < 0.2:
+                    t.conditions.append(condition("Asleep", t, 3, 5))
+            caster.orbs[4] += 1
+            
+        elif self.name == "Mind Charge":
+            caster.orbs[4] += 2
             
         elif self.name == "passed":
             caster.abilitylasttarget = []
