@@ -4,6 +4,7 @@ class gstate():
     def __init__(self):
         self.players = [] #has all the players
         self.npcs = [] #has all player except craos. note: "player" and "npc" are different classes
+        self.availabletargets = []
         self.abilities = [[],[],[[],[],[]],[[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]],[]] #keeps track of all abilities in the game, each sublist is the abilities of the correspondend stage. the first sublist are the stage 0 abilities and so on
         #the abilities in stage 2 divide into 3 sublists, offensive, defensive and utility
         self.starterpacks = [[],[],[],[],[],[]] #starter packs are the elemental abilities they gain when they level. there is fire and ice now.
@@ -18,6 +19,7 @@ class gstate():
         
         self.undecided = []
         self.decisionlist = []
+        
 
         
         

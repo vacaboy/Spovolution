@@ -3,8 +3,10 @@ import random as R
 import sys
 import pygame
 
+
 from globals import *
 from creature import player, npc, deadcorpse
+#from creature import *
 from abilities import *
 from state import *
 from simulation import simulation
@@ -76,6 +78,7 @@ abilities[3][0][0].append(ability("Mystical Flame", 3, 1, False, 2, True, "Offen
 abilities[3][0][0].append(ability("Corrosive Flame", 3, 1, False, 2, True, "Offensive", element = 0, orbs = [3,0,0,1,0], proficiencyneeded = 10,  proficiencygiven = [4,0,0,1.5,0]))
 abilities[3][0][0].append(ability("Flame Of Death", 3, 2, False, 2, False, "Offensive", element = 0, orbs = [7,0,0,3,0], proficiencyneeded = 30,  proficiencygiven = [8,0,0,3,0]))
 abilities[3][0][0].append(ability("Forgetfull Combustion", 3, 4, False, 2, True, "Offensive", element = 0, orbs = [7,0,0,0,3], proficiencyneeded = 30,  proficiencygiven = [8,0,0,0,3]))
+abilities[3][0][0].append(ability("Fire Elemental", 3, 0, False, 4, False, "Offensive", channel = 2, element = 0, orbs = [2,0,0,0,0], proficiencyneeded = 20,  proficiencygiven = [2,0,0,0,0]))
 
 #_________________________________________________________________________________________________________________________________________________________________
 #starter packs:
@@ -151,23 +154,30 @@ buffs[2][0].append(buff("Become Paralyzed", "Curse", "Condition", "For life: the
 
 
 #_________________________________________________________________________________________________________________________________________________________________
+gstate.get().system = npc(0 ,0, "system", (255,0,0))
+
 craos = player(375, 450, "craos",(255, 0, 255))
 craos.ai = playeraicomponent(craos)
+craos.owner = gstate.get().system
 
 robly18 = npc(375, 150, "robly18")
 #robly18.ai = attackwhoattackedme(robly18)
 robly18.ai = randomaicomponent(robly18)
+robly18.owner = gstate.get().system
 
 tavos = npc(670,150, "tavos")
 tavos.ai = randomaicomponent(tavos)
+tavos.owner = gstate.get().system
 
 tomis = npc(670, 450, "tomis")
 tomis.ai = randomaicomponent(tomis)
+tomis.owner = gstate.get().system
 
 gstate.get().craos = craos
 
 gstate.get().players = [craos, robly18, tavos, tomis]
 gstate.get().npcs = [robly18, tavos, tomis]
+gstate.get().availabletargets = [craos, robly18, tavos, tomis]
 
 gstate.get().system = npc(0 ,0, "system", (255,0,0))
 
@@ -227,8 +237,10 @@ while gstate.get().run:
                 tomis.abilities = tomis.abilities[1:]        
                 
             elif event.key == pygame.K_v:
-                for p in gstate.get().players:
-                    p.dodge = 1
+                for p in gstate.get().availabletargets:
+                    print(p.name)
+                print(" pets: " + str([ i.name for i in gstate.get().craos.pets]))
+                print([i.HP for i in gstate.get().craos.pets])
                     
             elif event.key == pygame.K_b:
                 print()
@@ -260,7 +272,10 @@ while gstate.get().run:
                 gstate.get().craos.abilities = gstate.get().craos.abilities[1:]
     
     for p in gstate.get().players:
+        #print(str([i[1].name for i in p.ai.decisions]))
         p.ai.decide()
+        for pe in p.pets:
+            pe.ai.decide()
         
     roundphase = roundphase.clock()
     roundphase.draw(screen)

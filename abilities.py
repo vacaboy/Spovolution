@@ -3,6 +3,7 @@ import random as R
 import gstate
 import math
 
+
 #channel [ability.name, turns left, True or False, ability]
 
 class condition(object):
@@ -209,7 +210,6 @@ class condition(object):
             
         elif self.name == "Freezestacks":
             if self.target.freezestacks > 0:
-                print("freezestacks damage " + self.name)
                 if 1 <= self.target.freezestacks <= 5:
                     gstate.get().system.attack([self.target], 5, a = 0)
                 if 6 <= self.target.freezestacks <= 10:
@@ -233,7 +233,7 @@ class condition(object):
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False, element = 0, orbs = [0,0,0,0,0], proficiencyneeded = 0, proficiencygiven = [0,0,0,0,0]):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False, element = 0, orbs = [0,0,0,0,0], proficiencyneeded = 0, proficiencygiven = [0,0,0,0,0], value = 0):
         self.name = name
         self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
@@ -249,11 +249,12 @@ class ability(object):
         self.orbs = orbs
         self.proficiencyneeded = proficiencyneeded
         self.proficiencygiven = proficiencygiven
+        self.value = value
 
         
     def clone(self):
         #print(self.name)
-        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel, self.Return, self.element, self.orbs, self.proficiencyneeded, self.proficiencygiven)     
+        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel, self.Return, self.element, self.orbs, self.proficiencyneeded, self.proficiencygiven, self.value)     
         
         
     def effect(self, targets, caster):
@@ -271,7 +272,10 @@ class ability(object):
             if self.proficiencygiven[i] > 0: #proficiencies 
                 caster.proficiencies[i] += self.proficiencygiven[i]
         
-        if self.name == "Tackle":
+        if self.name == "Attack":
+            caster.attack(targets, self.value)
+        
+        elif self.name == "Tackle":
             caster.attack(targets, 2)
             
 
@@ -617,6 +621,33 @@ class ability(object):
             caster.attack(targets, 60)
             for t in targets:
                 t.conditions.append(condition("Forget",t, 4, 1, value = 6))
+                
+        elif self.name == "Fire Elemental":
+            if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
+                caster.abilitiesinchannel.append([self.name, self.channel - 1, True, self.clone()])
+                #este "True" é verdadeiro ou falso consuante esta habilidade foi usada esta ronda, visto que se a habilidade channel nao for usada uma ronda, entao o channel para.
+                print(caster.name + " began channeling " + self.name + " for 2 rounds")
+                 
+            else: #a é o indice das habilidades que estao em channel que é o desta habilidade
+                a = [i[0] == "Fire Elemental" for i in caster.abilitiesinchannel].index(True)
+                if caster.abilitiesinchannel[a][1] == 1 or caster.abilitiesinchannel[a][1] == 0: #se o channel chegou ao fim, a habilidade atua
+                    caster.abilitiesinchannel[a][1] -= 1
+                    from creature import pet
+                    from aicomponent import attackpet
+                    a = pet(owner = caster, name = "Fire Elemental", color = (255,0,0), HP = 50, MaxHP = 50)
+                    a.ai = attackpet(a)
+                    a.abilities.append(ability("FireElementalAttack", 3, 1, False, 2, True, "Offensive"))
+                    caster.pets.append(a)
+                    gstate.get().availabletargets.append(a)
+                else:
+                    caster.abilitiesinchannel[a][1] -= 1
+                    caster.abilitiesinchannel[a][2] = True
+                     
+                    print("Only " + str(caster.abilitiesinchannel[a][1]) + " turns left until " + caster.name + " uses " + self.name)
+                    
+        elif self.name == "FireElementalAttack":
+            caster.attack(targets, 30)
+            caster.owner.orbs[0] += 1
             
         
             #______________________________________________________________________________________________________________________________________________________________________

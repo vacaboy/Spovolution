@@ -9,6 +9,12 @@ class simulation:
         gstate.get().deadcorpses = gstate.get().deadcorpses + [deadcorpse(p.pos[0], p.pos[1], p.name, p.color, p.HP, p.MaxHP, p.abilitylastused, p.abilitylasttarget, p.EXP, p.EXPtoevolve) for p in gstate.get().players if p.HP <= 0]
         gstate.get().players = [p for p in gstate.get().players if p.HP > 0]
         gstate.get().npcs = [n for n in gstate.get().npcs if n.HP > 0]
+        pe = []
+        for p in gstate.get().players:
+            p.pets = [pe for pe in p.pets if pe.HP > 0]
+            pe = pe + p.pets
+        gstate.get().availabletargets = gstate.get().players + pe
+                    
         
     def stuff(self, info):
         for p in gstate.get().players:

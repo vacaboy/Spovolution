@@ -200,8 +200,10 @@ class choosetarget(state):
                         
                     return calculateeffects(self.roundcount, self.stage)
                 else:
-                    if ((self.targetnumber >= (len(gstate.get().players) - 1)) and not gstate.get().craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
+                    if ((self.targetnumber >= (len(gstate.get().players) - 1 - len(gstate.get().craos.pets))) and not gstate.get().craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
                         for p in gstate.get().npcs:    
+                            for pe in p.pets:
+                                gstate.get().craos.target.append(pe)
                             gstate.get().craos.target.append(p)
 
                         for player in gstate.get().players: #condiçoes que atuam agora:
@@ -211,8 +213,8 @@ class choosetarget(state):
                           
                         return calculateeffects(self.roundcount, self.stage)
                         
-                    elif self.targetnumber >= len(gstate.get().players):
-                        for p in gstate.get().players:    
+                    elif self.targetnumber >= len(gstate.get().availabletargets):
+                        for p in gstate.get().availabletargets:    
                             gstate.get().craos.target.append(p)
 
                         for player in gstate.get().players: #condiçoes que atuam agora:
@@ -234,8 +236,10 @@ class choosetarget(state):
                 return calculateeffects(self.roundcount, self.stage)
             
                 
-        elif ((self.targetnumber >= (len(gstate.get().players) - 1)) and not gstate.get().craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
+        elif ((self.targetnumber >= (len(gstate.get().availabletargets) - 1 - len(gstate.get().craos.pets))) and not gstate.get().craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
             for p in gstate.get().npcs:    
+                for pe in p.pets:
+                    gstate.get().craos.target.append(pe)
                 gstate.get().craos.target.append(p)
             
 
@@ -246,8 +250,8 @@ class choosetarget(state):
               
             return calculateeffects(self.roundcount, self.stage)
 
-        elif self.targetnumber >= len(gstate.get().players): #se a habilidade tem toda a gente como target, siga
-            for p in gstate.get().players:    
+        elif self.targetnumber >= len(gstate.get().availabletargets): #se a habilidade tem toda a gente como target, siga
+            for p in gstate.get().availabletargets:    
                 gstate.get().craos.target.append(p)
             
 
@@ -298,7 +302,6 @@ class calculateeffects(state):
             return endround(self.roundcount, self.stage)
         else:
             return chooseability(self.roundcount, self.stage)
-
 #________________________________________________________________________________________________________________________________________________________
 class endround(state):
     def __init__(self, roundcount, stage):
@@ -525,17 +528,17 @@ class evolve2(state):
                 p.stage = 3
                 p.ai.decisionnumber += 1
                 if not (p == gstate.get().craos):
-                    #p.abilities = []
-                    a = R.randint(0,4)
+                    p.abilities = []
+                    a = R.randint(0,3)
                     if a == 0:
                         p.element = "Fire"
                     elif a == 1:
                         p.element = "Ice"
+                    #elif a == 2:
+                    #    p.element = "Tempest"
                     elif a == 2:
-                        p.element = "Tempest"
-                    elif a == 3:
                         p.element = "Necrotic"
-                    elif a == 4:
+                    elif a == 3:
                         p.element = "Mind"
                 self.gainstarterpack(p)
                 
@@ -698,9 +701,7 @@ class gainability1(state):
                     player.abilities.append(utilityabilities[b].clone())
                     a = True
                     player.EXP -= abilityprice[player.stage]
-
 #
-
 class gainability2(state):
     def __init__(self, roundcount, stage, time = 30):
         super().__init__(roundcount,stage)
@@ -891,7 +892,6 @@ class gainability2(state):
             creature.starterpacks[4] = True
             for ab in gstate.get().starterpacks[4]:
                 creature.abilities.append(ab.clone())
-
 #
 class buffbet1(state):
     def __init__(self, roundcount, stage, time = 30, buffnumber = 1):
@@ -1209,6 +1209,14 @@ class PVEfight(state):
         self.time = time 
         self.time1 = time 
         self.subround = 1
+        self.renderables = [circlerenderable(500,500, 20, (255,0,0))]
+        
+    def draw(self, screen):
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+        gstate.get().craos.drawabilities(screen)
+        for r in self.renderables:
+            r.draw(screen)
+        gstate.get().craos.draw(screen)
         
 class endgame(state):
     def __init__(self, roundcount, stage, victor):

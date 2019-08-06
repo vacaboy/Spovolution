@@ -4,28 +4,34 @@ import random as R
 import pygame
 import gstate
 from renderable import *
+passed = ability("passed", 3, 0, True, 1, False)
 
 class creature:
     def __init__(self, x, y, name = "none", color = "none"):
         self.x, self.y = self.pos = (x, y)
-        self.MaxHP = 20
-        self.HP = 20
-        self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"),ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
+        if color == "none":
+            self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
+        else:
+            self.color = color
+            
+        if name == "none":
+            self.name = R.randint(0,999)
+        else:
+            self.name = name
+        
         self.EXP = 0
         self.stage = 1
-        self.EXPtoevolve = 20
-        self.abilitylastused = []
-        self.abilitylasttarget = []
+        self.MaxHP = 20
+        self.HP = 20
+        self.abilities = []
         self.ability = passed
         self.target = []
-        self.damaged = False #True or False if this player was damaged this turn or not.
-        self.dealtdamage = False #True of False if this player dealt damage this turn or not.
-        self.attacksreceived = 0 #keeps track of how many attacks has this player received
-        self.conditions = [condition("Freezestacks", self, 4, 999)]
-        self.unlearnedabilities = []
         self.abilitiesincooldown = []
         self.abilitiesinchannel = []
         self.abilitiesinforget = []
+            
+        self.conditions = [condition("Freezestacks", self, 4, 999)]
+            
         self.attackmultiplier = 1
         self.attackadd = 0
         self.defensemultiplier = 1
@@ -36,47 +42,21 @@ class creature:
         self.accuracy = 1
         self.dodge = 0
         self.EXPmultiplier = 1
-        self.bet = 0
+        
+        self.damaged = False #True or False if this player was damaged this turn or not.
+        self.dealtdamage = False #True of False if this player dealt damage this turn or not.
+        self.attacksreceived = 0 #keeps track of how many attacks has this player received
+        
+        
         self.freezestacks = 0
+        self.pets = []
+        self.renderables = []
         self.orbs = [0,0,0,0,0]
         self.proficiencies = [0,0,0,0,0]
-        self.starterpacks = [False,False,False,False,False]
         
-        if color == "none":
-            self.color = (R.randint(0,255), R.randint(0,255), R.randint(0,255))
-        else:
-            self.color = color
-            
-        if name == "none":
-            self.name = R.randint(0,999)
-        else:
-            self.name = name
-
-        fontHP = gstate.get().fontHP
-
-        self.renderables = [playerrenderable(self),
-                            textrenderable(x + 55, y, self.color, fontHP, lambda: self.name),
-
-                            barrenderable(x-50, y-80, 100, 10, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP)),
-                            textrenderable(x+55, y-80, (255,0,0), fontHP, lambda: str(self.HP) + "/" + str(self.MaxHP)),
-
-                            barrenderable(x-50, y-60, 100, 10, (0,0,255), (0,0,255), lambda: (self.EXP, self.EXPtoevolve*2), True),
-                            textrenderable(x+55, y-60, (0,0,255), fontHP, lambda: str(self.EXP) + "/" + str(self.EXPtoevolve)),
-
-                            textrenderable(x-55, y+55, self.color, fontHP, lambda: "ability last used:"),
-                            textrenderable(x-55, y+65, self.color, fontHP, lambda: "target:"),
-                            textrenderable(x-55, y+80, self.color, fontHP, lambda: str(self.abilitylasttarget)),
-                            textrenderable(x-50, y+95, self.color, fontHP, lambda: str(self.abilitylastused))]
-            
-
     def startnewround(self):
-        
-        self.damaged = False
-        self.dealtdamage = False
         self.target = []
         self.ability = passed
-        self.attacksreceived = 0
-        self.attackmultiplier = 1
         self.attackadd = 0
         self.defensemultiplier = 1
         self.defenseadd = 0
@@ -85,13 +65,11 @@ class creature:
         self.lifesteal = 0
         self.accuracy = 1
         self.dodge = 0
-        self.EXPmultiplier = 1
-        self.bet = 0
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         if self.MaxHP <= 0:
             self.MaxHP = 1
-        #print()
+            
         for ab in self.abilitiesincooldown:
             ab[1] -= 1
             #print(self.name + " has " + ab[0] + " in cooldown for " + str(ab[1]) + " rounds ")
@@ -111,21 +89,17 @@ class creature:
         self.ai.Qdecided = False
         self.ai.decisions = []
         self.ai.tries = 1
-        #self.abilitylastused = []
-        #self.abilitylasttarget = []
         
-        #freezestacks:
+        for pe in self.pets:
+            pe.startnewround()
         
-         
-            
         
     def draw(self, screen):
         for r in self.renderables:
             r.draw(screen)
-       
-    def drawabilities(self, screen):
-        pass
-     
+        for pe in self.pets:
+            pe.draw(screen)
+            
     def attack(self, targets, damage, a = R.random(), accuracy = 1):
         a = R.random()
         self.dealtdamage = True 
@@ -178,8 +152,70 @@ class creature:
             h1 = round((amount * t.healmultiplier) + t.healadd)
             t.HP += h1
             print(self.name + " healed " + str(h1) + " to " + t.name)
+        
+class character(creature):
+    def __init__(self, x, y, name = "none", color = "none"):
+        super().__init__(x, y, name, color)
+        
+        self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"),ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
+        
+        self.EXPtoevolve = 20
+        self.abilitylastused = []
+        self.abilitylasttarget = []
+        self.unlearnedabilities = []
+        
+        self.bet = 0
+        
+        
+        self.starterpacks = [False,False,False,False,False]
 
-class player(creature):
+        fontHP = gstate.get().fontHP
+
+        self.renderables = [playerrenderable(self),
+                            textrenderable(x + 55, y, self.color, fontHP, lambda: self.name),
+
+                            barrenderable(x-50, y-80, 100, 10, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP)),
+                            textrenderable(x+55, y-80, (255,0,0), fontHP, lambda: str(self.HP) + "/" + str(self.MaxHP)),
+
+                            barrenderable(x-50, y-60, 100, 10, (0,0,255), (0,0,255), lambda: (self.EXP, self.EXPtoevolve*2), True),
+                            textrenderable(x+55, y-60, (0,0,255), fontHP, lambda: str(self.EXP) + "/" + str(self.EXPtoevolve)),
+
+                            textrenderable(x-55, y+55, self.color, fontHP, lambda: "ability last used:"),
+                            textrenderable(x-55, y+65, self.color, fontHP, lambda: "target:"),
+                            textrenderable(x-55, y+80, self.color, fontHP, lambda: str(self.abilitylasttarget)),
+                            textrenderable(x-50, y+95, self.color, fontHP, lambda: str(self.abilitylastused))]
+            
+
+    def startnewround(self):
+        super().startnewround()
+        self.damaged = False
+        self.dealtdamage = False
+        
+        self.attacksreceived = 0
+        self.attackmultiplier = 1
+        
+        self.EXPmultiplier = 1
+        self.bet = 0
+        
+        #print()
+        
+        
+        
+        #self.abilitylastused = []
+        #self.abilitylasttarget = []
+        
+        #freezestacks:
+        
+         
+            
+        
+    def draw(self, screen):
+        super().draw(screen)
+       
+    def drawabilities(self, screen):
+        pass
+#
+class player(character):
         
     def startnewround(self):
         super().startnewround()
@@ -208,57 +244,12 @@ class player(creature):
                 pygame.draw.line(screen, (255,0,0), (10, 10 + 40 * self.abilities.index(ab)), (290, 40 + 40 * self.abilities.index(ab)) )
                 pygame.draw.line(screen, (255,0,0), (10, 40 + 40 * self.abilities.index(ab)), (290, 10 + 40 * self.abilities.index(ab)) )
 #______________________________________________________________________________________________________________________________________________________________________
-
-class npc(creature):
-
-    def chooseability(self):
-        a = True
-        while a:
-            b = R.randint(0, len(self.abilities)-1)
-            if not (self.abilities[b].name in [i[0] for i in self.abilitiesincooldown]):
-                self.ability = self.abilities[b]
-                a = False
-
-    def choosetarget(self, n, selftarget):
-        self.target = []
-        if selftarget: #se te podes dar target a ti mesmo
-            if n >= len(gstate.get().players): #se o numero targets for maior ou igual que o numero de gstate.get().players, entao os targets sao todos os gstate.get().players:
-                for p in gstate.get().players:
-                    self.target.append(p)
-            else:
-                while n > 0: #se nao, vamos escolher gstate.get().players
-                    a = R.randint(0, len(gstate.get().players)-1)
-                    if gstate.get().players[a] in self.target:
-                        pass
-                    else:
-                        self.target.append(gstate.get().players[a])
-                        n -= 1
-        else:#se nao de podes dar target a ti mesmo
-            if n >= (len(gstate.get().players) - 1): #entao se o numero de targets for maior ou igual que o numero de gstate.get().players - 1, entao os targets sao todos os inimigos
-                for p in gstate.get().players:
-                    if p == self:
-                        pass
-                    else:
-                        self.target.append(p)
-            else:
-                while n > 0:#se nao, vamos escolher inimigos
-                    a = R.randint(0, len(gstate.get().players)-1)
-                    if (gstate.get().players[a] in self.target) or (gstate.get().players[a] == self):
-                        pass
-                    else:
-                        self.target.append(gstate.get().players[a])
-                        n -= 1
-        if self.ability.channel > 0: #se a habilidade escolhida tem channel:
-            if self.ability.name in [i[0] for i in self.abilitiesinchannel]: #se o player ja esta a dar channel à habilidade
-                a = [i[0] == self.ability.name for i in self.abilitiesinchannel].index(True)
-                if self.abilitiesinchannel[a][1] >= 2: #se a habilidade nao vai atuar este turno
-                    self.target = []
-            elif not (self.ability.name in [i[0] for i in self.abilitiesinchannel]): #se o player ainda nao esta a dar channel à habilidade:
-                self.target = []
-       
+class npc(character):
+    def startnewround(self):
+        super().startnewround()
     
 #______________________________________________________________________________________________________________________________________________________________________
-class deadcorpse(creature):
+class deadcorpse(character):
     def __init__(self,x ,y, name, color, HP , MaxHP, abilitylastused, abilitylasttarget, EXP, EXPtoevolve):
         super().__init__(x, y, name, color)
         self.HP = HP
@@ -271,3 +262,38 @@ class deadcorpse(creature):
         self.renderables.append(textrenderable(x, y, (0,0,0), gstate.get().fontHP, lambda: "R.I.P."))
         self.renderables.remove(self.renderables[2])
         self.renderables.append(barrenderable(x-50, y-80, 100, 10, (255,0,0), (255,0,0), lambda: (0, self.MaxHP)))
+#
+class monster(creature):
+    def __init__(self, x, y, ai, name = "none", color = "none"):
+        super().__init__(x, y, name, color)
+        self.ai = ai
+        
+    
+class pet(creature):
+    def __init__(self, owner, name = "none", color = "none", rend = "rect", HP = 0, MaxHP = 0):
+        self.owner = owner
+        self.getposition()
+        #self.x = 450
+        #self.y = 410
+        super().__init__(self.x, self.y, name, color)
+        self.HP = HP
+        self.MaxHP = MaxHP
+        if rend == "rect":
+            self.renderables.append(rectrenderable(self.x, self.y, 20, 20, self.color))
+            self.renderables.append(barrenderable(self.x, self.y-10, 20, 5, (255,0,0), (0,255,0), lambda: (self.HP, self.MaxHP)))
+            self.renderables.append(textrenderable(self.x+25, self.y-10, (255,0,0), gstate.get().fontHP, lambda: str(self.HP) + "/" + str(self.MaxHP)))
+            
+    def getposition(self):
+        #pass
+        self.x = self.owner.x + 60
+        y = self.owner.y + (30 * (len(self.owner.pets) - 1))
+        w = True
+        while w:
+            if y in [i.y for i in self.owner.pets]:
+                y = y - 30
+            else:
+                w = False
+        self.y = y
+        
+        
+        
