@@ -11,6 +11,7 @@ class gstate():
         self.deadcorpses = [] #has all the dead folk
         self.log = [] #isto mantem, ao longo de cada turno, quem da dano a quem. [caster, damage, target]
         self.fonttime = pygame.font.SysFont("comicsans", 50, True)
+        self.fontwrite = pygame.font.SysFont("comicsans", 20, True)
         self.fontA = pygame.font.SysFont("mayence", 30, False, True)
         self.fontHP = pygame.font.SysFont("comicsans",20 ,False ,True)
         self.fontend = pygame.font.SysFont("mayence", 180, True)

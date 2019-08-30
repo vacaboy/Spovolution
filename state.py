@@ -13,9 +13,10 @@ class state():
         self.name = "0"
         self.roundcount = roundcount
         self.stage = stage
+        self.showing = False
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage]))]
-                            
+        self.temporaryrenderables = []
         
     def clock(self):
         self.time1 = self.time1 - 0.1
@@ -39,6 +40,40 @@ class state():
             
     def receiveevent(self, event):
         return self
+        
+    def receiveevent1(self, event, screen):
+        mouseposition = event.pos
+        for ren in self.temporaryrenderables:
+            self.renderables.remove(ren)
+        self.temporaryrenderables = []
+        self.showing = False
+        for i in range(len(gstate.get().craos.abilities)):
+                if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
+                    a = rectrenderable(mouseposition[0], mouseposition[1], 200, 150, (193,205,205))
+                    self.renderables.append(a)
+                    self.temporaryrenderables.append(a)
+                    self.write(screen, gstate.get().craos.abilities[i].text, (mouseposition[0]+10, mouseposition[1]+10), 180, gstate.get().fontwrite)
+                self.showing = True
+        return self
+        
+    def write(self, surface, te, pos, width , font, color=(200,0,0)):
+        words = [word.split(' ') for word in te.splitlines()]  # 2D array where each row is a list of words.
+        space = font.size(' ')[0]  # The width of a space.
+        x, y = pos
+        max_width = x + width
+        for line in words:
+            for wo in line:
+                wo_surface = font.render(wo, 0, color)
+                wo_width, wo_height = wo_surface.get_size()
+                if x + wo_width >= max_width:
+                    x = pos[0]  # Reset the x.
+                    y += wo_height  # Start on new row.
+                a = textrenderable1(x, y, color, font, wo)
+                self.renderables.append(a)
+                self.temporaryrenderables.append(a)
+                x += wo_width + space
+            x = pos[0]  # Reset the x.
+            y += wo_height  # Start on new row.
        
 class chooseability(state):
 
@@ -236,7 +271,8 @@ class choosetarget(state):
                 return calculateeffects(self.roundcount, self.stage)
             
                 
-        elif ((self.targetnumber >= (len(gstate.get().availabletargets) - 1 - len(gstate.get().craos.pets))) and not gstate.get().craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
+        elif ((self.targetnumber >= (len(gstate.get().availabletargets
+        ) - 1 - len(gstate.get().craos.pets))) and not gstate.get().craos.ability.selftarget): #se a habilidade tem toda a gente como target, siga
             for p in gstate.get().npcs:    
                 for pe in p.pets:
                     gstate.get().craos.target.append(pe)
@@ -1053,11 +1089,11 @@ class buffbet2(state):
         self.name = "Betting time!"
         self.time = time
         self.time1 = time
-        #self.buffnumber = buffnumber
-        self.buffnumber = 4
+        self.buffnumber = buffnumber
+        #self.buffnumber = 
         self.buff = self.pickbuff()
         #self.done = False
-        self.done = True
+        self.done = False
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),

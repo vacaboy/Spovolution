@@ -4,7 +4,7 @@ import random as R
 import pygame
 import gstate
 from renderable import *
-passed = ability("passed", 3, 0, True, 1, False)
+passed = ability("passed", 3, 0, True, 1,"Does nothing this round", False)
 
 class creature:
     def __init__(self, x, y, name = "none", color = "none"):
@@ -157,7 +157,11 @@ class character(creature):
     def __init__(self, x, y, name = "none", color = "none"):
         super().__init__(x, y, name, color)
         
-        self.abilities = [ability("Tackle",0, 1, False, 2, True, "Offensive"),ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
+        self.abilities = []
+        self.abilities.append(gstate.get().abilities[0][0].clone())
+        self.abilities.append(gstate.get().abilities[0][1].clone())
+        self.abilities.append(gstate.get().abilities[0][2].clone())
+        #[ability("Tackle",0, 1, False, 2, True, "Offensive"),ability("Double Edged Sword",0, 1, False, 2, True, "Offensive"), ability("chill",0, 0, True, 2, False, "Defensive")]
         
         self.EXPtoevolve = 20
         self.abilitylastused = []

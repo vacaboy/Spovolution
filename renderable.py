@@ -35,6 +35,17 @@ class textrenderable(renderable):
         txt = self.font.render(self.textfun(), True, self.color)
         screen.blit(txt, (self.x, self.y))
 
+class textrenderable1(renderable):
+    def __init__(self, x, y, color, font, text):
+        super().__init__(x, y)
+        self.color = color
+        self.font = font
+        self.text = text
+
+    def draw(self, screen):
+        txt = self.font.render(self.text, True, self.color)
+        screen.blit(txt, (self.x, self.y))
+
 class barrenderable(rectrenderable):
     def __init__(self, x, y, w, h, bgcolor, fgcolor, numfun, bordered = False):
         super().__init__(x, y, w, h)

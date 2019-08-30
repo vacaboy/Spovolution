@@ -9,7 +9,7 @@ evolveprice = [0, 20, 100, 1000] #the same but for evolving
 evolveHPgain = [0, 75, 600, 2000] #HP and MaxHP gained when evolving, per stage.
 evolveEXP = [0, 20, 100, 1000] #EXP needed to evolve, per stage.
 evolveround = [0, 7, 20, 45] #round when everyone evolves.
-passed = ability("passed", 3, 0, True, 1, False)
+passed = ability("passed", 3, 0, True, 1, "Does nothing this round", False)
 
 circle0 = circlerenderable(380, 300, 40, (255,0,0))
 circle1 = circlerenderable(480, 300, 40, (135,206,250))
@@ -22,3 +22,6 @@ def Fireelemental(own):
     a.ai = attackpet(a)
     a.abilities.append(ability("FireElementaAttack", 3, 1, False, 2, True, "Offensive", ))
     return a
+    
+    
+

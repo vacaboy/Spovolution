@@ -171,6 +171,7 @@ class condition(object):
             self.target.defenseadd +=self.value
             #print(self.target.name + " receives " + str(self.value) + " less damage this turn")
                 
+            
         elif self.name == "Thorns":
             for a in gstate.get().log:
                 if a[2] == self.target:
@@ -233,7 +234,7 @@ class condition(object):
 
 #______________________________________________________________________________________________________________________________________________________________________
 class ability(object): 
-    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False, element = 0, orbs = [0,0,0,0,0], proficiencyneeded = 0, proficiencygiven = [0,0,0,0,0], value = 0):
+    def __init__(self, name, phase, targetnumber, selftarget, priority, damage, text = " ", abilitytype = "0", worked = False, cooldown = 0, channel = 0, Return = False, element = 0, orbs = [0,0,0,0,0], proficiencyneeded = 0, proficiencygiven = [0,0,0,0,0], value = 0):
         self.name = name
         self.phase = phase
         self.priority = priority #can be 1, 2 or 3. If it's effects are calculated before, during the batle, or after.
@@ -250,11 +251,11 @@ class ability(object):
         self.proficiencyneeded = proficiencyneeded
         self.proficiencygiven = proficiencygiven
         self.value = value
-
+        self.text = text
         
     def clone(self):
         #print(self.name)
-        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.abilitytype, self.worked, self.cooldown, self.channel, self.Return, self.element, self.orbs, self.proficiencyneeded, self.proficiencygiven, self.value)     
+        return ability(self.name, self.phase, self.targetnumber, self.selftarget, self.priority, self.damage, self.text, self.abilitytype, self.worked, self.cooldown, self.channel, self.Return, self.element, self.orbs, self.proficiencyneeded, self.proficiencygiven, self.value)     
         
         
     def effect(self, targets, caster):
@@ -351,8 +352,8 @@ class ability(object):
             if d <= 10:
                 caster.conditions.append(condition("Paralyzed", caster, 1, 1))
                 print(caster.name + " paralyzed himself with Headbutt")
-            a = R.randint(1,11)
-            b = R.randint(1,11)
+            a = R.randint(1,12)
+            b = R.randint(1,12)
             c = a + b
             caster.attack(targets, c)
                 
@@ -511,8 +512,7 @@ class ability(object):
                     print(caster.name + " intimidated " + player.name + " for " + str(a) + " rounds ")
         
         elif self.name == "No Pain, No Gain":
-            caster.EXPmultiplier *= 2
-            print(caster.name + " Gains double experience this turn.")
+            caster.conditions.append(condition("More Experience", caster, 1, 2, value = 2))
             
         elif self.name == "Reflective Mirror":
             for d in gstate.get().decisionlist:
