@@ -171,11 +171,25 @@ class condition(object):
             self.target.defenseadd +=self.value
             #print(self.target.name + " receives " + str(self.value) + " less damage this turn")
                 
+        elif self.name == "More Dodge":
+            self.target.dodge = 1 - ((1 - self.target.dodge) * (1 - self.value))
+            
+        elif self.name == "Less Dodge":
+            pass
+            
+        elif self.name == "More Accuracy":
+            pass
+        
+        elif self.name == "Less Accuracy":
+            self.target.accuracy *= self.value
+            
+        elif self.name == "Get Thorns":
+            self.target.conditions.append(condition("Thorns", self.target, 3, 1, value = self.value))
             
         elif self.name == "Thorns":
             for a in gstate.get().log:
                 if a[2] == self.target:
-                    gstate.get().system.attack([a[0]], self.value, a = 0)
+                    self.target.attack([a[0]], self.value, a = 0, tolog = False)
                     
         elif self.name == "Ice Thorns":
             for a in gstate.get().log:
@@ -207,6 +221,10 @@ class condition(object):
         elif self.name == "Iced":
             self.target.ai.decisionnumber -= 1
             print(self.target.name + " became ICED")
+            
+        elif self.name == "Fiery Spirit":
+            self.target.conditions = [co for co in self.target.conditions if not(co.name == "Iced" or co.name == "Asleep" or co.name == "Paralyzed")]
+                
             
             
         elif self.name == "Freezestacks":
@@ -279,7 +297,6 @@ class ability(object):
         elif self.name == "Tackle":
             caster.attack(targets, 2)
             
-
         elif self.name == "Double Edged Sword":
             caster.attack(targets, 3)
             caster.attack([caster], 2)
@@ -290,39 +307,24 @@ class ability(object):
             else:
                 print("but it failed")
             
-
-            
         elif self.name == "Uncertain Footing":
             if caster.attacksreceived == 0:
                 caster.attack(targets, 7) 
             else:
                 print("but it failed")
             
-
         elif self.name == "QuickPoke":
             caster.attack(targets, 1)
-        
-
                 
         elif self.name == "chill":
             caster.heal([caster], 2) 
             
-
         elif self.name == "Spear Throw":
-            # a = R.randint(1, 100)
-            # if a <= 55:
             b=R.randint(1,12)
             c=R.randint(1,12)
             d=R.randint(1,12)
             e = b + c + d
             caster.attack(targets, e , accuracy = 0.55)
-            # elif 55 < a <= 65:
-                # print("but he missed by a tiny bit")
-            # elif 65 < a <= 90:
-                # print("but he missed")
-            # else:
-                # print("but he missed horrobly")
-
 
         elif self.name == "Kick":
             a = R.randint(1,10)
@@ -330,22 +332,16 @@ class ability(object):
             c = a + b
             caster.attack(targets, c)
        
-
         elif self.name == "Punch":
             caster.attack(targets, 9)
             
-
         elif self.name == "Blood Drain":
-            # d = R.randint(1,100)
-            # if d <= 75:
+
             a = R.randint(1,8)
             b = R.randint(1,8)
             c = a + b
             caster.lifesteal += 1
             caster.attack(targets, c, accuracy = 0.75)
-            # else:
-                # print("but he missed")
-            #caster.abilitiesincooldown.append(["Blood Drain", 1 + 1])
             
         elif self.name == "Headbutt":
             d = R.randint(1,100)
@@ -369,13 +365,10 @@ class ability(object):
                         
                     if caster in d[2]:
                         b += 1 
-            print("On the edge: attacks: " + str(a) + " , on caster: " + str(b))
             if a == b and a > 0:
                 caster.attack(targets, 30)
             else:
                 print("but it failed")
-
-
         
         elif self.name == "Everyone... GET IN HERE!":
             a = 0
@@ -403,7 +396,6 @@ class ability(object):
             else:
                 print("but failed")
                 
-
         elif self.name == "Unleash The Power":
             if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
                 caster.abilitiesinchannel.append([self.name, self.channel - 1, True, self.clone()])
@@ -429,20 +421,15 @@ class ability(object):
                     
         elif self.name == "Refreshing Waters":
             caster.heal([caster], 12) 
-            #caster.abilitiesincooldown.append(["Refreshing Waters", 1 + 1])
-             
 
         elif self.name == "Rock Solid":
             caster.conditions.append(condition("Rock Solid", caster, 1, 1))
-             
-            #caster.abilitiesincooldown.append(["Rock Solid", 5 + 1])
 
         elif self.name == "Regenerate":
             a = R.randint(1,10)
             caster.conditions.append(condition("Regenerate", caster, 1, a))
              
             print(caster.name + " will regenerate 3 HP per turn for " + str(a) + " turns")
-            #caster.abilitiesincooldown.append(["Regenerate", 1 + 1])
 
         elif self.name == "Dodge":
             caster.dodge = (1 - ( (1 - caster.dodge) * (1 - 0.7) ))
@@ -450,24 +437,20 @@ class ability(object):
             
         elif self.name == "Shocking Response":
             caster.conditions.append(condition("Shocking Response", caster, 3, 2 ))
-            #caster.abilitiesincooldown.append(["Shocking Response", 2 + 1])
             
         elif self.name == "Flight":
             a = R.randint(1,3)
             caster.conditions.append(condition("Flight", caster, 1, a))
-            #caster.abilitiesincooldown.append(["Flight", 5 + 1])
             print(caster.name + " is flying for " + str(a) + " round(s)")
             
         elif self.name == "Nature's Call":
             a = R.randint(1,10)
             caster.conditions.append(condition("Nature's Call", caster, 1, a))
-            #caster.abilitiesincooldown.append(["Nature's Call", 2 + 1])
             print(caster.name + " will take 3 less damage for " + str(a) + " turns.")
             
         elif self.name == "Web Cacoon":
             caster.conditions.append(condition("Web Cacoon", caster, 3, 3 + 1))
-            #caster.abilitiesincooldown.append(["Web Cacoon", 3 + 1])
-            print(caster.name + " is encaised in a  Webby Cacoon!")
+            print(caster.name + " is encaised in a  Webby Cacoon for 3 rounds!")
             
         elif self.name == "High Jump":
             caster.conditions.append(condition("High Jump", caster, 3, 1 + 1))
@@ -482,16 +465,12 @@ class ability(object):
             a = R.randint(1,6)
             caster.conditions.append(condition("Fight Stance", caster, 1, a))
             print(caster.name + " will deal 7 more damage for " + str(a) + " turns because of Fight Stance")
-            #caster.abilitiesincooldown.append(["Fight Stance", 2 + 1])
 
         elif self.name == "Limitless":
             caster.conditions.append(condition("Limitless", caster, 1, 1))
-            #caster.abilitiesincooldown.append(["Limitless", 999])
             print(caster.name + " will deal double damage next turn because of Limitless")
 
         elif self.name == "Lullaby":
-            #print(caster.name + " sang a Lullaby")
-            #caster.abilitiesincooldown.append(["Lullaby", 5 + 1])
             for player in targets:
                 if player == caster:
                     pass
@@ -502,7 +481,6 @@ class ability(object):
                         print(caster.name + " put " + player.name + " to Sleep. ")
 
         elif self.name == "Intimidate":
-            #caster.abilitiesincooldown.append(["Intimidate", 1 + 1])
             a = R.randint(1,6)
             for player in targets:
                 if player == caster:
@@ -530,11 +508,7 @@ class ability(object):
                     p.conditions.append(condition("Taunt Origin", caster, 1, 1))
                 else:
                     p.conditions.append(condition("Taunt", p, 1, 1))
-            
-            
-            
-            
-            
+
             #______________________________________________________________________________________________________________________________________________________________________
             #_______________________________________________________________________________________________________________________________________________________--
             #________________________________________________________-----------------------____________________________________________________________________
@@ -649,7 +623,32 @@ class ability(object):
             caster.attack(targets, 30)
             caster.owner.orbs[0] += 1
             
-        
+        elif self.name == "Wall Of Fire":
+            a = R.randint(1,4)
+            print("The Wall of fire will be active this and the next " + str(1+a) + " rounds")
+            for t in targets:
+                t.conditions.append(condition("Thorns", t, 3, 2+a, value = 15))
+                t.conditions.append(condition("More Dodge", t, 1, 1+a, value = 0.3))
+                t.conditions.append(condition("More Dodge", t, 3, 1, value = 0.3))
+                t.conditions.append(condition("Less Accuracy", t, 1, 1+a, value = 0.5))
+                t.conditions.append(condition("Less Accuracy", t, 3, 1, value = 0.5))
+                
+        elif self.name == "Healing Flames":
+            caster.heal([caster], 30) 
+            caster.orbs[0] += 1
+            
+        elif self.name == "Fiery Spirit":
+            a = R.randint(1,8)
+            caster.conditions.append(condition("Fiery Spirit", caster, 4, 2+a))
+            print(caster.name + " has a fiery spirit for this and the next " + str(1+a) + " rounds")
+            
+        elif self.name == "Fire Jet":
+            caster.conditions.append(condition("Immobilized", caster, 1, 1 + 1))
+            caster.conditions.append(condition("Anti-Immobilized", caster, 1, 1))
+            caster.conditions.append(condition("Get Thorns", caster, 4, 1, value = 10))
+            caster.dodge = 1
+            print(caster.name + " Jumped high in the air with a fire jet!")
+            
             #______________________________________________________________________________________________________________________________________________________________________
             #_______________________________________________________________________________________________________________________________________________________--
             #________________________________________________________-----------------------____________________________________________________________________

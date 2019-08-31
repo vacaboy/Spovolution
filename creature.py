@@ -100,8 +100,9 @@ class creature:
         for pe in self.pets:
             pe.draw(screen)
             
-    def attack(self, targets, damage, a = R.random(), accuracy = 1):
-        a = R.random()
+    def attack(self, targets, damage, a = 50, accuracy = 1, tolog = True):
+        if a == 50:
+            a = R.random()
         self.dealtdamage = True 
         d3 = 0
         d1 = ( damage * self.attackmultiplier) + self.attackadd
@@ -109,6 +110,7 @@ class creature:
             d1 = 0
         for t in targets:
             hit = True
+            print("a: " + str(a) +  "   to hit: " +str(self.accuracy * (1 - t.dodge) * accuracy))
             if a <= (self.accuracy * (1 - t.dodge) * accuracy):
                 d2 = round( (d1 * t.defensemultiplier) - t.defenseadd )
                 if d2 < 0:
@@ -121,9 +123,10 @@ class creature:
                 if not (t == self):
                     t.EXP += round((d2 * t.EXPmultiplier))
                 t.HP -= d2
-                gstate.get().log.append([self, d2, t])
-                t.damaged = True
-                t.attacksreceived += 1
+                if tolog:
+                    gstate.get().log.append([self, d2, t])
+                    t.damaged = True
+                    t.attacksreceived += 1
                 print(self.name + " dealt " + str(d2) + " damage to " + t.name)
                 print(str(damage) + " "  +  str(d1) + " "  + str(d2) + " "  + str(d3))
             else:

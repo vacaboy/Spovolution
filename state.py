@@ -565,7 +565,8 @@ class evolve2(state):
                 p.ai.decisionnumber += 1
                 if not (p == gstate.get().craos):
                     p.abilities = []
-                    a = R.randint(0,3)
+                    #a = R.randint(0,3)
+                    a = 0
                     if a == 0:
                         p.element = "Fire"
                     elif a == 1:
@@ -744,11 +745,6 @@ class gainability2(state):
         self.name = "choose ability type"
         self.time = time
         self.time1 = time
-        #self.textoffensive = gstate.get().fontA.render("Offensive", 1, (0,0,0))
-        #self.textdefensive = gstate.get().fontA.render("Defensive", 1, (0,0,0))
-        #self.textutility = gstate.get().fontA.render("Utility", 1, (0,0,0))
-        #circle1 = circlerenderable(380, 300, 40, (255,0,0))
-        #circle2 = circlerenderable(480, 300, 40, (135,206,250))
         self.renderables.append(circle0)
         self.renderables.append(circle1)
         self.renderables.append(circle2)
@@ -768,18 +764,6 @@ class gainability2(state):
     def draw(self, screen):
         super().draw(screen)
 
-        # if gstate.get().craos.stage == 2:
-            # #escolha de tipo de habilidade :
-            # pygame.draw.rect(screen, (255,48,48), (320, 290, 160, 30))
-            # pygame.draw.rect(screen, (30,144,255), (520, 290, 160, 30))
-            # pygame.draw.rect(screen, (0,201,87), (720, 290, 160, 30))
-    # ##        pygame.draw.rect(screen, (227,207,87), (490, 295, 20, 20))
-    # ##        pygame.draw.line(screen, (255,0,0),(490, 295) , (510, 315))
-    # ##        pygame.draw.line(screen, (255,0,0),(510, 295) , (490, 315))
-
-            # screen.blit(self.textoffensive, (330, 295))
-            # screen.blit(self.textdefensive, (530, 295))
-            # screen.blit(self.textutility, (730, 295))
     def effect(self):
         if self.element != " " and not self.done1:
             self.done1 = True
@@ -842,18 +826,27 @@ class gainability2(state):
         elif player.EXP < abilityprice[player.stage]:
             pass
         else:
-            offensiveabilities1 = [ab for ab in offensiveabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
-            if offensiveabilities1 == []:
+            #offensiveabilities1 = [ab for ab in offensiveabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
+            if offensiveabilities == []:
                 pass
             else:
                 while not a:
-                    b = R.randint(0,len(offensiveabilities1) - 1)
+                    b = R.randint(0,len(offensiveabilities) - 1)
                     #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
-                    if (not (offensiveabilities1[b].name in [i.name for i in player.abilities])) and ( not (offensiveabilities1[b].name in [i.name for i in player.unlearnedabilities])): 
-                        
-                        player.abilities.append(offensiveabilities1[b].clone())
-                        a = True
-                        player.EXP -= abilityprice[player.stage]
+                    if (not (offensiveabilities[b].name in [i.name for i in player.abilities])) and ( not (offensiveabilities[b].name in [i.name for i in player.unlearnedabilities])): 
+                        c = R.random()
+                        d = offensiveabilities[b].proficiencyneeded - player.proficiencies[self.element]
+                        print(offensiveabilities[b].name)
+                        print(str(offensiveabilities[b].proficiencyneeded))
+                        print("c: " + str(c))
+                        print("d: " + str(d) + "    1/d:" + str(1/d))
+                        print()
+                        if d <= 1:
+                            d = 1
+                        if c < (1 / d):
+                            player.abilities.append(offensiveabilities[b].clone())
+                            a = True
+                            player.EXP -= abilityprice[player.stage]
 
     def gainabilitydefensive(self, player):
         #verify if the player already has all the abilities:
@@ -868,18 +861,27 @@ class gainability2(state):
         elif player.EXP < abilityprice[player.stage]:
             pass
         else:
-            defensiveabilities1 = [ab for ab in defensiveabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
-            if defensiveabilities1 == []:
+            #defensiveabilities1 = [ab for ab in defensiveabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
+            if defensiveabilities == []:
                 pass
             else:
                 while not a:
-                    b = R.randint(0,len(defensiveabilities1) - 1)
+                    b = R.randint(0,len(defensiveabilities) - 1)
                     #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
-                    if (not (defensiveabilities1[b].name in [i.name for i in player.abilities])) and ( not (defensiveabilities1[b].name in [i.name for i in player.unlearnedabilities])):
-                    #if not (defensiveabilities[b].name in [i.name for i in player.abilities]):
-                        player.abilities.append(defensiveabilities1[b].clone())
-                        a = True
-                        player.EXP -= abilityprice[player.stage]
+                    if (not (defensiveabilities[b].name in [i.name for i in player.abilities])) and ( not (defensiveabilities[b].name in [i.name for i in player.unlearnedabilities])):
+                        c = R.random()
+                        d = defensiveabilities[b].proficiencyneeded - player.proficiencies[self.element]
+                        print(defensiveabilities[b].name)
+                        print(str(defensiveabilities[b].proficiencyneeded))
+                        print("c: " + str(c))
+                        print("d: " + str(d) + "    1/d:" + str(1/d))
+                        print()
+                        if d <= 1:
+                            d = 1
+                        if c < (1 / d):
+                            player.abilities.append(defensiveabilities[b].clone())
+                            a = True
+                            player.EXP -= abilityprice[player.stage]
                     
     def gainabilityutility(self, player):
         #verify if the player already has all the abilities:
@@ -894,18 +896,27 @@ class gainability2(state):
         elif player.EXP < abilityprice[player.stage]:
             pass
         else:
-            utilityabilities1 = [ab for ab in utilityeabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
-            if utilityabilities1 == []:
+            #utilityabilities1 = [ab for ab in utilityeabilities if ab.proficiencyneeded <= player.proficiencies[self.element]]
+            if utilityabilities == []:
                 pass
             else:
                 while not a:
-                    b = R.randint(0,len(utilityabilities1) - 1)
+                    b = R.randint(0,len(utilityabilities) - 1)
                     #verificar se o nome da habilidade não está nos nomes das habilidades do jogador
-                    if (not (utilityabilities1[b].name in [i.name for i in player.abilities])) and ( not (utilityabilities1[b].name in [i.name for i in player.unlearnedabilities])):
-                    #if not (utilityabilities[b].name in [i.name for i in player.abilities]):
-                        player.abilities.append(utilityabilities1[b].clone())
-                        a = True
-                        player.EXP -= abilityprice[player.stage]
+                    if (not (utilityabilities[b].name in [i.name for i in player.abilities])) and ( not (utilityabilities[b].name in [i.name for i in player.unlearnedabilities])):
+                        c = R.random()
+                        d = utilityabilities[b].proficiencyneeded - player.proficiencies[self.element]
+                        print(utilityabilities[b].name)
+                        print(str(utilityabilities[b].proficiencyneeded))
+                        print("c: " + str(c))
+                        print("d: " + str(d) + "    1/d:" + str(1/d))
+                        print()
+                        if d <= 1:
+                            d = 1
+                        if c < (1 / d):
+                            player.abilities.append(utilityabilities[b].clone())
+                            a = True
+                            player.EXP -= abilityprice[player.stage]
                         
     def gainstarterpack(self, creature, element):
         if element == 0:
@@ -1089,11 +1100,11 @@ class buffbet2(state):
         self.name = "Betting time!"
         self.time = time
         self.time1 = time
-        self.buffnumber = buffnumber
-        #self.buffnumber = 
+        #self.buffnumber = buffnumber
+        self.buffnumber = 4
         self.buff = self.pickbuff()
+        self.done = True
         #self.done = False
-        self.done = False
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),
@@ -1286,6 +1297,27 @@ class endgame(state):
         elif self.victor == "lose":
             self.textlose.draw(screen)
             
+class startgame(state):
+    def __init__(self, roundcount, stage, time = 0):
+        super().__init__(roundcount, stage)
+        self.name = "Welcome!"
+        self.time = time
+        self.time1 = time
+        self.renderables.append(rectrenderable(320, 290, 160, 30, (227,207,87)))
+        self.renderables.append(rectrenderable(720, 290, 160, 30, (227,207,87)))
+        
+    def clock(self):
+        return self
             
-            
-            
+    def effect(self): 
+        return self
+
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (0,0,0), (0,0, width, height))
+        for r in self.renderables:
+            r.draw(screen)
+    
+
+    def receiveevent(self, event):
+        pass

@@ -21,26 +21,6 @@ gstate.init()
 screen = pygame.display.set_mode((width, height))
 #screen = pygame.display.set_mode((200, 60))
 
-##def write(surface, text, pos, width , font, color=(200,0,0)):
-##    words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
-##    space = font.size(' ')[0]  # The width of a space.
-##    x, y = pos
-##    max_width = x + width
-##    for line in words:
-##        for wo in line:
-##            wo_surface = font.render(wo, 0, color)
-##            wo_width, wo_height = wo_surface.get_size()
-##            if x + wo_width >= max_width:
-##                x = pos[0]  # Reset the x.
-##                y += wo_height  # Start on new row.
-##            a = textrenderable1(x, y, color, font, wo)
-##            roundphase.renderables.append(a)
-##            roundphase.temporaryrenderables.append(a)
-##            x += wo_width + space
-##        x = pos[0]  # Reset the x.
-##        y += wo_height  # Start on new row.
-
-
 #abilities:
 abilities = gstate.get().abilities
 
@@ -98,13 +78,18 @@ abilities[3][0][0].append(ability("Flame Of Death", 3, 2, False, 2, False,"7 fir
 abilities[3][0][0].append(ability("Forgetfull Combustion", 3, 4, False, 2, True,"7 fire orbs and 3 mind orbs used \nup to 4 targets take 60 damage and forget(6)", "Offensive", element = 0, orbs = [7,0,0,0,3], proficiencyneeded = 30,  proficiencygiven = [8,0,0,0,3]))
 abilities[3][0][0].append(ability("Fire Elemental", 3, 0, False, 4, False," ", "Offensive", channel = 2, element = 0, orbs = [2,0,0,0,0], proficiencyneeded = 20,  proficiencygiven = [2,0,0,0,0]))
 
+abilities[3][0][1].append(ability("Wall Of Fire", 3, 1, True, 1, False, "1 fire orb used \nfor this and the next 1+1d4 rounds, attacks against the target have 30% less accuracy and hurt the attacker for 15 damage. Attacks the target makes have 50% less accuracy", "Defensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 5, proficiencygiven = [1.4,0,0,0,0]))
+abilities[3][0][1].append(ability("Healing Flames", 3, 0, True, 3, False, "cooldown 2 \nHeal 30 HP, gain a fire orb", "Defensive", element = 0,proficiencyneeded = 25, proficiencygiven = [1.4,0,0,0,0], cooldown = 2))
+abilities[3][0][1].append(ability("Fiery Spirit", 3, 0, True, 3, False, "3 fire orbs used \nfor this and the next 1+1d8 rounds, you cant be paralyzed, iced or put to sleep", "Defensive", element = 0,proficiencyneeded = 10, proficiencygiven = [3,0,0,0,0]))
+abilities[3][0][1].append(ability("Fire Jet", 3, 0, True, 1, False, "coolown 1. 1 fire orbs used \nAttacks targeting you this turn miss. You are Immobilized, Attacks made against you next turn deal 10 damage to the attacker", "Defensive", element = 0,proficiencyneeded = 20, proficiencygiven = [3,0,0,0,0], cooldown = 1))
+
 #_________________________________________________________________________________________________________________________________________________________________
 #starter packs:
 starterpacks = gstate.get().starterpacks
 
 starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True,"deal 35 damage. gain a fire orb", "Offensive", element = 0,  proficiencygiven = [1,0,0,0,0]))
 starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False,"this round, you receive 10 less damage from attakcs and you deal 5 damage to the attacker. gain a fire orb", "Defensive", element = 0,  proficiencygiven = [1,0,0,0,0]))
-starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False,"gain 2 fire orbs", "Utility", element = 0,  proficiencygiven = [1,0,0,0,0]))
+starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False,"gain 2 fire orbs", "Utility", element = 0,  proficiencygiven = [1,0,0,0,0], cooldown = 99))
 
 starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True,"deal 25 damage and there is a 50% chance to freeze the target. gain a ice orb", "Offensive", element = 1,  proficiencygiven = [0,1,0,0,0]))
 starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False,"this round, you receive 10 less damage from attacks and the attacker has a 50% chance of being frozen, gain a ice orb", "Defensive", element = 1,  proficiencygiven = [0,1,0,0,0]))
@@ -283,11 +268,15 @@ while gstate.get().run:
             elif event.key == pygame.K_d:
                 for a in gstate.get().abilities[2][1]:
                     gstate.get().craos.abilities.append(a)
+
+                    
             elif event.key == pygame.K_u:
-                for a in gstate.get().abilities[2][2]:
-                    gstate.get().craos.abilities.append(a)
+                gstate.get().players[2].abilities = []
+                gstate.get().players[2].abilities.append(ability("Lullaby",2, 3,False, 3, False,"cooldown 5 \nevery enemy has a 50% chance to fall asleep", "Utility"))
+                gstate.get().players[2].abilities.append(ability("Shocking Response",2, 0,True, 4, False,"cooldown 2 \nFor the next 2 rounds, attacks agains you deal 5 damage to the attacker and they have a 10% chance to be paralyzed", "Defensive"))
+                    
             elif event.key == pygame.K_k:
-                for a in gstate.get().abilities[3][0][0]:
+                for a in gstate.get().abilities[3][0][1]:
                     gstate.get().craos.abilities.append(a)
                 gstate.get().craos.orbs[0] += 50
             elif event.key == pygame.K_r:
