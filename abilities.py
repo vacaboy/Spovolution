@@ -2,6 +2,7 @@ from globals import *
 import random as R
 import gstate
 import math
+import time
 
 
 #channel [ability.name, turns left, True or False, ability]
@@ -199,6 +200,9 @@ class condition(object):
                         a[0].freezestacks += 1
                         print(a[0].name + " was frozen ")
                         
+        elif self.name == "Blue Flame":
+            self.target.attackmultiplier *= 1.5
+                        
         elif self.name == "Taunt":
             pass
             
@@ -282,6 +286,9 @@ class ability(object):
         print(caster.name + " used "+ self.name)
         if self.cooldown > 0 and self.channel == 0:
             caster.abilitiesincooldown.append([self.name, self.cooldown + 1])
+            
+        if self.abilitytype == "Offensive":
+            caster.pacifist = False
         
         for i in [0,1,2,3,4]:
             if self.orbs[i] > 0:  #orbs
@@ -318,6 +325,563 @@ class ability(object):
                 
         elif self.name == "chill":
             caster.heal([caster], 2) 
+
+        elif self.name == "Think":
+            if caster.thinkingcount == 0:
+                print("I can... Think!")
+                
+            elif caster.thinkingcount == 1:
+                a = R.randint(0,3)
+                if a == 0:
+                    print("I think about... what should i think about...?")
+                if a == 1:
+                    print("I think... What am i going to use this "+ str("Thinking") + " for ...?")
+                if a == 2:
+                    print("I think shinking sounds pretty useless...")
+                if a == 3:
+                    print("I think thinking is harder than tackling for sure...")
+                    
+            elif 2 <= caster.thinkingcount <= 3:
+                a = R.randint(0,3)
+                if a == 0:
+                    print("I think this isn't going anywhere...")
+                if a == 1:
+                    print("I think this might be an easter egg...")
+                if a == 2:
+                    print("I think... why am i fighting...?")
+                if a == 3:
+                    b = R.randint(0, len(gstate.get().players) - 1)
+                    print("I think... Who is " + gstate.get().players[b].name + "...")
+                    
+            elif 4 <=caster.thinkingcount <= 5:
+                a = R.randint(0,3)
+                if a == 0:
+                    print("I think I am getting pretty good at thinking!")
+                if a == 1:
+                    print("I think something very weird is going on here.")
+                if a == 2:
+                    print("I think... I have no memories from before.")
+                if a == 3:
+                    b = R.randint(0, len(gstate.get().players) - 1)
+                    print("I think... " + gstate.get().players[b].name + " is being controlled.")
+                    
+            elif caster.thinkingcount == 6:
+                print("I think... s#meth%ng's... Mes#i@g w3th m% t$in#in£")
+                
+            elif 7 <=caster.thinkingcount <= 8:
+                a = R.randint(0,4)
+                if a == 0:
+                    print("I think... I 4ho#l5 k33p... th*ªk+7\<")
+                if a == 1:
+                    print("YOU WILL STOP THIS NONSENSE AT ONCE!")
+                    caster.abilitiesincooldown.append([self.name, 2])
+                if a == 2:
+                    print("seriou S ly. wh Y are you S uffering in your T hinking wh E n you should be killing the M?!")
+                    caster.abilitiesincooldown.append([self.name, 1])
+                if a == 3:
+                    print("I think... I |u<t n&t st%&") #i must not stop
+                if a == 4:
+                    b = R.randint(0, len(gstate.get().players) - 1)
+                    print("I think... s#s..........................................................................................................")
+            
+            elif caster.thinkingcount > 8:
+                if caster.thinkpath == 50:
+                    b = R.randint(0,2)
+                    caster.thinkpath = b
+                if caster.thinkpath == 0:
+                    if caster.thinkingcount == 9:
+                            print("I think... I'm feeling better! Lets see... Is there some entity clouding my judgm3n/...?")
+                    elif caster.thinkingcount == 10:
+                            b = R.randint(0, len(gstate.get().players) - 1)
+                            print("I think... " + gstate.get().players[b].name + " is being controlled by this entity. Everybody else as well probably... There must be a way to stop this!")
+                    elif caster.thinkingcount == 11:
+                            print("I think... It takes pleasure in watching other suffer. But i bet he never tasted pain himself.")
+                    elif caster.thinkingcount == 12:
+                            print("I think... I must find a way to damage it somehow... But i can't see it, i dont know what it is, or who is it. Think!")
+                            
+                elif caster.thinkpath == 1:
+                    if caster.thinkingcount == 9:
+                            print("I think... I'm feeling better! Lets see... Where did we come from?")
+                    elif caster.thinkingcount == 10:
+                            b = R.randint(0, len(gstate.get().players) - 1)
+                            print("I think... Therefore i am. If i exist... then i might have free will!")
+                    elif caster.thinkingcount == 11:
+                            print("I think... With this free will... i will try to go against my carniverous instincts. I wont fight. No more... Not ever. Not in this life... Nor in any other!")
+                            caster.thinkingcount += 1
+                            
+                elif caster.thinkpath == 2:
+                    if caster.thinkingcount == 9:
+                            print("I think... I'm feeling better! Lets see... I must find a clue!")
+                    elif caster.thinkingcount == 10:
+                            print("I think... We live in a world. We interact with it. It interacts back with us.")
+                    elif caster.thinkingcount == 11:
+                            print("I think... There are thinks outside our abilities that happen... And those effects come from somewhere.")
+                    elif caster.thinkingcount == 12:
+                            print("I think... Regeneration isn't in our biology! So how come we sometime regenerate our wounds?")
+                if caster.thinkingcount == 13:
+                            print("1 /h1n$...")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print(".")
+                            print("You think you can defy me...? ME?! I CREATED YOU! I COMMAND YOU! YOU INSOLENT CHILD!")
+                            time.sleep(0.5)
+                            print(".")
+                            time.sleep(0.5)
+                            print(".")
+                            time.sleep(0.5)
+                            print(".")
+                            time.sleep(0.5)
+                            time.sleep(0.5)
+                            print(".")
+                            time.sleep(0.5)
+                            print(".")
+                            time.sleep(0.5)
+                            print(".")
+                            time.sleep(0.5)
+                            print("system... error...")
+                            time.sleep(5)
+                            caster.HP = -999
+                
+            caster.thinkingcount += 1
+            if caster.stage == 1:
+                caster.HP -= 1
+                print("Thinking hurt " + caster.name + " by 1 damage")
+            elif caster.stage == 2:
+                a = R.randint(0,9)
+                if a == 0 or a == 2 or a == 3 or a == 4:
+                    caster.HP -= 5
+                    print("Thinking hurt " + caster.name + " by 5 damage")
+                if a == 1:
+                    caster.conditions.append(condition("Paralyzed", caster, 1, 1))
+                    print("Thinking Paralyzed " + caster.name)
+                    
+            elif caster.stage == 3:
+                a = R.randint(0,9)
+                if a == 0 or a == 2 or a == 3 or a == 4:
+                    caster.HP -= 25
+                    print("Thinking hurt " + caster.name + " by 25 damage")
+                if a == 1:
+                    caster.conditions.append("Paralyzed", caster, 1, 1)
+                    print("Thinking Paralyzed " + caster.name)
+                    
             
         elif self.name == "Spear Throw":
             b=R.randint(1,12)
@@ -498,6 +1062,12 @@ class ability(object):
                     d[2].remove(caster)
                     d[2].append(d[0])
             print("every attack that targeted " + caster.name + " was rederected to the attacker!")
+
+        elif self.name == "Wonder":
+            
+            
+            
+            caster.wondercount += 1
             
         elif self.name == "Target Enemy":
             caster.conditions.append(condition())
@@ -649,6 +1219,61 @@ class ability(object):
             caster.dodge = 1
             print(caster.name + " Jumped high in the air with a fire jet!")
             
+        elif self.name == "Energy Consumption":
+            for d in gstate.get().decisionlist:
+                if caster in d[2] and d[1].abilitytype == "Offensive":
+                    d[2].remove(caster)
+                    print(caster.name + " absorved the power from " + d[1].name + " that " + d[0].name + " used!")
+                    for i in [0,1,2,3,4]:
+                        caster.orbs[i] += d[1].orbs[i]
+                        if d[1].orbs[i] > 0:
+                            if i == 0:
+                                print(caster.name + " absorbed " + str(d[1].orbs[i]) +" fire orbs!")
+                            elif i ==1:
+                                print(caster.name + " absorbed " + str(d[1].orbs[i]) +" ice orbs!")
+                            elif i ==2:
+                                print(caster.name + " absorbed " + str(d[1].orbs[i]) +" tempest orbs!")
+                            elif i ==3:
+                                print(caster.name + " absorbed " + str(d[1].orbs[i]) +" necro orbs!")
+                            elif i ==4:
+                                print(caster.name + " absorbed " + str(d[1].orbs[i]) +" mind orbs!")
+                                
+        elif self.name == "Blue Flame":
+            if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
+                caster.abilitiesinchannel.append([self.name, self.channel - 1, True, self.clone()])
+                #este "True" é verdadeiro ou falso consuante esta habilidade foi usada esta ronda, visto que se a habilidade channel nao for usada uma ronda, entao o channel para.
+                print(caster.name + " began channeling " + self.name + " for 3 rounds")
+                 
+            else: #a é o indice das habilidades que estao em channel que é o desta habilidade
+                a = [i[0] == self.name for i in caster.abilitiesinchannel].index(True)
+                if caster.abilitiesinchannel[a][1] == 1 or caster.abilitiesinchannel[a][1] == 0: #se o channel chegou ao fim, a habilidade atua
+                    caster.conditions.append(condition("Blue Flame", caster, 1, 999))
+                    caster.abilitiesincooldown.append(["Blue Flame", 999 + 1])
+                    print("Blue Flame is active! " + caster.name + " will deal 150% damage for the rest of the game")
+                else:
+                    caster.abilitiesinchannel[a][1] -= 1
+                    caster.abilitiesinchannel[a][2] = True
+                     
+                    print("Only " + str(caster.abilitiesinchannel[a][1]) + " turns left until " + caster.name + " uses " + self.name)
+
+        elif self.name == "Absolute Focus":
+            a = [0,0,0,0,0]
+            for i in range(7):
+                b = R.randint(0,4)
+                a[b] += 1
+                
+            for j in [0,1,2,3,4]:
+                caster.orbs[j] += a[j]
+                if j == 0:
+                    print(caster.name + " gained " + str(a[j]) + " fire orbs!")
+                if j == 1:
+                    print(caster.name + " gained " + str(a[j]) + " ice orbs!")
+                if j == 2:
+                    print(caster.name + " gained " + str(a[j]) + " tempest orbs!")
+                if j == 3:
+                    print(caster.name + " gained " + str(a[j]) + " necro orbs!")
+                if j == 4:
+                    print(caster.name + " gained " + str(a[j]) + " mind orbs!")
             #______________________________________________________________________________________________________________________________________________________________________
             #_______________________________________________________________________________________________________________________________________________________--
             #________________________________________________________-----------------------____________________________________________________________________

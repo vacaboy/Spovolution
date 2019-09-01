@@ -18,6 +18,10 @@ class creature:
             self.name = R.randint(0,999)
         else:
             self.name = name
+        self.thinkingcount = 0
+        self.thinkpath = 50
+        self.pacifist = True
+        self.wondercount = 0
         
         self.EXP = 0
         self.stage = 1

@@ -31,6 +31,8 @@ abilities[0].append(ability("chill",0, 0, True, 2, False,"heal 2 damage" , "Defe
 abilities[1].append(ability("Uncertain Footing",1, 1, False, 3,True,"deals 7 damage if noone attacks you this round", "Offensive"))
 abilities[1].append(ability("Stand Tall",1, 1, False, 3, True,"deals 7 damage if at least 1 attack target you this round", "Offensive"))
 abilities[1].append(ability("QuickPoke",1, 3, False, 1, True,"deals 1 damage to every enemy", "Offensive"))
+abilities[1].append(ability("Think",1, 0, False, 3, False,"Can i... think...?", "Utility"))
+
 
 abilities[2][0].append(ability("Spear Throw",2, 1,False, 2, True,"deals 3d12 damage. 55% accuracy", "Offensive"))
 abilities[2][0].append(ability("Kick",2, 1,False, 2, True,"deals 2d10 damage", "Offensive"))
@@ -61,6 +63,8 @@ abilities[2][2].append(ability("No Pain, No Gain",2, 0,True, 1, False,"cooldown 
 abilities[2][2].append(ability("Reflective Mirror",2, 0, False, 1, False,"usable once \nevery ability targeting you this round is refleted to the caster.", "Utility", cooldown = 999))
 #abilities[2][2].append(ability("Target Enemy",2, 3, False, 3, False," ", "Utility", cooldown = 999))
 #abilities[2][2].append(ability("Taunt",2, 3, False, 3, False," ", "Utility", cooldown = 0))
+abilities[2][2].append(ability("Wonder",2, 0, False, 4, False,"I wonder what this does...", "Utility"))
+
 
 
 
@@ -76,12 +80,16 @@ abilities[3][0][0].append(ability("Mystical Flame", 3, 1, False, 2, True,"3 fire
 abilities[3][0][0].append(ability("Corrosive Flame", 3, 1, False, 2, True,"3 fire orbs and 1 necro orb used \ntarget loses 80 MaxHP", "Offensive", element = 0, orbs = [3,0,0,1,0], proficiencyneeded = 10,  proficiencygiven = [4,0,0,1.5,0]))
 abilities[3][0][0].append(ability("Flame Of Death", 3, 2, False, 2, False,"7 fire orbs and 3 necro orbs used \ntarget loses 50 MaxHP for the next 2+1d8 rounds", "Offensive", element = 0, orbs = [7,0,0,3,0], proficiencyneeded = 30,  proficiencygiven = [8,0,0,3,0]))
 abilities[3][0][0].append(ability("Forgetfull Combustion", 3, 4, False, 2, True,"7 fire orbs and 3 mind orbs used \nup to 4 targets take 60 damage and forget(6)", "Offensive", element = 0, orbs = [7,0,0,0,3], proficiencyneeded = 30,  proficiencygiven = [8,0,0,0,3]))
-abilities[3][0][0].append(ability("Fire Elemental", 3, 0, False, 4, False," ", "Offensive", channel = 2, element = 0, orbs = [2,0,0,0,0], proficiencyneeded = 20,  proficiencygiven = [2,0,0,0,0]))
+abilities[3][0][0].append(ability("Fire Elemental", 3, 0, False, 4, False,"channel 2. 2 orbs per use. \nYou summon a Fire elemental to fight at your side. Each turn, it deals 30 damage to a random target and gives you a fire orb. It has 50 HP", "Offensive", channel = 2, element = 0, orbs = [2,0,0,0,0], proficiencyneeded = 20,  proficiencygiven = [2,0,0,0,0]))
 
 abilities[3][0][1].append(ability("Wall Of Fire", 3, 1, True, 1, False, "1 fire orb used \nfor this and the next 1+1d4 rounds, attacks against the target have 30% less accuracy and hurt the attacker for 15 damage. Attacks the target makes have 50% less accuracy", "Defensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 5, proficiencygiven = [1.4,0,0,0,0]))
 abilities[3][0][1].append(ability("Healing Flames", 3, 0, True, 3, False, "cooldown 2 \nHeal 30 HP, gain a fire orb", "Defensive", element = 0,proficiencyneeded = 25, proficiencygiven = [1.4,0,0,0,0], cooldown = 2))
-abilities[3][0][1].append(ability("Fiery Spirit", 3, 0, True, 3, False, "3 fire orbs used \nfor this and the next 1+1d8 rounds, you cant be paralyzed, iced or put to sleep", "Defensive", element = 0,proficiencyneeded = 10, proficiencygiven = [3,0,0,0,0]))
-abilities[3][0][1].append(ability("Fire Jet", 3, 0, True, 1, False, "coolown 1. 1 fire orbs used \nAttacks targeting you this turn miss. You are Immobilized, Attacks made against you next turn deal 10 damage to the attacker", "Defensive", element = 0,proficiencyneeded = 20, proficiencygiven = [3,0,0,0,0], cooldown = 1))
+abilities[3][0][1].append(ability("Fiery Spirit", 3, 0, True, 3, False, "3 fire orbs used \nfor this and the next 1+1d8 rounds, you cant be paralyzed, iced or put to sleep", "Defensive", orbs = [3,0,0,0,0], element = 0,proficiencyneeded = 10, proficiencygiven = [3,0,0,0,0]))
+abilities[3][0][1].append(ability("Fire Jet", 3, 0, True, 1, False, "coolown 1. 1 fire orbs used \nAttacks targeting you this turn miss. You are Immobilized, Attacks made against you next turn deal 10 damage to the attacker", "Defensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 20, proficiencygiven = [3,0,0,0,0], cooldown = 1))
+
+abilities[3][0][2].append(ability("Energy Consumption", 3, 0, True, 1, False, "usable once. 5 fire orbs used \nevery elemental offensive ability targeting you this round doesn't target you anymore, and you gain orb equal to the cost of those abilities", "Utility", element = 0, orbs = [5,0,0,0,0],proficiencyneeded = 100, proficiencygiven = [20,0,0,0,0], cooldown = 999))
+abilities[3][0][2].append(ability("Blue Flame", 3, 0, True, 3, False, "usable once. 1 fire orbs used per cast. channel 3  \nYour fire turns blue. For the rest of the game, you deal 1.5 damage.", "Utility", element = 0,channel = 3, orbs = [1,0,0,0,0],proficiencyneeded = 50, proficiencygiven = [3.3,0,0,0,0], cooldown = 999))
+abilities[3][0][2].append(ability("Absolute Focus", 3, 0, True, 3, False, "cooldown 4.\nYou get 7 random orbs.", "Utility", element = 0, orbs = [0,0,0,0,0],proficiencyneeded = 1, proficiencygiven = [0,0,0,0,0], cooldown = 4))
 
 #_________________________________________________________________________________________________________________________________________________________________
 #starter packs:
@@ -188,8 +196,8 @@ gstate.get().simulation = simulation()
 
 
 #roundphase = chooseability(1, 1)
-#roundphase = chooseability(6, 1)
-roundphase = chooseability(19, 2)
+roundphase = chooseability(6, 1)
+#roundphase = chooseability(19, 2)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
@@ -271,10 +279,21 @@ while gstate.get().run:
 
                     
             elif event.key == pygame.K_u:
-                gstate.get().players[2].abilities = []
-                gstate.get().players[2].abilities.append(ability("Lullaby",2, 3,False, 3, False,"cooldown 5 \nevery enemy has a 50% chance to fall asleep", "Utility"))
-                gstate.get().players[2].abilities.append(ability("Shocking Response",2, 0,True, 4, False,"cooldown 2 \nFor the next 2 rounds, attacks agains you deal 5 damage to the attacker and they have a 10% chance to be paralyzed", "Defensive"))
-                    
+                #gstate.get().players[2].abilities = []
+                #gstate.get().players[2].abilities.append(ability("Lullaby",2, 3,False, 3, False,"cooldown 5 \nevery enemy has a 50% chance to fall asleep", "Utility"))
+                #gstate.get().players[2].abilities.append(ability("Shocking Response",2, 0,True, 4, False,"cooldown 2 \nFor the next 2 rounds, attacks agains you deal 5 damage to the attacker and they have a 10% chance to be paralyzed", "Defensive"))
+
+                gstate.get().players[2].abilities.append(ability("The Floor Is Lava", 3, 3, False, 4, False,"cooldown:4, 2 fire orb used. \nfor the next 4 rounds, every enemy takes 10 damage", "Offensive", cooldown = 4, element = 0, orbs = [2,0,0,0,0],  proficiencygiven = [2,0,0,0,0]))
+                gstate.get().players[2].abilities.append(ability("Lava Burst", 3, 1, False, 2, True,"1 fire orb used \nwith a 60% chance, the target takes 60 damage and is immobilized", "Offensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 10,  proficiencygiven = [1.5,0,0,0,0]))
+
+                gstate.get().players[1].abilities.append(ability("The Floor Is Lava", 3, 3, False, 4, False,"cooldown:4, 2 fire orb used. \nfor the next 4 rounds, every enemy takes 10 damage", "Offensive", cooldown = 4, element = 0, orbs = [2,0,0,0,0],  proficiencygiven = [2,0,0,0,0]))
+                gstate.get().players[1].abilities.append(ability("Lava Burst", 3, 1, False, 2, True,"1 fire orb used \nwith a 60% chance, the target takes 60 damage and is immobilized", "Offensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 10,  proficiencygiven = [1.5,0,0,0,0]))
+
+                gstate.get().players[3].abilities.append(ability("The Floor Is Lava", 3, 3, False, 4, False,"cooldown:4, 2 fire orb used. \nfor the next 4 rounds, every enemy takes 10 damage", "Offensive", cooldown = 4, element = 0, orbs = [2,0,0,0,0],  proficiencygiven = [2,0,0,0,0]))
+                gstate.get().players[3].abilities.append(ability("Lava Burst", 3, 1, False, 2, True,"1 fire orb used \nwith a 60% chance, the target takes 60 damage and is immobilized", "Offensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 10,  proficiencygiven = [1.5,0,0,0,0]))
+
+
+                
             elif event.key == pygame.K_k:
                 for a in gstate.get().abilities[3][0][1]:
                     gstate.get().craos.abilities.append(a)
