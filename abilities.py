@@ -415,7 +415,7 @@ class ability(object):
                     elif caster.thinkingcount == 10:
                             print("I think... We live in a world. We interact with it. It interacts back with us.")
                     elif caster.thinkingcount == 11:
-                            print("I think... There are thinks outside our abilities that happen... And those effects come from somewhere.")
+                            print("I think... There are thinks outside our abilities that happen... Like those... buffs? And those effects come from somewhere.")
                     elif caster.thinkingcount == 12:
                             print("I think... Regeneration isn't in our biology! So how come we sometime regenerate our wounds?")
                 if caster.thinkingcount == 13:

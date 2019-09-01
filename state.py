@@ -1100,11 +1100,11 @@ class buffbet2(state):
         self.name = "Betting time!"
         self.time = time
         self.time1 = time
-        #self.buffnumber = buffnumber
-        self.buffnumber = 4
+        self.buffnumber = buffnumber
+        #self.buffnumber = 4
         self.buff = self.pickbuff()
-        self.done = True
-        #self.done = False
+        #self.done = True
+        self.done = False
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),
