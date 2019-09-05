@@ -228,9 +228,21 @@ class condition(object):
             
         elif self.name == "Fiery Spirit":
             self.target.conditions = [co for co in self.target.conditions if not(co.name == "Iced" or co.name == "Asleep" or co.name == "Paralyzed")]
-                
             
-            
+        elif self.name == "Rotting Icicles":
+            r = True
+            while r:
+                a = R.randint(0, len(gstate.get().availabletargets) - 1)
+                if gstate.get().availabletargets[a] != self.target:
+                    self.target.soulattack([gstate.get().availabletargets[a]], 20)
+                    b = R.random()
+                    r = False
+                    if b <0.5:
+                        gstate.get().availabletargets[a].freezestacks += 1
+                        print(self.target.name + " threw a Rotting Icicle to " + gstate.get().availabletargets[a].name + " and froze him ")
+                    else:
+                        print(self.target.name + " threw a Rotting Icicle to " + gstate.get().availabletargets[a].name + " but didn't freeze him ")
+                        
         elif self.name == "Freezestacks":
             if self.target.freezestacks > 0:
                 if 1 <= self.target.freezestacks <= 5:
@@ -1295,6 +1307,56 @@ class ability(object):
             
         elif self.name == "Ice Charge":
             caster.orbs[1] += 2
+            
+        elif self.name == "Ice Blast":
+            for t in targets:
+                a = R.random()
+                if a < 0.7: 
+                    t.freezestacks += 1
+                    print(t.name + " was frozen ")
+            caster.attack(targets, 10)
+            caster.orbs[1] += 2
+            
+        elif self.name == "Ice Elemental":
+            from creature import pet
+            from aicomponent import attackpet
+            a = pet(owner = caster, name = "Ice Elemental", color = (135,206,250), HP = 75, MaxHP = 75)
+            a.ai = attackpet(a)
+            a.abilities.append(ability("IceElementalAttack", 3, 1, False, 2, True, "Offensive"))
+            caster.pets.append(a)
+            gstate.get().availabletargets.append(a)
+            
+        elif self.name == "IceElementalAttack":
+            caster.attack(targets, 10)
+            for t in targets:
+                t.freezestacks += 1
+                print(t.name + " was frozen ")
+            caster.owner.orbs[1] += 1
+            
+        elif self.name == "Ice Meteor":
+            caster.attack(targets, 40)
+            for t in targets:
+                a = R.random()
+                if a < 0.2:
+                    t.freezestacks += 1
+                    print(t.name + " was frozen ")
+                    
+        elif self.name == "Ice Hammer":
+            caster.attack(targets, 10)
+            for t in targets:
+                t.freezestacks += 1
+                print(t.name + " was frozen ")
+            caster.orbs[1] += 1
+            
+        elif self.name == "Frost":
+            for t in targets:
+                t.freezestacks += 3
+                print(t.name + " was frozen 3 times!")
+            
+        elif self.name == "Rotting Icicles":
+            a = R.randint(1,4)
+            caster.conditions.append(condition("Rotting Icicles", caster, 2, 1 + a))
+            print(caster.name + " will be throwing rotting icicles for " + str(1+a) + " rounds")
             
             #______________________________________________________________________________________________________________________________________________________________________
             #_______________________________________________________________________________________________________________________________________________________--

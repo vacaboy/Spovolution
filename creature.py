@@ -34,7 +34,7 @@ class creature:
         self.abilitiesinchannel = []
         self.abilitiesinforget = []
             
-        self.conditions = [condition("Freezestacks", self, 4, 999)]
+        self.conditions = [condition("Freezestacks", self, 1, 999)]
             
         self.attackmultiplier = 1
         self.attackadd = 0
@@ -136,8 +136,9 @@ class creature:
             else:
                 print(self.name + " missed the attack against " + t.name)
                 
-    def soulattack(self, targets, damage, a = R.random(), accuracy = 1):
-        a = R.random()
+    def soulattack(self, targets, damage, a = 50, accuracy = 1):
+        if a == 50:
+            a = R.random()
         d3 = 0
         d1 = damage
         if d1 < 0:

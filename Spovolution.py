@@ -91,13 +91,22 @@ abilities[3][0][2].append(ability("Energy Consumption", 3, 0, True, 1, False, "u
 abilities[3][0][2].append(ability("Blue Flame", 3, 0, True, 3, False, "usable once. 1 fire orbs used per cast. channel 3  \nYour fire turns blue. For the rest of the game, you deal 1.5 damage.", "Utility", element = 0,channel = 3, orbs = [1,0,0,0,0],proficiencyneeded = 50, proficiencygiven = [3.3,0,0,0,0], cooldown = 999))
 abilities[3][0][2].append(ability("Absolute Focus", 3, 0, True, 3, False, "cooldown 4.\nYou get 7 random orbs.", "Utility", element = 0, orbs = [0,0,0,0,0],proficiencyneeded = 1, proficiencygiven = [0,0,0,0,0], cooldown = 4))
 
+#Ice:
+abilities[3][1][0].append(ability("Ice Blast", 3, 1, False, 2, True,"cooldown 4 \ndeal 10 damage, there is a 70% cheance to freeze the target gain two ice orb", "Offensive", cooldown = 4, element = 1, proficiencyneeded = 5, proficiencygiven = [0,1.2,0,0,0]))
+abilities[3][1][0].append(ability("Ice Elemental", 3, 0, False, 4, False,"7 ice orbs used. \nYou summon a Ice elemental to fight at your side. Each turn, it deals 10 damage to a random target, freezing them and giving you a ice orb. It has 75 HP", "Offensive", element = 1, orbs = [0,7,0,0,0], proficiencyneeded = 40,  proficiencygiven = [0,3,0,0,0]))
+abilities[3][1][0].append(ability("Ice Meteor", 3, 2, False, 2, True,"2 ice orbs used \ndeal 40 damage to 2 targets, there is a 20% cheance to freeze them", "Offensive", element = 1, proficiencyneeded = 5, proficiencygiven = [0,1.4,0,0,0], orbs = [0,2,0,0,0]))
+abilities[3][1][0].append(ability("Ice Hammer", 3, 1, False, 2, True,"cooldown 2 \ndeal 10 damage to target and freeze it. Gain a ice orb", "Offensive", element = 1, proficiencyneeded = 50, proficiencygiven = [0,2.5,0,0,0]))
+abilities[3][1][0].append(ability("Frost", 3, 1, False, 2, False,"3 ice orbs used \nFreeze target 3 times.", "Offensive", element = 1, proficiencyneeded = 10, proficiencygiven = [0,1.3,0,0,0], orbs = [0,3,0,0,0]))
+abilities[3][1][0].append(ability("Rotting Icicles", 3, 0, False, 3, True,"1 ice orbs and 1 necro orb used \nfor the next 1+1d4 rounds, a random target will lose 20 MaxHP and has a 50% chance to freeze.", "Offensive", element = 1, proficiencyneeded = 20, proficiencygiven = [0,2,0,1,0], orbs = [0,3,0,1,0]))
+
+
 #_________________________________________________________________________________________________________________________________________________________________
 #starter packs:
 starterpacks = gstate.get().starterpacks
 
 starterpacks[0].append(ability("Fire Burst", 3, 1, False, 2, True,"deal 35 damage. gain a fire orb", "Offensive", element = 0,  proficiencygiven = [1,0,0,0,0]))
 starterpacks[0].append(ability("Fire Shield", 3, 0, True, 1, False,"this round, you receive 10 less damage from attakcs and you deal 5 damage to the attacker. gain a fire orb", "Defensive", element = 0,  proficiencygiven = [1,0,0,0,0]))
-starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False,"gain 2 fire orbs", "Utility", element = 0,  proficiencygiven = [1,0,0,0,0], cooldown = 99))
+starterpacks[0].append(ability("Fire Charge", 3, 0, True, 2, False,"gain 2 fire orbs", "Utility", element = 0,  proficiencygiven = [1,0,0,0,0]))
 
 starterpacks[1].append(ability("Icicle Spike", 3, 1, False, 2, True,"deal 25 damage and there is a 50% chance to freeze the target. gain a ice orb", "Offensive", element = 1,  proficiencygiven = [0,1,0,0,0]))
 starterpacks[1].append(ability("Ice Shield", 3, 0, True, 1, False,"this round, you receive 10 less damage from attacks and the attacker has a 50% chance of being frozen, gain a ice orb", "Defensive", element = 1,  proficiencygiven = [0,1,0,0,0]))
