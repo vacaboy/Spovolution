@@ -41,7 +41,7 @@ class aicomponent:
             
     def verify(self):
         for i in [0,1,2,3,4]: #verificar se tens orbs suficientes para usar a habilidade
-            if self.creature.ability.orbs[i] > self.creature.orbs[i]:
+            if self.creature.ability.orbs[i] + self.creature.orbsplanningtobeused[i] > self.creature.orbs[i]:
                 self.verified = False
         if self.creature.ability.name in [i[1].name for i in self.decisions]: #ver se ja usaste esta habilidade
             self.verified = False
@@ -66,7 +66,8 @@ class aicomponent:
         self.verify()
         if self.Qdecided == False and self.verified:
             self.decisions.append((self.creature, self.creature.ability, self.creature.target))
-            
+            for i in [0,1,2,3,4]:
+                self.creature.orbsplanningtobeused[i] += self.creature.ability.orbs[i]
             self.creature.ability = passed
             self.creature.target = []
             

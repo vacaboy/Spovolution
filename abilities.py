@@ -200,6 +200,13 @@ class condition(object):
                         a[0].freezestacks += 1
                         print(a[0].name + " was frozen ")
                         
+        elif self.name == "Ice Wall":
+            for a in gstate.get().decisionlist:
+                if a[0] == self.target:
+                    if a[1].abilitytype == "Offensive":
+                        a[0].freezestacks += 1
+                        print(a[0].name + " froze because he's being involved by a ice wall.")
+                
         elif self.name == "Blue Flame":
             self.target.attackmultiplier *= 1.5
                         
@@ -242,6 +249,30 @@ class condition(object):
                         print(self.target.name + " threw a Rotting Icicle to " + gstate.get().availabletargets[a].name + " and froze him ")
                     else:
                         print(self.target.name + " threw a Rotting Icicle to " + gstate.get().availabletargets[a].name + " but didn't freeze him ")
+                        
+        elif self.name == "Ice Tomb":
+            if self.target.shield > 0:
+                self.duration += 1
+                gstate.get().system.heal([self.target],30)
+                self.target.EXP += 30
+                self.target.conditions.append(condition("Paralyzed", self.target, 1, 1))
+                
+        elif self.name == "Icy Skin1":
+            self.target.defenseadd += 5
+            
+        elif self.name == "Icy Skin2":
+            if self.target.freezestacks > 0:
+                gstate.get().system.heal([self.target], 10 * self.target.freezestacks)
+                
+        elif self.name == "Predictive Ice":
+            self.target.defenseadd -= 20
+            r = True
+            for l in gstate.get().log:
+                if l[2] == self.target and l[1] > 0:
+                    r = False
+            if r:
+                tar = [a for a in gstate.get().availabletargets if (a != self.target) and(a not in [b for b in self.target.pets])]
+                self.target.attack(tar, 10)
                         
         elif self.name == "Freezestacks":
             if self.target.freezestacks > 0:
@@ -894,7 +925,6 @@ class ability(object):
                     caster.conditions.append("Paralyzed", caster, 1, 1)
                     print("Thinking Paralyzed " + caster.name)
                     
-            
         elif self.name == "Spear Throw":
             b=R.randint(1,12)
             c=R.randint(1,12)
@@ -1210,10 +1240,10 @@ class ability(object):
             print("The Wall of fire will be active this and the next " + str(1+a) + " rounds")
             for t in targets:
                 t.conditions.append(condition("Thorns", t, 3, 2+a, value = 15))
-                t.conditions.append(condition("More Dodge", t, 1, 1+a, value = 0.3))
-                t.conditions.append(condition("More Dodge", t, 3, 1, value = 0.3))
-                t.conditions.append(condition("Less Accuracy", t, 1, 1+a, value = 0.5))
-                t.conditions.append(condition("Less Accuracy", t, 3, 1, value = 0.5))
+                t.conditions.append(condition("More Dodge", t, 1, 2+a, value = 0.3))
+                #t.conditions.append(condition("More Dodge", t, 3, 1, value = 0.3))
+                t.conditions.append(condition("Less Accuracy", t, 1, 2+a, value = 0.5))
+                #t.conditions.append(condition("Less Accuracy", t, 3, 1, value = 0.5))
                 
         elif self.name == "Healing Flames":
             caster.heal([caster], 30) 
@@ -1358,6 +1388,62 @@ class ability(object):
             caster.conditions.append(condition("Rotting Icicles", caster, 2, 1 + a))
             print(caster.name + " will be throwing rotting icicles for " + str(1+a) + " rounds")
             
+        elif self.name == "Ice Wall":
+            a = R.randint(1,4)
+            print("The Ice Wall will be active this and the next " + str(1+a) + " rounds")
+            for t in targets:
+                t.conditions.append(condition("Ice Thorns", t, 3, 2+a, value = 0.7))
+                t.conditions.append(condition("Ice Wall", t, 3, 2+a, value = 0.3))
+                
+        elif self.name == "Ice Tomb":
+            caster.conditions.append(condition("Ice Tomb", caster, 3, 1))
+            caster.shield += 100
+            print(caster.name + " Encased himself in a ice tomb!")
+                
+        elif self.name == "Icy Skin":
+            if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
+                caster.abilitiesinchannel.append([self.name, self.channel - 1, True, self.clone()])
+                #este "True" é verdadeiro ou falso consuante esta habilidade foi usada esta ronda, visto que se a habilidade channel nao for usada uma ronda, entao o channel para.
+                print(caster.name + " began channeling " + self.name + " for 2 rounds")
+                 
+            else: #a é o indice das habilidades que estao em channel que é o desta habilidade
+                a = [i[0] == self.name for i in caster.abilitiesinchannel].index(True)
+                if caster.abilitiesinchannel[a][1] == 1 or caster.abilitiesinchannel[a][1] == 0: #se o channel chegou ao fim, a habilidade atua
+                    caster.freezestacks = 0
+                    caster.conditions.append(condition("Icy Skin1", caster, 1, 999))
+                    caster.conditions.append(condition("Icy Skin2", caster, 4, 999))
+                    caster.abilitiesincooldown.append([self.name, 999 + 1])
+                    print("Icy Skin is active! " + caster.name + " will receive 5 less damage for the rest of the game.")
+                else:
+                    caster.abilitiesinchannel[a][1] -= 1
+                    caster.abilitiesinchannel[a][2] = True
+                     
+                    print("Only " + str(caster.abilitiesinchannel[a][1]) + " turns left until " + caster.name + " uses " + self.name)
+                
+        elif self.name == "Ice Armor":
+            if  not (self.name in [i[0] for i in caster.abilitiesinchannel]): #verificar se o player ja esta a dar channel à habilidade
+                caster.abilitiesinchannel.append([self.name, self.channel - 1, True, self.clone()])
+                #este "True" é verdadeiro ou falso consuante esta habilidade foi usada esta ronda, visto que se a habilidade channel nao for usada uma ronda, entao o channel para.
+                print(caster.name + " began channeling " + self.name + " for 2 rounds")
+                 
+            else: #a é o indice das habilidades que estao em channel que é o desta habilidade
+                a = [i[0] == self.name for i in caster.abilitiesinchannel].index(True)
+                if caster.abilitiesinchannel[a][1] == 1 or caster.abilitiesinchannel[a][1] == 0: #se o channel chegou ao fim, a habilidade atua
+                    caster.shield += 150
+                    caster.abilitiesincooldown.append([self.name, 7 + 1])
+                    print(caster.name + " is wearing a 150 HP suit of armor.")
+                else:
+                    caster.abilitiesinchannel[a][1] -= 1
+                    caster.abilitiesinchannel[a][2] = True
+                     
+                    print("Only " + str(caster.abilitiesinchannel[a][1]) + " turns left until " + caster.name + " uses " + self.name)
+                    
+        elif self.name == "Predictive Ice":
+            caster.defenseadd += 20
+            caster.conditions.append(condition("Ice Thorns", caster, 3, 1))
+            caster.conditions.append(condition("Predictive Ice", caster, 3, 1))
+            
+                
             #______________________________________________________________________________________________________________________________________________________________________
             #_______________________________________________________________________________________________________________________________________________________--
             #________________________________________________________-----------------------____________________________________________________________________

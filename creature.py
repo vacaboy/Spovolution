@@ -27,6 +27,7 @@ class creature:
         self.stage = 1
         self.MaxHP = 20
         self.HP = 20
+        self.shield = 0
         self.abilities = []
         self.ability = passed
         self.target = []
@@ -56,6 +57,7 @@ class creature:
         self.pets = []
         self.renderables = []
         self.orbs = [0,0,0,0,0]
+        self.orbsplanningtobeused = [0,0,0,0,0]
         self.proficiencies = [0,0,0,0,0]
         
     def startnewround(self):
@@ -69,10 +71,14 @@ class creature:
         self.lifesteal = 0
         self.accuracy = 1
         self.dodge = 0
+        self.orbsplanningtobeused = [0,0,0,0,0]
         if self.HP >self.MaxHP:
             self.HP = self.MaxHP
         if self.MaxHP <= 0:
             self.MaxHP = 1
+            
+        if self.shield > 0:
+            print(self.name + " has a shield of " + str(self.shield) + " protecting him.")
             
         for ab in self.abilitiesincooldown:
             ab[1] -= 1
@@ -126,7 +132,15 @@ class creature:
                 self.EXP += round((d2 * self.EXPmultiplier))
                 if not (t == self):
                     t.EXP += round((d2 * t.EXPmultiplier))
-                t.HP -= d2
+                    
+                if t.shield > 0: #tirar dano ao shield primeiro:
+                    if t.shield  >= d2:
+                        t.shield -= d2
+                    else:
+                        t.HP -= (d2 - t.shield)
+                        t.shield = 0
+                else:
+                    t.HP -= d2
                 if tolog:
                     gstate.get().log.append([self, d2, t])
                     t.damaged = True

@@ -49,10 +49,11 @@ class state():
         self.showing = False
         for i in range(len(gstate.get().craos.abilities)):
                 if  10 <= mouseposition[0]  <= 290 and (10 + (40 * i)) <= mouseposition[1] <= (40 + (40 * i)):
-                    a = rectrenderable(mouseposition[0], mouseposition[1], 200, 150, (193,205,205))
+                    a = rectrenderable(30, mouseposition[1], 250, 200, (193,205,205))
                     self.renderables.append(a)
                     self.temporaryrenderables.append(a)
-                    self.write(screen, gstate.get().craos.abilities[i].text, (mouseposition[0]+10, mouseposition[1]+10), 180, gstate.get().fontwrite)
+                    self.write(screen, gstate.get().craos.abilities[i].text, (40, mouseposition[1]+10), 180, gstate.get().fontwrite)
+
                 self.showing = True
         return self
         
@@ -593,15 +594,19 @@ class evolve2(state):
         print(mouseposition)
         if ((mouseposition[0] - 380)**2 + (mouseposition[1] - 300)**2) <= 40**2:
             gstate.get().craos.element = "Fire"
+            self.done = True
         elif ((mouseposition[0] - 480)**2 + (mouseposition[1] - 300)**2) <= 40**2:
             gstate.get().craos.element = "Ice"
+            self.done = True
         elif ((mouseposition[0] - 580)**2 + (mouseposition[1] - 300)**2) <= 40**2:
             gstate.get().craos.element = "Tempest"
+            self.done = True
         elif ((mouseposition[0] - 680)**2 + (mouseposition[1] - 300)**2) <= 40**2:
             gstate.get().craos.element = "Necrotic"
+            self.done = True
         elif ((mouseposition[0] - 780)**2 + (mouseposition[1] - 300)**2) <= 40**2:
             gstate.get().craos.element = "Mind"
-        self.done = True
+            self.done = True
         return self
         
     def gainstarterpack(self, creature):
@@ -784,20 +789,28 @@ class gainability2(state):
     def receiveevent(self, event):
         mouseposition = event.pos
         print(mouseposition)
+        r = False
         if not self.done1:
             if ((mouseposition[0] - 380)**2 + (mouseposition[1] - 300)**2) <= 40**2:
                 self.element = 0
+                r = True
             elif ((mouseposition[0] - 480)**2 + (mouseposition[1] - 300)**2) <= 40**2:
                 self.element = 1
+                r = True
             elif ((mouseposition[0] - 580)**2 + (mouseposition[1] - 300)**2) <= 40**2:
                 self.element = 2
+                r = True
             elif ((mouseposition[0] - 680)**2 + (mouseposition[1] - 300)**2) <= 40**2:
                 self.element = 3
+                r = True
             elif ((mouseposition[0] - 780)**2 + (mouseposition[1] - 300)**2) <= 40**2:
                 self.element = 4
-            if not gstate.get().craos.starterpacks[self.element]:
-                self.gainstarterpack(gstate.get().craos, self.element)
-                return chooseability(self.roundcount, self.stage, self.time)
+                r = True
+            if r:
+                if not gstate.get().craos.starterpacks[self.element]:
+                    self.gainstarterpack(gstate.get().craos, self.element)
+                    gstate.get().craos.EXP -= abilityprice[gstate.get().craos.stage]
+                    return chooseability(self.roundcount, self.stage, self.time)
             return self
         else:
             if  320 <= mouseposition[0]  <= 480 and 290 <= mouseposition[1] <= 320:
@@ -836,13 +849,14 @@ class gainability2(state):
                     if (not (offensiveabilities[b].name in [i.name for i in player.abilities])) and ( not (offensiveabilities[b].name in [i.name for i in player.unlearnedabilities])): 
                         c = R.random()
                         d = offensiveabilities[b].proficiencyneeded - player.proficiencies[self.element]
+                        if d <= 1:
+                            d = 1
                         print(offensiveabilities[b].name)
                         print(str(offensiveabilities[b].proficiencyneeded))
                         print("c: " + str(c))
                         print("d: " + str(d) + "    1/d:" + str(1/d))
                         print()
-                        if d <= 1:
-                            d = 1
+                        
                         if c < (1 / d):
                             player.abilities.append(offensiveabilities[b].clone())
                             a = True
@@ -871,13 +885,13 @@ class gainability2(state):
                     if (not (defensiveabilities[b].name in [i.name for i in player.abilities])) and ( not (defensiveabilities[b].name in [i.name for i in player.unlearnedabilities])):
                         c = R.random()
                         d = defensiveabilities[b].proficiencyneeded - player.proficiencies[self.element]
+                        if d <= 1:
+                            d = 1
                         print(defensiveabilities[b].name)
                         print(str(defensiveabilities[b].proficiencyneeded))
                         print("c: " + str(c))
                         print("d: " + str(d) + "    1/d:" + str(1/d))
                         print()
-                        if d <= 1:
-                            d = 1
                         if c < (1 / d):
                             player.abilities.append(defensiveabilities[b].clone())
                             a = True
@@ -906,13 +920,13 @@ class gainability2(state):
                     if (not (utilityabilities[b].name in [i.name for i in player.abilities])) and ( not (utilityabilities[b].name in [i.name for i in player.unlearnedabilities])):
                         c = R.random()
                         d = utilityabilities[b].proficiencyneeded - player.proficiencies[self.element]
+                        if d <= 1:
+                            d = 1
                         print(utilityabilities[b].name)
                         print(str(utilityabilities[b].proficiencyneeded))
                         print("c: " + str(c))
                         print("d: " + str(d) + "    1/d:" + str(1/d))
                         print()
-                        if d <= 1:
-                            d = 1
                         if c < (1 / d):
                             player.abilities.append(utilityabilities[b].clone())
                             a = True
