@@ -209,9 +209,9 @@ gstate.get().system = npc(0 ,0, "system", (255,0,0))
 gstate.get().simulation = simulation()
 
 
-#roundphase = chooseability(1, 1)
+roundphase = chooseability(1, 1)
 #roundphase = chooseability(6, 1)
-roundphase = chooseability(19, 2)
+#roundphase = chooseability(19, 2)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
