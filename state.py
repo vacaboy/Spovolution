@@ -105,7 +105,11 @@ class chooseability(state):
             for corpse in gstate.get().deadcorpses:
                 if corpse.name == "craos":
                     return endgame(self.roundcount, self.stage, "lose")
-
+        for p in gstate.get().players:
+            #print(str([i[1].name for i in p.ai.decisions]))
+            p.ai.decide()
+            for pe in p.pets:
+                pe.ai.decide()
 
         if len(gstate.get().players) == 1 and gstate.get().players[0].name == "craos":
             return endgame(self.roundcount, self.stage, "win")
@@ -209,6 +213,11 @@ class choosetarget(state):
         return self
      
     def effect(self):
+        # for p in gstate.get().players:
+            # #print(str([i[1].name for i in p.ai.decisions]))
+            # p.ai.decide()
+            # for pe in p.pets:
+                # pe.ai.decide()
     
         if gstate.get().craos.ability.Return:
             print("passou aqui")
@@ -334,6 +343,7 @@ class calculateeffects(state):
         return self
 
     def effect(self):
+        gstate.get().craos.ai.decide()
         if [p for p in gstate.get().players if p.ai.Qdecided] == gstate.get().players: #se todos ja se decidiram:
             gstate.get().simulation.run(gstate.get().decisionlist)
             return endround(self.roundcount, self.stage)
@@ -357,19 +367,17 @@ class endround(state):
                 if c.priority == "endround":
                     c.effect()
         
-        
+        print(gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
         for player in gstate.get().players:
             player.startnewround()
             player.ai.gatherinfo()
-            
+        print(gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+        
         for p in gstate.get().players: #conditions that act at the end of the round.
             for c in p.conditions:
                 if c.priority == "Afterstartnewround":
                     c.effect()
             
-        #print()
-        #a = [[l[0].name, l[1], l[2].name] for l in gstate.get().log]
-        #print(str(a))
         
         gstate.get().log = []   
         gstate.get().decisionlist = []
@@ -377,6 +385,7 @@ class endround(state):
         print("round: " + str(self.roundcount + 1))
         
         if (self.roundcount + 1) == evolveround[1]:
+            print("1" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
             return buffbet1(self.roundcount + 1, self.stage)
         elif (self.roundcount + 1) == evolveround[2]:
             return buffbet2(self.roundcount + 1, self.stage)
@@ -475,9 +484,10 @@ class evolve1(state):
                     self.gainabilitydefensive(p)
                     self.gainabilityutility(p)
                     #p.abilities.append(ability("Reflective Mirror",2, 3, False, 1, False, "Utility", cooldown = 999))
-                    
+                print("4" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
                 p.startnewround()
                 
+            print("5" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
             gstate.get().decisionlist = []
             return chooseability(self.roundcount, self.stage + 1)
         else:
@@ -567,19 +577,20 @@ class evolve2(state):
                 p.stage = 3
                 p.ai.decisionnumber += 1
                 if not (p == gstate.get().craos):
-                    p.abilities = []
+                    if p.ai.name != "attackwhoattackedmeaicomponent":
+                        p.abilities = []
                     #a = R.randint(0,3)
-                    a = 0
+                    a = R.randint(0,1)
                     if a == 0:
-                        p.element = "Fire"
+                        p.element = 0
                     elif a == 1:
-                        p.element = "Ice"
+                        p.element = 1
                     #elif a == 2:
-                    #    p.element = "Tempest"
+                    #    p.element = 2
                     elif a == 2:
-                        p.element = "Necrotic"
+                        p.element = 3
                     elif a == 3:
-                        p.element = "Mind"
+                        p.element = 4
                 self.gainstarterpack(p)
                 
                 p.startnewround()
@@ -595,40 +606,40 @@ class evolve2(state):
         mouseposition = event.pos
         print(mouseposition)
         if ((mouseposition[0] - 380)**2 + (mouseposition[1] - 300)**2) <= 40**2:
-            gstate.get().craos.element = "Fire"
+            gstate.get().craos.element = 0
             self.done = True
         elif ((mouseposition[0] - 480)**2 + (mouseposition[1] - 300)**2) <= 40**2:
-            gstate.get().craos.element = "Ice"
+            gstate.get().craos.element = 1
             self.done = True
         elif ((mouseposition[0] - 580)**2 + (mouseposition[1] - 300)**2) <= 40**2:
-            gstate.get().craos.element = "Tempest"
+            gstate.get().craos.element = 2
             self.done = True
         elif ((mouseposition[0] - 680)**2 + (mouseposition[1] - 300)**2) <= 40**2:
-            gstate.get().craos.element = "Necrotic"
+            gstate.get().craos.element = 3
             self.done = True
         elif ((mouseposition[0] - 780)**2 + (mouseposition[1] - 300)**2) <= 40**2:
-            gstate.get().craos.element = "Mind"
+            gstate.get().craos.element = 4
             self.done = True
         return self
         
     def gainstarterpack(self, creature):
-        if creature.element == "Fire":
+        if creature.element == 0:
             creature.starterpacks[0] = True
             for ab in gstate.get().starterpacks[0]:
                 creature.abilities.append(ab.clone())
-        elif creature.element == "Ice":
+        elif creature.element == 1:
             creature.starterpacks[1] = True
             for ab in gstate.get().starterpacks[1]:
                 creature.abilities.append(ab.clone())
-        elif creature.element == "tempest":
+        elif creature.element == 2:
             creature.starterpacks[2] = True
             for ab in gstate.get().starterpacks[2]:
                 creature.abilities.append(ab.clone())
-        elif creature.element == "Necrotic":
+        elif creature.element == 3:
             creature.starterpacks[3] = True
             for ab in gstate.get().starterpacks[3]:
                 creature.abilities.append(ab.clone())
-        elif creature.element == "Mind":
+        elif creature.element == 4: 
             creature.starterpacks[4] = True
             for ab in gstate.get().starterpacks[4]:
                 creature.abilities.append(ab.clone())
@@ -988,6 +999,7 @@ class buffbet1(state):
                             textrenderable(890, 470, (0,0,0), gstate.get().fontA, lambda: "-10"),
                             textrenderable(950, 470, (0,0,0), gstate.get().fontA, lambda: "-50"),
                             textrenderable(780, 95, (0,0,0), gstate.get().fontHP, lambda: "Place your Bet")]
+        print(str(gstate.get().players[1].ability.name) + " " + str([i.name for i in gstate.get().players[1].target]))
                             
         if self.buff.bufftype1 == "Blessing":
             self.renderables.append(rectrenderable(320, 260, 670, 100, (255,185,15)))
@@ -1012,9 +1024,13 @@ class buffbet1(state):
             if self.buffnumber < 4:
                 for p in gstate.get().players:
                     p.bet = 0
+                print(str(gstate.get().players[1].ability.name) + " " + str([i.name for i in gstate.get().players[1].target]))
+                print("2" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+                print(str(gstate.get().players[1].ability.name) + " " + str([i.name for i in gstate.get().players[1].target]))
                 return buffbet1(self.roundcount, self.stage, buffnumber = self.buffnumber + 1)
                 
             elif self.buffnumber == 4:
+                print("3" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
                 return evolve1(self.roundcount, self.stage)
             else:
                 print("wtf?!")
@@ -1084,7 +1100,8 @@ class buffbet1(state):
             print(p.name + " placed a bet of " + str(p.bet))
         for w in winner:
             self.buff.effect(w)
-            print(w.name + " won this bet!")
+            print(w.name + " won this effect!")
+            print("he got: " + self.buff.text)
         
         self.done = True
         
@@ -1106,6 +1123,7 @@ class buffbet1(state):
         for w in winner:
             self.buff.effect(w)
             print(w.name + " lost this bet!")
+            print("he got: " + self.buff.text)
         
         self.done = True
         
@@ -1116,11 +1134,11 @@ class buffbet2(state):
         self.name = "Betting time!"
         self.time = time
         self.time1 = time
-        self.buffnumber = buffnumber
-        #self.buffnumber = 4
+        #self.buffnumber = buffnumber
+        self.buffnumber = 4
         self.buff = self.pickbuff()
-        #self.done = True
-        self.done = False
+        self.done = True
+        #self.done = False
         self.renderables = [textrenderable(300, 10, (255,0,0), gstate.get().fonttime, lambda: self.name + ":" + str(self.time)),
                             textrenderable(300, 30, (0,0,255), gstate.get().fonttime, lambda: "round:" + str(self.roundcount) + "/" + str(evolveround[stage])),
                             rectrenderable(770, 380, 40, 40, (227,207,87)),
@@ -1239,6 +1257,7 @@ class buffbet2(state):
         for w in winner:
             self.buff.effect(w)
             print(w.name + " won this bet!")
+            print("he got: " + self.buff.text)
         
         self.done = True
         
@@ -1260,6 +1279,7 @@ class buffbet2(state):
         for w in winner:
             self.buff.effect(w)
             print(w.name + " lost this bet!")
+            print("he got: " + self.buff.text)
         
         self.done = True
         

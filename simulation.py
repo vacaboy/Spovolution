@@ -27,7 +27,7 @@ class simulation:
                     p.abilitylasttarget.append([i.name for i in d[2]])
     
     def run(self, info):
-        for i in [1,2,3,4]:#ha 4 fazes de combate
+        for i in [0,1,2,3,4]:#ha 4 fazes de combate
             print()
             for a in info:#fazer as decisoes.
                 

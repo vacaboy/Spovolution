@@ -35,7 +35,7 @@ class creature:
         self.abilitiesinchannel = []
         self.abilitiesinforget = []
             
-        self.conditions = [condition("Freezestacks", self, 1, 999)]
+        self.conditions = [condition("Freezestacks", self, 4, 999)]
             
         self.attackmultiplier = 1
         self.attackadd = 0
@@ -96,13 +96,11 @@ class creature:
                 self.abilities.append(ab[0].clone())
         self.abilitiesinforget = [ab for ab in self.abilitiesinforget if ab[1] > 0]
         
-        self.ai.Qdecided = False
-        self.ai.decisions = []
-        self.ai.tries = 1
+
+        self.ai.startnewround()
         
         for pe in self.pets:
             pe.startnewround()
-        
         
     def draw(self, screen):
         for r in self.renderables:
@@ -120,7 +118,7 @@ class creature:
             d1 = 0
         for t in targets:
             hit = True
-            print("a: " + str(a) +  "   to hit: " +str(self.accuracy * (1 - t.dodge) * accuracy))
+            #print("a: " + str(a) +  "   to hit: " +str(self.accuracy * (1 - t.dodge) * accuracy))
             if a <= (self.accuracy * (1 - t.dodge) * accuracy):
                 d2 = round( (d1 * t.defensemultiplier) - t.defenseadd )
                 if d2 < 0:
@@ -146,7 +144,7 @@ class creature:
                     t.damaged = True
                     t.attacksreceived += 1
                 print(self.name + " dealt " + str(d2) + " damage to " + t.name)
-                print(str(damage) + " "  +  str(d1) + " "  + str(d2) + " "  + str(d3))
+                #print(str(damage) + " "  +  str(d1) + " "  + str(d2) + " "  + str(d3))
             else:
                 print(self.name + " missed the attack against " + t.name)
                 
@@ -211,7 +209,6 @@ class character(creature):
                             textrenderable(x-55, y+80, self.color, fontHP, lambda: str(self.abilitylasttarget)),
                             textrenderable(x-50, y+95, self.color, fontHP, lambda: str(self.abilitylastused))]
             
-
     def startnewround(self):
         super().startnewround()
         self.damaged = False

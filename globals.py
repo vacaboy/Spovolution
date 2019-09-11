@@ -17,11 +17,11 @@ circle2 = circlerenderable(580, 300, 40, (10,50,255))
 circle3 = circlerenderable(680, 300, 40, (200,206,200))
 circle4 = circlerenderable(780, 300, 40, (255,0,100))
 
-def Fireelemental(own):
-    a = pet(owner = own, name = "Fire Elemental", color = (255,0,0), HP = 50, MaxHP = 50)
-    a.ai = attackpet(a)
-    a.abilities.append(ability("FireElementaAttack", 3, 1, False, 2, True, "Offensive", ))
-    return a
+#def Fireelemental(own):
+ #   a = pet(owner = own, name = "Fire Elemental", color = (255,0,0), HP = 50, MaxHP = 50)
+  #  a.ai = attackpet(a)
+   # a.abilities.append(ability("FireElementaAttack", 3, 1, False, 2, True, "Offensive", ))
+    #return a
     
     
 

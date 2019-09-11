@@ -87,13 +87,13 @@ abilities[3][0][1].append(ability("Healing Flames", 3, 0, True, 3, False, "coold
 abilities[3][0][1].append(ability("Fiery Spirit", 3, 0, True, 3, False, "3 fire orbs used \nfor this and the next 1+1d8 rounds, you cant be paralyzed, iced or put to sleep", "Defensive", orbs = [3,0,0,0,0], element = 0,proficiencyneeded = 10, proficiencygiven = [3,0,0,0,0]))
 abilities[3][0][1].append(ability("Fire Jet", 3, 0, True, 1, False, "coolown 1. 1 fire orbs used \nAttacks targeting you this turn miss. You are Immobilized, Attacks made against you next turn deal 10 damage to the attacker", "Defensive", element = 0, orbs = [1,0,0,0,0], proficiencyneeded = 20, proficiencygiven = [3,0,0,0,0], cooldown = 1))
 
-abilities[3][0][2].append(ability("Energy Consumption", 3, 0, True, 1, False, "usable once. 5 fire orbs used \nevery elemental offensive ability targeting you this round doesn't target you anymore, and you gain orb equal to the cost of those abilities", "Utility", element = 0, orbs = [5,0,0,0,0],proficiencyneeded = 100, proficiencygiven = [20,0,0,0,0], cooldown = 999))
+abilities[3][0][2].append(ability("Energy Consumption", 3, 0, True, 1, False, "cooldown 5. 5 fire orbs used \nevery elemental offensive ability targeting you this round doesn't target you anymore, and you gain orb equal to the cost of those abilities", "Utility", element = 0, orbs = [5,0,0,0,0],proficiencyneeded = 100, proficiencygiven = [20,0,0,0,0], cooldown = 5))
 abilities[3][0][2].append(ability("Blue Flame", 3, 0, True, 3, False, "usable once. 1 fire orbs used per cast. channel 3  \nYour fire turns blue. For the rest of the game, you deal 1.5 damage.", "Utility", element = 0,channel = 3, orbs = [1,0,0,0,0],proficiencyneeded = 50, proficiencygiven = [3.3,0,0,0,0], cooldown = 999))
 abilities[3][0][2].append(ability("Absolute Focus", 3, 0, True, 3, False, "cooldown 4.\nYou get 7 random orbs.", "Utility", element = 0, orbs = [0,0,0,0,0],proficiencyneeded = 1, proficiencygiven = [0,0,0,0,0], cooldown = 4))
 
 #Ice:
 abilities[3][1][0].append(ability("Ice Blast", 3, 1, False, 2, True,"cooldown 4 \ndeal 10 damage, there is a 70% cheance to freeze the target. gain two ice orb", "Offensive", cooldown = 4, element = 1, proficiencyneeded = 5, proficiencygiven = [0,1.2,0,0,0]))
-abilities[3][1][0].append(ability("Ice Elemental", 3, 0, False, 4, False,"7 ice orbs used. \nYou summon a Ice elemental to fight at your side. Each turn, it deals 10 damage to a random target, freezing them and giving you a ice orb. It has 75 HP", "Offensive", element = 1, orbs = [0,7,0,0,0], proficiencyneeded = 40,  proficiencygiven = [0,3,0,0,0]))
+abilities[3][1][0].append(ability("Ice Elemental", 3, 0, False, 4, False,"7 ice orbs used. \nYou summon a Ice elemental to fight at your side. Each turn, it deals 10 damage to a random target, freezing them and giving you a ice orb. It has 70 HP", "Offensive", element = 1, orbs = [0,7,0,0,0], proficiencyneeded = 40,  proficiencygiven = [0,3,0,0,0]))
 abilities[3][1][0].append(ability("Ice Meteor", 3, 2, False, 2, True,"2 ice orbs used \ndeal 40 damage to 2 targets, there is a 20% cheance to freeze them", "Offensive", element = 1, proficiencyneeded = 5, proficiencygiven = [0,1.4,0,0,0], orbs = [0,2,0,0,0]))
 abilities[3][1][0].append(ability("Ice Hammer", 3, 1, False, 2, True,"cooldown 2 \ndeal 10 damage to target and freeze it. Gain a ice orb", "Offensive", element = 1, proficiencyneeded = 50, proficiencygiven = [0,2.5,0,0,0]))
 abilities[3][1][0].append(ability("Frost", 3, 1, False, 2, False,"3 ice orbs used \nFreeze target 3 times.", "Offensive", element = 1, proficiencyneeded = 10, proficiencygiven = [0,1.3,0,0,0], orbs = [0,3,0,0,0]))
@@ -104,6 +104,17 @@ abilities[3][1][1].append(ability("Ice Tomb", 3, 0, True, 1, False, "7 ice orb u
 abilities[3][1][1].append(ability("Icy Skin", 3, 0, True, 3, False, "2 iced orbs per use. channel 2. one use only\nFor the rest of the game, attack against you deal 5 less damage. Your freeze stacks go to zero and henever you get frozen, you don't and you gain 10 HP instead.", "Defensive", orbs = [0,2,0,0,0], element = 1,channel = 2, cooldown = 999,proficiencyneeded = 50, proficiencygiven = [0,3.5,0,0,0]))
 abilities[3][1][1].append(ability("Ice Armor", 3, 0, True, 3, False, "2 iced orbs per use. channel 2 cooldown 7\nYou create a suit of armor that has 150 HP. Whenever you take damage. the armor takes it instead.", "Defensive", orbs = [0,2,0,0,0], element = 1,channel = 2, cooldown = 7,proficiencyneeded = 20, proficiencygiven = [0,2,0,0,0]))
 abilities[3][1][1].append(ability("Predictive Ice", 3, 0, True, 1, False, "3 ice orb and 1 mind orb used.\nThis round, attacks amde against you deal 20 less damage and freeze the atacker. If there was no attack made against you this turn, then you deal 10 damage and freeze all enemies.","Defensive", orbs = [0,3,0,0,1], element = 1, proficiencyneeded = 15, proficiencygiven = [0,3,0,0,1]))
+
+abilities[3][1][2].append(ability("Energy Consumption", 3, 0, True, 1, False, "cooldown 5. 5 ice orbs used \nevery elemental offensive ability targeting you this round doesn't target you anymore, and you gain orb equal to the cost of those abilities", "Utility", element = 1, orbs = [0,5,0,0,0],proficiencyneeded = 100, proficiencygiven = [20,0,0,0,0], cooldown = 5))
+abilities[3][1][2].append(ability("Absolute Focus", 3, 0, True, 3, False, "cooldown 4.\nYou get 7 random orbs.", "Utility", element = 1, orbs = [0,0,0,0,0],proficiencyneeded = 1, proficiencygiven = [0,0,0,0,0], cooldown = 4))
+abilities[3][1][2].append(ability("True Ice", 3, 0, True, 3, False, "usable once. 2 ice orbs used per cast. channel 3  \nuse 2 ice orbs. channel 3. Your ice is colder than cold itself, when an ability you cast freezes someone, it has a 33% chance to Ice him.", "Utility", element = 1,channel = 3, orbs = [0,2,0,0,0],proficiencyneeded = 60, proficiencygiven = [0,3.5,0,0,0], cooldown = 999))
+abilities[3][1][2].append(ability("Icy Floor", 3, 0, True, 3, False, "4 ice orbs \nfor the next 2+1d4 rounds, everyone except you has 50% less accuracy.", "Utility", element = 1,orbs = [0,4,0,0,0],proficiencyneeded = 30, proficiencygiven = [0,2,0,0,0]))
+abilities[3][1][2].append(ability("Absolute Zero", 3, 0, True, 3, False, "5 ice orbs per use. channel 2 \nThe air itself becomes frigid. Everything except you receives 15 freeze stacks", "Utility", element = 1,channel = 2,orbs = [0,5,0,0,0],proficiencyneeded = 70, proficiencygiven = [0,2.5,0,0,0]))
+abilities[3][1][2].append(ability("Icy Wave", 3, 0, True, 3, False, "2 ice orbs \nevery enemy has a 60% chance of being frozen and a 20% of being iced.", "Utility", element = 1,orbs = [0,2,0,0,0],proficiencyneeded = 10, proficiencygiven = [0,1.2,0,0,0]))
+abilities[3][1][2].append(ability("Cool Down", 3, 0, True, 3, False, "4 ice orbs \neveryone that has a freeze stack, gains another 3 freeze stacks", "Utility", element = 1,orbs = [0,4,0,0,0],proficiencyneeded = 13, proficiencygiven = [0,1.4,0,0,0]))
+abilities[3][1][2].append(ability("Criostasis", 3, 1, True, 3, False, "4 ice orbs, cooldown 5 \nTarget is Paralyzed.", "Utility", element = 1,orbs = [0,4,0,0,0],proficiencyneeded = 23, proficiencygiven = [0,1.5,0,0,0], cooldown = 5))
+abilities[3][1][2].append(ability("Living Ice", 3, 0, True, 3, False, "1 ice orb and 1 mind orb, usable once \nNext turn, the first ability you use from the Ice element is cast twice. The second cast doesn't use orbs.", "Utility", element = 1,orbs = [0,1,0,0,1],proficiencyneeded = 70, proficiencygiven = [0,2,0,0,2], cooldown = 999))
+
 
 #_________________________________________________________________________________________________________________________________________________________________
 #starter packs:
@@ -186,8 +197,8 @@ craos.ai = playeraicomponent(craos)
 craos.owner = gstate.get().system
 
 robly18 = npc(375, 150, "robly18")
-#robly18.ai = attackwhoattackedme(robly18)
-robly18.ai = randomaicomponent(robly18)
+robly18.ai = attackwhoattackedme(robly18)
+#robly18.ai = randomaicomponent(robly18)
 robly18.owner = gstate.get().system
 
 tavos = npc(670,150, "tavos")
@@ -209,9 +220,9 @@ gstate.get().system = npc(0 ,0, "system", (255,0,0))
 gstate.get().simulation = simulation()
 
 
-roundphase = chooseability(1, 1)
+#roundphase = chooseability(1, 1)
 #roundphase = chooseability(6, 1)
-#roundphase = chooseability(19, 2)
+roundphase = chooseability(19, 2)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
@@ -321,12 +332,14 @@ while gstate.get().run:
 
             elif event.key == pygame.K_e:
                 gstate.get().craos.EXP += 500
+                gstate.get().craos.orbs[1] += 500
+                gstate.get().craos.proficiencies[1] += 500
     
-    for p in gstate.get().players:
-        #print(str([i[1].name for i in p.ai.decisions]))
-        p.ai.decide()
-        for pe in p.pets:
-            pe.ai.decide()
+##    for p in gstate.get().players:
+##        #print(str([i[1].name for i in p.ai.decisions]))
+##        p.ai.decide()
+##        for pe in p.pets:
+##            pe.ai.decide()
         
     roundphase = roundphase.clock()
     roundphase.draw(screen)
