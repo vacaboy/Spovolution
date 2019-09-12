@@ -577,7 +577,7 @@ class evolve2(state):
                 p.stage = 3
                 p.ai.decisionnumber += 1
                 if not (p == gstate.get().craos):
-                    if p.ai.name != "attackwhoattackedmeaicomponent":
+                    if p.ai.name == "randomaicomponent":
                         p.abilities = []
                     #a = R.randint(0,3)
                     a = R.randint(0,1)
