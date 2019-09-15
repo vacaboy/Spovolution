@@ -367,11 +367,11 @@ class endround(state):
                 if c.priority == "endround":
                     c.effect()
         
-        print(gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+       # print(gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
         for player in gstate.get().players:
             player.startnewround()
             player.ai.gatherinfo()
-        print(gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+      #  print(gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
         
         for p in gstate.get().players: #conditions that act at the end of the round.
             for c in p.conditions:
@@ -385,7 +385,7 @@ class endround(state):
         print("round: " + str(self.roundcount + 1))
         
         if (self.roundcount + 1) == evolveround[1]:
-            print("1" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+           # print("1" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
             return buffbet1(self.roundcount + 1, self.stage)
         elif (self.roundcount + 1) == evolveround[2]:
             return buffbet2(self.roundcount + 1, self.stage)
@@ -484,10 +484,10 @@ class evolve1(state):
                     self.gainabilitydefensive(p)
                     self.gainabilityutility(p)
                     #p.abilities.append(ability("Reflective Mirror",2, 3, False, 1, False, "Utility", cooldown = 999))
-                print("4" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+         #       print("4" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
                 p.startnewround()
                 
-            print("5" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+           # print("5" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
             gstate.get().decisionlist = []
             return chooseability(self.roundcount, self.stage + 1)
         else:
@@ -1025,12 +1025,12 @@ class buffbet1(state):
                 for p in gstate.get().players:
                     p.bet = 0
                 print(str(gstate.get().players[1].ability.name) + " " + str([i.name for i in gstate.get().players[1].target]))
-                print("2" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+          #      print("2" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
                 print(str(gstate.get().players[1].ability.name) + " " + str([i.name for i in gstate.get().players[1].target]))
                 return buffbet1(self.roundcount, self.stage, buffnumber = self.buffnumber + 1)
                 
             elif self.buffnumber == 4:
-                print("3" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
+     #           print("3" + gstate.get().players[1].name + " " +str([i.name for i in gstate.get().players[1].ai.whoattackedme]))
                 return evolve1(self.roundcount, self.stage)
             else:
                 print("wtf?!")

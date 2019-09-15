@@ -197,8 +197,8 @@ craos.ai = playeraicomponent(craos)
 craos.owner = gstate.get().system
 
 robly18 = npc(375, 150, "robly18")
-robly18.ai = attackwhoattackedme(robly18)
-#robly18.ai = randomaicomponent(robly18)
+#robly18.ai = attackwhoattackedme(robly18)
+robly18.ai = randomaicomponent(robly18)
 robly18.owner = gstate.get().system
 
 tavos = npc(670,150, "tavos")
@@ -220,9 +220,9 @@ gstate.get().system = npc(0 ,0, "system", (255,0,0))
 gstate.get().simulation = simulation()
 
 
-#roundphase = chooseability(1, 1)
+roundphase = chooseability(1, 1)
 #roundphase = chooseability(6, 1)
-roundphase = chooseability(19, 2)
+#roundphase = chooseability(19, 2)
 print("round: 1")
 
 #______________________________________________________________________________________________________________________________________________________________________
